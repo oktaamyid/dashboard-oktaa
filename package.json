@@ -12,6 +12,7 @@
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@heroicons/react": "^2.2.0",
     "firebase": "^11.4.0",
+    "firebase-functions": "^6.3.2",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
