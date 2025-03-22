@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-interface RouteContext {
-     params?: Promise<{ shortUrl?: string }>;
+interface Params {
+     shortUrl?: string;
 }
 
-export async function GET(req: Request, context: RouteContext) {
-     const shortUrl = (await context?.params)?.shortUrl;
+export async function GET(request: Request, { params }: { params: Params }) {
+     const shortUrl = params?.shortUrl || "";
 
      if (!shortUrl) {
           return NextResponse.json({ error: "Invalid short URL" }, { status: 400 });
