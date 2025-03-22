@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 
-export default function ShortUrlPage({ params }: { params: { shortUrl?: string } }) {
+export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: string }> }) {
+     const params = use(props.params);
      const router = useRouter();
      const [originalUrl, setOriginalUrl] = useState<string | null>(null);
      const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
