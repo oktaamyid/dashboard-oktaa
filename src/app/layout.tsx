@@ -7,12 +7,23 @@ import Header from '@/components/header';
 import { useState } from 'react';
 import { usePathname } from "next/navigation";
 import { Analytics } from "@vercel/analytics/react"
+import { Metadata } from "next";
 
 const raleway = Raleway({
      subsets: ['latin'],
      weight: ['400', '700'],
      variable: '--font-raleway',
 });
+
+export async function generateMetadata(): Promise<Metadata> {
+     return {
+          metadataBase: new URL("https://your-domain.com"),
+          title: "Oktaa.",
+          icons: "/oktaa-white.svg",
+          authors: [{ name: "Firtiansyah Okta Resama", url: "https://your-domain.com"}],
+          description: "Oktaa is the domain name from Firtiansyah Okta, and then use the Okta for brand identity name."
+     };
+}
 
 export default function RootLayout({
      children,
