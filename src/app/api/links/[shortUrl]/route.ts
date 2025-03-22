@@ -3,11 +3,11 @@ import { db } from "@/lib/firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 interface RouteContext {
-     params?: { shortUrl?: string };
+     params?: Promise<{ shortUrl?: string }>;
 }
 
 export async function GET(req: Request, context: RouteContext) {
-     const shortUrl = context?.params?.shortUrl;
+     const shortUrl = (await context?.params)?.shortUrl;
 
      if (!shortUrl) {
           return NextResponse.json({ error: "Invalid short URL" }, { status: 400 });
