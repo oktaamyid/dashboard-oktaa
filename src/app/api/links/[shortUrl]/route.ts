@@ -3,17 +3,17 @@ import { db } from "@/lib/firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 interface RouteContext {
-     params: Promise<{ shortUrl: string }>;
+     params?: { shortUrl?: string };
 }
 
 export async function GET(req: Request, context: RouteContext) {
+     const shortUrl = context?.params?.shortUrl;
+
+     if (!shortUrl) {
+          return NextResponse.json({ error: "Invalid short URL" }, { status: 400 });
+     }
+
      try {
-          const shortUrl = (await context.params).shortUrl;
-
-          if (!shortUrl) {
-               return NextResponse.json({ error: "Invalid short URL" }, { status: 400 });
-          }
-
           const q = query(collection(db, "links"), where("shortUrl", "==", shortUrl));
           const querySnapshot = await getDocs(q);
 
@@ -25,11 +25,11 @@ export async function GET(req: Request, context: RouteContext) {
 
           return NextResponse.json({
                originalUrl: linkData.originalUrl,
-               showConfirmationPage: linkData.showConfirmationPage ?? false,
-          }, { status: 200 });
-
+               requireConfirmationPage: linkData.requireConfirmationPage ?? false, // Checkbox saat membuat short URL
+               showConfirmationPage: linkData.showConfirmationPage ?? false, 
+          });
      } catch (error) {
-          console.error("[API ERROR] Error fetching link:", error);
+          console.error("Error fetching link:", error);
           return NextResponse.json({ error: "Failed to fetch link" }, { status: 500 });
      }
 }
