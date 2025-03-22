@@ -35,7 +35,7 @@ export default function RootLayout({
 
      return (
           <html lang="en">
-               <body className={`${raleway.variable} ${isShortUrlPage ? "bg-white" : "antialiased bg-gradient-to-br from-gray-700 to-black/80"}`}>
+               <body className={`${raleway.variable} ${isShortUrlPage ? "bg-gray-100" : "antialiased bg-gradient-to-br from-gray-700 to-black/80"}`}>
                     {isShortUrlPage ? (
                          <div className="p-6">{children}</div>
                     ) : (

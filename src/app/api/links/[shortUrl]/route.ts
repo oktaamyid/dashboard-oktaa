@@ -25,8 +25,7 @@ export async function GET(req: Request, context: RouteContext) {
 
           return NextResponse.json({
                originalUrl: linkData.originalUrl,
-               requireConfirmationPage: linkData.requireConfirmationPage ?? false, // Checkbox saat membuat short URL
-               showConfirmationPage: linkData.showConfirmationPage ?? false, 
+               showConfirmationPage: linkData.showConfirmationPage ?? false,
           });
      } catch (error) {
           console.error("Error fetching link:", error);
