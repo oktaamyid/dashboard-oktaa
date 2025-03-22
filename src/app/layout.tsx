@@ -17,7 +17,7 @@ const raleway = Raleway({
 
 export async function generateMetadata(): Promise<Metadata> {
      return {
-          metadataBase: new URL("https://your-domain.com"),
+          metadataBase: new URL("https://firtiansyah.my.id"),
           title: "Oktaa.",
           icons: "/oktaa-white.svg",
           authors: [{ name: "Firtiansyah Okta Resama", url: "https://your-domain.com"}],
