@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "@/app/types";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
+
 interface LinkFormProps {
      initialData?: Link;
      onSubmit: (data: Link) => void;
@@ -15,17 +16,36 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
           initialData || {
                id: "",
                originalUrl: "",
+               shortUrl: "",
                showConfirmationPage: false,
-               confirmationPageSettings: { adEnabled: false, countdown: 5 },
+               confirmationPageSettings: { adEnabled: false, countdown: 5, customMessage: "" },
           }
      );
 
      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           const { name, value, type, checked } = e.target;
-          setFormData((prev) => ({
-               ...prev,
-               [name]: type === "checkbox" ? checked : value,
-          }));
+     
+          setFormData((prev) => {
+               if (name.startsWith("confirmationPageSettings.")) {
+                    const key = name.split(".")[1];
+     
+                    return {
+                         ...prev,
+                         confirmationPageSettings: {
+                              ...prev.confirmationPageSettings,
+                              [key]: type === "checkbox" ? checked : type === "number" ? Number(value) : value,
+                              adEnabled: prev.confirmationPageSettings?.adEnabled ?? false,
+                              countdown: prev.confirmationPageSettings?.countdown ?? 5, // Set default jika undefined
+                              customMessage: prev.confirmationPageSettings?.customMessage ?? "", // Default kosong
+                         },
+                    };
+               }
+     
+               return {
+                    ...prev,
+                    [name]: type === "checkbox" ? checked : value,
+               };
+          });
      };
 
      return (
@@ -41,6 +61,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                     }}
                     className="space-y-4"
                >
+                    {/* Original URL */}
                     <Input
                          label="Original URL"
                          name="originalUrl"
@@ -50,6 +71,17 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          onChange={handleChange}
                     />
 
+                    {/* Short URL */}
+                    <Input
+                         label="Short URL"
+                         name="shortUrl"
+                         type="text"
+                         required
+                         value={formData.shortUrl}
+                         onChange={handleChange}
+                    />
+
+                    {/* Show Confirmation Page Checkbox */}
                     <label className="flex items-center space-x-2 text-white">
                          <input
                               type="checkbox"
@@ -61,6 +93,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          <span>Show Confirmation Page</span>
                     </label>
 
+                    {/* Confirmation Page Settings */}
                     {formData.showConfirmationPage && (
                          <>
                               <Input
@@ -69,7 +102,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                                    type="number"
                                    min="1"
                                    max="30"
-                                   value={formData.confirmationPageSettings?.countdown || 5}
+                                   value={formData.confirmationPageSettings?.countdown || ""}
                                    onChange={handleChange}
                               />
                               <Input
@@ -82,10 +115,14 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          </>
                     )}
 
+                    {/* Buttons */}
                     <div className="flex space-x-4">
-                         <Button type="submit">{initialData ? "Update Link" : "Create Link"}</Button>
-                         <Button type="submit" variant="danger" onClick={onCancel}>Cancel</Button>
-
+                         <Button type="submit">
+                              {initialData ? "Update Link" : "Create Link"}
+                         </Button>
+                         <Button type="button" variant="danger" onClick={onCancel}>
+                              Cancel
+                         </Button>
                     </div>
                </form>
           </div>

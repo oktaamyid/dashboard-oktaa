@@ -1,15 +1,8 @@
 // lib/firestore.ts
 import { db } from "./firebaseConfig";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { Experience, Project, Link } from "@/app/types";
 
-const linksCollection = collection(db, "links");
-export const createLink = async (link: Partial<Link>) => {
-     return await addDoc(linksCollection, {
-          ...link,
-          createdAt: link.createdAt || new Date().toISOString(),
-     });
-};
 
 export const getExperiences = async (): Promise<Experience[]> => {
      const querySnapshot = await getDocs(collection(db, "experience"));
@@ -47,6 +40,23 @@ export const getLinks = async (): Promise<Link[]> => {
                }
           } as Link;
      });
+};
+
+export const checkShortUrlExists = async (shortUrl: string): Promise<boolean> => {
+     const q = query(collection(db, "links"), where("shortUrl", "==", shortUrl));
+     const querySnapshot = await getDocs(q);
+     return !querySnapshot.empty;
+};
+
+export const createLink = async (linkData: Omit<Link, "id">) => {
+     const { shortUrl } = linkData;
+
+     if (!shortUrl) throw new Error("Short URL is required");
+     const isExists = await checkShortUrlExists(shortUrl);
+     if (isExists) throw new Error("Short URL is already taken");
+
+     const docRef = await addDoc(collection(db, "links"), linkData);
+     return { id: docRef.id, ...linkData };
 };
 
 
