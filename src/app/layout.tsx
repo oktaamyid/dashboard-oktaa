@@ -6,6 +6,7 @@ import Sidebar from '@/components/sidebar';
 import Header from '@/components/header';
 import { useState } from 'react';
 import { usePathname } from "next/navigation";
+import { Analytics } from "@vercel/analytics/react"
 
 const raleway = Raleway({
      subsets: ['latin'],
@@ -26,7 +27,7 @@ export default function RootLayout({
      };
 
      const isShortUrlPage =
-          pathname !== "/" &&  
+          pathname !== "/" &&
           !pathname.startsWith("/experiences") &&
           !pathname.startsWith("/links") &&
           !pathname.startsWith("/projects") &&
@@ -36,6 +37,7 @@ export default function RootLayout({
      return (
           <html lang="en">
                <body className={`${raleway.variable} ${isShortUrlPage ? "bg-gray-100" : "antialiased bg-gradient-to-br from-gray-700 to-black/80"}`}>
+                    <Analytics />
                     {isShortUrlPage ? (
                          <div className="p-6">{children}</div>
                     ) : (
