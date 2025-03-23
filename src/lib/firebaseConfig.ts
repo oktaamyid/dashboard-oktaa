@@ -1,6 +1,7 @@
 // src/lib/firebaseConfig.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 // Inisialisasi Firestore
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Inisialisasi Analytics (hanya di browser)
 let analytics;
@@ -29,4 +31,4 @@ if (typeof window !== "undefined") {
      });
 }
 
-export { db, analytics };
+export { db, analytics, auth };

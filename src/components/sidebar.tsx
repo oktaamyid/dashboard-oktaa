@@ -21,13 +21,13 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
           >
                <nav>
                     <div className="flex items-center justify-center py-6">
-                         <Link href="/" className={`text-2xl font-bold ${isOpen ? "" : "hidden"} `}>Oktaa</Link>
+                         <Link href="/dashboard" className={`text-2xl font-bold ${isOpen ? "" : "hidden"} `}>Oktaa</Link>
                     </div>
                     <ul className="space-y-2">
                          {sidebarItems.map((item) => (
                               <li key={item.name}>
                                    <Link
-                                        href={item.href}
+                                        href={`/dashboard/${item.href}`}
                                         className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg"
                                    >
                                         <item.icon className="h-6 w-6" />

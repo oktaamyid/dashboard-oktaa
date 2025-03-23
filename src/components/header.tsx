@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Bars3Icon, ArrowRightIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
+import { deleteCookie } from "cookies-next";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebaseConfig";
 
 export default function Header({
      isOpen,
@@ -10,6 +14,14 @@ export default function Header({
      onToggleSidebar: () => void;
 }) {
      const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+     const router = useRouter();
+
+     const handleLogout = async () => {
+          await signOut(auth);
+          deleteCookie("token");
+          router.push("/login");
+     };
 
      return (
           <header className="bg-gray-800 shadow p-4 flex justify-between items-center">
@@ -38,7 +50,7 @@ export default function Header({
                     />
                     {isDropdownOpen && (
                          <div className="absolute right-0 mt-2 w-48 bg-gray-700 text-white rounded-lg shadow-lg">
-                              <button className="block w-full px-4 py-2 text-left hover:bg-gray-600">
+                              <button onClick={handleLogout} className="block w-full px-4 py-2 text-left hover:bg-gray-600">
                                    Logout
                               </button>
                          </div>

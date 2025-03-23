@@ -21,10 +21,7 @@ export default function RootLayout({
      // Pengecekan untuk halaman Short URL
      const isShortUrlPage =
           pathname !== "/" &&
-          !pathname.startsWith("/experiences") &&
-          !pathname.startsWith("/links") &&
-          !pathname.startsWith("/projects") &&
-          !pathname.startsWith("/api") &&
+          !pathname.startsWith("/dashboard") &&
           pathname.split("/").length === 2;
 
      useEffect(() => {
