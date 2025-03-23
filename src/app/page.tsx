@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
      const router = useRouter();
-     const [checkingAuth] = useState(true); // Tetap loading hingga redirect selesai
+     const [checkingAuth] = useState(true);
 
      useEffect(() => {
           const token = document.cookie.split("; ").find(row => row.startsWith("token="));
@@ -14,7 +14,7 @@ export default function Home() {
           } else {
                router.replace("/login");
           }
-     }, []);
+     }, [router]);
 
      // Sembunyikan seluruh halaman sebelum redirect selesai
      if (checkingAuth) {
