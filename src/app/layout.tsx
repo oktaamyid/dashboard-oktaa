@@ -1,13 +1,7 @@
-"use client";
-
 import { Raleway } from "next/font/google";
 import "./globals.css";
-import Sidebar from '@/components/sidebar';
-import Header from '@/components/header';
-import { useState } from 'react';
-import { usePathname } from "next/navigation";
-import { Analytics } from "@vercel/analytics/react"
-import { metadata } from './metadata';
+import RootLayout from './rootLayout';
+import { Metadata } from 'next';
 
 const raleway = Raleway({
      subsets: ['latin'],
@@ -15,47 +9,20 @@ const raleway = Raleway({
      variable: '--font-raleway',
 });
 
-export { metadata }
+export const metadata: Metadata = {
+     metadataBase: new URL("https://firtiansyah.my.id"),
+     title: "Oktaa.", // <- Seharusnya ini mengubah title
+     icons: "/oktaa-white.svg",
+     authors: [{ name: "Firtiansyah Okta Resama", url: "https://firtiansyah.my.id" }],
+     description: "Oktaa is the domain name from Firtiansyah Okta, and then use the Okta for brand identity name.",
+};
 
-export default function RootLayout({
-     children,
-}: Readonly<{
-     children: React.ReactNode;
-}>) {
-     const [isOpen, setIsOpen] = useState(true);
-     const pathname = usePathname();
-
-     const toggleSidebar = () => {
-          setIsOpen(!isOpen);
-     };
-
-     const isShortUrlPage =
-          pathname !== "/" &&
-          !pathname.startsWith("/experiences") &&
-          !pathname.startsWith("/links") &&
-          !pathname.startsWith("/projects") &&
-          !pathname.startsWith("/api") &&
-          pathname.split("/").length === 2;
-
+export default function Layout({children}: { children: React.ReactNode }) {
      return (
           <html lang="en">
-               <body className={`${raleway.variable} ${isShortUrlPage ? "bg-gray-100" : "antialiased bg-gradient-to-br from-gray-700 to-black/80"}`}>
-                    <Analytics />
-                    {isShortUrlPage ? (
-                         <div className="p-6">{children}</div>
-                    ) : (
-
-                         <div className="flex min-h-screen">
-                              {/* Teruskan state isOpen ke Sidebar */}
-                              <Sidebar isOpen={isOpen} />
-                              <div className="flex-1">
-                                   {/* Teruskan isOpen dan toggleSidebar ke Header */}
-                                   <Header isOpen={isOpen} onToggleSidebar={toggleSidebar} />
-                                   <div className="p-6">{children}</div>
-                              </div>
-                         </div>
-                    )}
+               <body className={raleway.variable}>
+                    <RootLayout>{children}</RootLayout>
                </body>
           </html>
-     );
+     )
 }
