@@ -2,11 +2,11 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
      title: "Shorten Link Verification - Oktaa.",
-     description: "Verify your shorten link securely through our dashboard. Simplify and manage your links with ease.",
+     description: "Verify your shorten link securely through Oktaa. Simplify and manage your links with ease.",
      keywords: ["Shorten Link Verification", "Oktaa Dashboard", "Secure Access", "Link Management", "Short Links"],
      openGraph: {
           title: "Shorten Link Verification - Oktaa.",
-          description: "Easily verify and manage your shorten links securely through our dashboard.",
+          description: "Easily verify and manage your shorten links securely through Oktaa.",
           url: "https://oktaa.my.id",
           type: "website",
           images: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
      twitter: {
           card: "summary_large_image",
           title: "Shorten Link Verification - Oktaa",
-          description: "Verify and manage your shorten links securely through our dashboard.",
+          description: "Easily verify and manage your shorten links securely through Oktaa.",
      },
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",
