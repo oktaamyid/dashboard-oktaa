@@ -1,7 +1,3 @@
-export { };
-
-declare global {
-     interface Window {
-          adsbygoogle?: { push: () => void }[];
-     }
+interface Window {
+     adsbygoogle?: { [key: string]: unknown }[];
 }
