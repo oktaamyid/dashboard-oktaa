@@ -11,6 +11,7 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
      const [originalUrl, setOriginalUrl] = useState<string | null>(null);
      const [showConfirmationPage, setShowConfirmationPage] = useState<boolean>(false);
      const [loading, setLoading] = useState<boolean>(true);
+     const [error, setError] = useState<boolean>(false);
 
      useEffect(() => {
           try {
@@ -19,13 +20,17 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                console.error("Adsense script error: ", error);
           }
 
-          if (!params?.shortUrl) return;
+          if (!params?.shortUrl) {
+               router.replace('/404');
+               return;
+          } 
 
           const fetchOriginalUrl = async () => {
                try {
                     const res = await fetch(`/api/links/${encodeURIComponent(params.shortUrl || "")}`);
                     if (!res.ok) {
-                         router.push("/404");
+                         setError(true);
+                         router.replace('/404');
                          return;
                     }
 
@@ -39,7 +44,8 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                     }
                } catch (error) {
                     console.error("Fetch error:", error);
-                    router.push("/404");
+                    setError(true);
+                    router.replace('/404');
                } finally {
                     setLoading(false);
                }
@@ -63,6 +69,10 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                     </div>
                </div>
           );
+     }
+
+     if (error) {
+          return null;
      }
 
      if (showConfirmationPage) {
