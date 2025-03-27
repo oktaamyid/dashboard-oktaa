@@ -4,6 +4,7 @@ export const metadata: Metadata = {
      title: "Shorten Link Verification - Oktaa.",
      description: "Verify your shorten link securely through Oktaa. Simplify and manage your links with ease.",
      keywords: ["Shorten Link Verification", "Oktaa Dashboard", "Secure Access", "Link Management", "Short Links"],
+     robots: "index, follow",
      openGraph: {
           title: "Shorten Link Verification - Oktaa.",
           description: "Easily verify and manage your shorten links securely through Oktaa.",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
           type: "website",
           images: [
                {
-                    url: "/oktaa-white.svg",
+                    url: "https://oktaa.my.id/oktaa-white.svg",
                     width: 1200,
                     height: 630,
                     alt: "Shorten Link Verification - Oktaa",
@@ -22,11 +23,18 @@ export const metadata: Metadata = {
           card: "summary_large_image",
           title: "Shorten Link Verification - Oktaa",
           description: "Easily verify and manage your shorten links securely through Oktaa.",
+          images: ["https://oktaa.my.id/oktaa-white.svg"],
+     },
+     themeColor: "#1e2939",
+     icons: {
+          icon: "https://oktaa.my.id/favicon.ico",
+          apple: "https://oktaa.my.id/apple-touch-icon.png",
      },
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",
      },
 };
+
 
 export default function ShortUrlLayout({ children }: { children: React.ReactNode }) {
      return <>{children}</>;
