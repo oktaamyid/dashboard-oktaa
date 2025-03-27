@@ -12,6 +12,21 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
      const [loading, setLoading] = useState<boolean>(true);
 
      useEffect(() => {
+          const script = document.createElement("script");
+          script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+          script.async = true;
+          script.setAttribute("data-ad-client", "ca-pub-8320640493505504");
+          document.head.appendChild(script);
+
+          script.onload = () => {
+               window.adsbygoogle = window.adsbygoogle || [];
+               window.adsbygoogle.push({
+                    push: function (): void {
+                         throw new Error("Function not implemented.");
+                    }
+               });
+          };
+
           if (!params?.shortUrl) return;
 
           const fetchOriginalUrl = async () => {
@@ -108,13 +123,20 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                     </div>
                </div>
 
-               {/* Ads Section (Placeholder) */}
+               {/* Ads Section */}
                <div className="mt-6 w-full max-w-[90%] sm:max-w-md">
                     <p className="text-sm text-gray-500 text-center">Advertisement</p>
-                    <div className="w-full h-24 bg-gray-300 rounded-lg flex items-center justify-center">
-                         <span className="text-gray-600 text-sm sm:text-base">Ad Space</span>
+                    <div className="w-full h-24 flex items-center justify-center">
+                         {/* Google AdSense */}
+                         <ins className="adsbygoogle"
+                              style={{ display: "block" }}
+                              data-ad-client="ca-pub-8320640493505504"
+                              data-ad-slot="9039091075"
+                              data-ad-format="auto"
+                              data-full-width-responsive="true"></ins>
                     </div>
                </div>
+
           </div>
      );
 }
