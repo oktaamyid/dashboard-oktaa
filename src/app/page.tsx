@@ -16,10 +16,9 @@ export default function Home() {
           }
      }, [router]);
 
-     // Sembunyikan seluruh halaman sebelum redirect selesai
      if (checkingAuth) {
           return <div className="h-screen w-screen flex items-center justify-center">
-               <p className="text-white text-lg">Loading...</p>
+               <p className="text-black text-lg">Loading...</p>
           </div>;
      }
 

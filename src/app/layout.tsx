@@ -1,6 +1,5 @@
 import { Raleway } from "next/font/google";
 import "./globals.css";
-import RootLayout from './rootLayout';
 import { Metadata } from 'next';
 
 const raleway = Raleway({
@@ -21,7 +20,7 @@ export default function Layout({children}: { children: React.ReactNode }) {
      return (
           <html lang="en">
                <body className={raleway.variable}>
-                    <RootLayout>{children}</RootLayout>
+                    {children}
                </body>
           </html>
      )
