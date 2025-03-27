@@ -41,7 +41,7 @@ export default function Header({
                </div>
                <div className="relative">
                     <Image
-                         src="https://placehold.co/400"
+                         src="/oktaa-white.svg"
                          alt="Profile"
                          width={25}
                          height={25}
