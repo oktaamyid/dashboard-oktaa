@@ -40,8 +40,6 @@ export interface Link {
 
      showConfirmationPage: boolean;
      confirmationPageSettings?: {
-          adEnabled: boolean;
-          countdown: number;
           customMessage?: string;
      };
 }

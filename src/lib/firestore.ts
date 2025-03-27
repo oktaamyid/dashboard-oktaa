@@ -34,25 +34,26 @@ export const getLinks = async (): Promise<Link[]> => {
                // Confirmation Page
                showConfirmationPage: data.showConfirmationPage ?? false,
                confirmationPageSettings: data.confirmationPageSettings || {
-                    adEnabled: false,
-                    countdown: 0,
-                    customMessage: "",
+                    customMessage: data.customMessage || "",
                }
           } as Link;
      });
 };
 
-export const checkShortUrlExists = async (shortUrl: string): Promise<boolean> => {
+export const checkShortUrlExists = async (shortUrl: string, excludeId?: string): Promise<boolean> => {
      const q = query(collection(db, "links"), where("shortUrl", "==", shortUrl));
      const querySnapshot = await getDocs(q);
-     return !querySnapshot.empty;
+
+     if (querySnapshot.empty) return false;
+
+     return querySnapshot.docs.some((doc) => doc.id !== excludeId);
 };
 
-export const createLink = async (linkData: Omit<Link, "id">) => {
-     const { shortUrl } = linkData;
 
-     if (!shortUrl) throw new Error("Short URL is required");
-     const isExists = await checkShortUrlExists(shortUrl);
+export const createLink = async (linkData: Omit<Link, "id">) => {
+     if (!linkData.shortUrl) throw new Error("Short URL is required");
+
+     const isExists = await checkShortUrlExists(linkData.shortUrl);
      if (isExists) throw new Error("Short URL is already taken");
 
      const docRef = await addDoc(collection(db, "links"), linkData);
@@ -61,6 +62,11 @@ export const createLink = async (linkData: Omit<Link, "id">) => {
 
 
 export const updateLink = async (id: string, updatedData: Partial<Link>) => {
+     if (updatedData.shortUrl) {
+          const isExists = await checkShortUrlExists(updatedData.shortUrl, id);
+          if (isExists) throw new Error("Short URL is already taken");
+     }
+
      return await updateDoc(doc(db, "links", id), updatedData);
 };
 
