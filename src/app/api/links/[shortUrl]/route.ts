@@ -27,6 +27,9 @@ export async function GET(request: Request, props: { params: Promise<Params> }) 
           return NextResponse.json({
                originalUrl: linkData.originalUrl,
                showConfirmationPage: linkData.showConfirmationPage ?? false,
+               confirmationPageSettings: {
+                    customMessage: linkData.confirmationPageSettings?.customMessage ?? ""
+               }
           });
      } catch (error) {
           console.error("Error fetching link:", error);

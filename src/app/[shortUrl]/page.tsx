@@ -4,12 +4,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, use } from "react";
 import Image from 'next/image';
 import Head from 'next/head';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: string }> }) {
      const params = use(props.params);
      const router = useRouter();
      const [originalUrl, setOriginalUrl] = useState<string | null>(null);
      const [showConfirmationPage, setShowConfirmationPage] = useState<boolean>(false);
+     const [customMessage, setCustomMessage] = useState<string | null>(null);
      const [loading, setLoading] = useState<boolean>(true);
      const [error, setError] = useState<boolean>(false);
 
@@ -23,7 +26,7 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
           if (!params?.shortUrl) {
                router.replace('/404');
                return;
-          } 
+          }
 
           const fetchOriginalUrl = async () => {
                try {
@@ -35,15 +38,17 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                     }
 
                     const data = await res.json();
+
                     setOriginalUrl(data.originalUrl);
                     setShowConfirmationPage(data.showConfirmationPage ?? false);
+                    setCustomMessage(data.confirmationPageSettings?.customMessage);
 
                     if (!data.showConfirmationPage) {
                          window.location.href = data.originalUrl;
                          return;
                     }
                } catch (error) {
-                    console.error("Fetch error:", error);
+                    console.error("❌ Fetch error:", error);
                     setError(true);
                     router.replace('/404');
                } finally {
@@ -63,20 +68,49 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
           return (
                <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
                     <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
-                         <div className="h-6 bg-gray-300 rounded w-1/3 mb-4 animate-pulse"></div>
-                         <div className="h-10 bg-gray-300 rounded w-full mb-4 animate-pulse"></div>
-                         <div className="h-10 bg-gray-300 rounded w-1/2 mb-4 animate-pulse"></div>
+                         {/* Brand Header Skeleton */}
+                         <div className="flex items-center gap-4 mb-6">
+                              <Skeleton circle width={50} height={50} />
+                              <Skeleton width={200} height={24} />
+                         </div>
+
+                         {/* URL Box Skeleton */}
+                         <div className="space-y-4">
+                              <Skeleton width={120} height={16} />
+                              <Skeleton width="100%" height={24} />
+
+                              {/* Custom Message Skeleton (conditional) */}
+                              <div className="space-y-2">
+                                   <Skeleton width={180} height={16} />
+                                   <Skeleton width="100%" height={48} />
+                              </div>
+
+                              <Skeleton width={220} height={16} />
+                              <Skeleton width="100%" height={40} />
+
+                              {/* Buttons Skeleton */}
+                              <div className="flex gap-4 pt-2">
+                                   <Skeleton width="50%" height={40} />
+                                   <Skeleton width="50%" height={40} />
+                              </div>
+                         </div>
+
+                         {/* Ad Section Skeleton */}
+                         <div className="mt-6 space-y-2">
+                              <Skeleton width={100} height={16} containerClassName="mx-auto" />
+                              <Skeleton width="100%" height={96} />
+                         </div>
                     </div>
                </div>
           );
      }
 
      if (error) {
-          return null;
+          return console.log(error);
      }
 
      if (showConfirmationPage) {
-          console.log("Confirmation page is enabled.");
+          console.log("success");
      }
 
      return (
@@ -88,7 +122,7 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                          crossOrigin="anonymous"
                     />
                </Head>
-               
+
                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
                     {/* Brand Icon & Header */}
                     <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 text-center sm:text-left">
@@ -106,6 +140,14 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                     <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-[90%] sm:max-w-md text-center">
                          <p className="text-gray-500 text-sm">Short URL accessed:</p>
                          <p className="text-blue-600 font-medium text-lg break-words">{window.location.origin}/{params.shortUrl}</p>
+
+                         {/* Custom Message Display */}
+                         {customMessage && (
+                              <div className="mt-4 bg-gray-200 p-3 rounded-lg text-gray-700 text-sm sm:text-base">
+                                   <p className="font-medium">Message from the creator:</p>
+                                   <p className="italic">{customMessage}</p>
+                              </div>
+                         )}
 
                          <div className="mt-4">
                               <label className="block text-sm font-medium text-gray-700">You will be redirected to:</label>

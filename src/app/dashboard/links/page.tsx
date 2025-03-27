@@ -12,21 +12,23 @@ export default function LinksPage() {
      const [isFormVisible, setFormVisible] = useState(false);
 
      useEffect(() => {
-               const fetchData = async () => {
-                    const data = await getLinks();
+          const fetchData = async () => {
+               const data = await getLinks();
                setLinks(data);
           };
 
           fetchData();
      }, []);
 
-     const handleCreateOrUpdate = async (linkData: Omit<Link, "id">, id?: string) => {
-          if (id) {
-               await updateLink(id, linkData);
+     const handleCreateOrUpdate = async (linkData: Omit<Link, "id">) => {
+          if (editingLink) {
+               // Update jika sedang dalam mode edit
+               await updateLink(editingLink.id, linkData);
                setLinks((prevLinks) =>
-                    prevLinks.map((link) => (link.id === id ? { ...link, ...linkData } : link))
+                    prevLinks.map((link) => (link.id === editingLink.id ? { ...link, ...linkData } : link))
                );
           } else {
+               // Create jika tidak dalam mode edit
                const newLink = await createLink(linkData);
                setLinks((prevLinks) => [...prevLinks, { id: newLink.id, ...linkData }]);
           }
@@ -34,6 +36,7 @@ export default function LinksPage() {
           setEditingLink(null);
           setFormVisible(false);
      };
+
 
      const handleDelete = async (id: string) => {
           await deleteLink(id);
@@ -46,8 +49,9 @@ export default function LinksPage() {
 
                {isFormVisible ? (
                     <LinkForm
-                         onSubmit={handleCreateOrUpdate}
+                         onSubmit={(data) => handleCreateOrUpdate(data)}
                          initialData={editingLink || undefined}
+
                          onCancel={() => {
                               setEditingLink(null);
                               setFormVisible(false);

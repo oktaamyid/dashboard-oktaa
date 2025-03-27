@@ -7,40 +7,34 @@ import Button from "@/components/ui/button";
 
 interface LinkFormProps {
      initialData?: Link;
-     onSubmit: (data: Link) => void;
+     onSubmit: (data: Omit<Link, "id">) => void;
      onCancel: () => void;
 }
 
 export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormProps) {
-     const [formData, setFormData] = useState<Link>(
-          initialData || {
-               id: "",
-               originalUrl: "",
-               shortUrl: "",
-               showConfirmationPage: false,
-               confirmationPageSettings: { adEnabled: false, countdown: 5, customMessage: "" },
-          }
-     );
+     const [formData, setFormData] = useState<Omit<Link, "id">>({
+          originalUrl: initialData?.originalUrl || "",
+          shortUrl: initialData?.shortUrl || "",
+          showConfirmationPage: initialData?.showConfirmationPage || false,
+          confirmationPageSettings: {
+               customMessage: initialData?.confirmationPageSettings?.customMessage || "",
+          },
+     });
 
      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           const { name, value, type, checked } = e.target;
-     
+
           setFormData((prev) => {
-               if (name.startsWith("confirmationPageSettings.")) {
-                    const key = name.split(".")[1];
-     
+               if (name === "confirmationPageSettings.customMessage") {
                     return {
                          ...prev,
                          confirmationPageSettings: {
                               ...prev.confirmationPageSettings,
-                              [key]: type === "checkbox" ? checked : type === "number" ? Number(value) : value,
-                              adEnabled: prev.confirmationPageSettings?.adEnabled ?? false,
-                              countdown: prev.confirmationPageSettings?.countdown ?? 5, // Set default jika undefined
-                              customMessage: prev.confirmationPageSettings?.customMessage ?? "", // Default kosong
+                              customMessage: value,
                          },
                     };
                }
-     
+
                return {
                     ...prev,
                     [name]: type === "checkbox" ? checked : value,
@@ -95,24 +89,13 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
 
                     {/* Confirmation Page Settings */}
                     {formData.showConfirmationPage && (
-                         <>
-                              <Input
-                                   label="Countdown (seconds)"
-                                   name="confirmationPageSettings.countdown"
-                                   type="number"
-                                   min="1"
-                                   max="30"
-                                   value={formData.confirmationPageSettings?.countdown || ""}
-                                   onChange={handleChange}
-                              />
-                              <Input
-                                   label="Custom Message"
-                                   name="confirmationPageSettings.customMessage"
-                                   type="text"
-                                   value={formData.confirmationPageSettings?.customMessage || ""}
-                                   onChange={handleChange}
-                              />
-                         </>
+                         <Input
+                              label="Custom Message"
+                              name="confirmationPageSettings.customMessage"
+                              type="text"
+                              value={formData.confirmationPageSettings?.customMessage || ""}
+                              onChange={handleChange}
+                         />
                     )}
 
                     {/* Buttons */}
