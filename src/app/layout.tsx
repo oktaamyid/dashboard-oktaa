@@ -14,6 +14,9 @@ export const metadata: Metadata = {
      icons: "/oktaa-white.svg",
      authors: [{ name: "Firtiansyah Okta Resama", url: "https://firtiansyah.my.id" }],
      description: "Oktaa is the domain name from Firtiansyah Okta, and then use the Okta for brand identity name.",
+     other: {
+          "google-adsense-account": "ca-pub-8320640493505504",
+     }
 };
 
 export default function Layout({children}: { children: React.ReactNode }) {
