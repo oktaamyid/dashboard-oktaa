@@ -18,14 +18,13 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
           script.setAttribute("data-ad-client", "ca-pub-8320640493505504");
           document.head.appendChild(script);
 
-          script.onload = () => {
-               window.adsbygoogle = window.adsbygoogle || [];
-               window.adsbygoogle.push({
-                    push: function (): void {
-                         throw new Error("Function not implemented.");
-                    }
-               });
-          };
+          try {
+               if (window.adsbygoogle) {
+                    window.adsbygoogle.push({});
+               }
+          } catch (error) {
+               console.error("Ads err: ", error);
+          }
 
           if (!params?.shortUrl) return;
 
@@ -127,7 +126,6 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                <div className="mt-6 w-full max-w-[90%] sm:max-w-md">
                     <p className="text-sm text-gray-500 text-center">Advertisement</p>
                     <div className="w-full h-24 flex items-center justify-center">
-                         {/* Google AdSense */}
                          <ins className="adsbygoogle"
                               style={{ display: "block" }}
                               data-ad-client="ca-pub-8320640493505504"
@@ -136,7 +134,6 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                               data-full-width-responsive="true"></ins>
                     </div>
                </div>
-
           </div>
      );
 }
