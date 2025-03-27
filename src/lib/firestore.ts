@@ -1,6 +1,6 @@
 // lib/firestore.ts
 import { db } from "./firebaseConfig";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, serverTimestamp } from "firebase/firestore";
 import { Experience, Project, Link } from "@/app/types";
 
 
@@ -56,8 +56,12 @@ export const createLink = async (linkData: Omit<Link, "id">) => {
      const isExists = await checkShortUrlExists(linkData.shortUrl);
      if (isExists) throw new Error("Short URL is already taken");
 
-     const docRef = await addDoc(collection(db, "links"), linkData);
-     return { id: docRef.id, ...linkData };
+     const docRef = await addDoc(collection(db, "links"), {
+          ...linkData,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+     });
+     return { id: docRef.id, ...linkData, createdAt: new Date(), updatedAt: new Date() };
 };
 
 
@@ -67,9 +71,11 @@ export const updateLink = async (id: string, updatedData: Partial<Link>) => {
           if (isExists) throw new Error("Short URL is already taken");
      }
 
-     return await updateDoc(doc(db, "links", id), updatedData);
+     return await updateDoc(doc(db, "links", id), {
+          ...updatedData,
+          updatedAt: serverTimestamp(),
+     });
 };
-
 
 export const deleteLink = async (id: string) => {
      return await deleteDoc(doc(db, "links", id));

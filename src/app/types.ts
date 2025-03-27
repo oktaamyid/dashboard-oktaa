@@ -23,6 +23,7 @@ export interface Link {
      originalUrl: string;
      shortUrl?: string;
      createdAt?: string;
+     updatedAt?: string;
      clicks?: number;
 
      // Statistik
