@@ -1,11 +1,31 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-     title: "Confirm Link Access",
-     description: "Confirmation link accees page.",
+     title: "Shorten Link Verification - Oktaa.",
+     description: "Verify your shorten link securely through our dashboard. Simplify and manage your links with ease.",
+     keywords: ["Shorten Link Verification", "Oktaa Dashboard", "Secure Access", "Link Management", "Short Links"],
+     openGraph: {
+          title: "Shorten Link Verification - Oktaa.",
+          description: "Easily verify and manage your shorten links securely through our dashboard.",
+          url: "https://oktaa.my.id",
+          type: "website",
+          images: [
+               {
+                    url: "/oktaa-white.svg",
+                    width: 1200,
+                    height: 630,
+                    alt: "Shorten Link Verification - Oktaa",
+               },
+          ],
+     },
+     twitter: {
+          card: "summary_large_image",
+          title: "Shorten Link Verification - Oktaa",
+          description: "Verify and manage your shorten links securely through our dashboard.",
+     },
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",
-     }
+     },
 };
 
 export default function ShortUrlLayout({ children }: { children: React.ReactNode }) {

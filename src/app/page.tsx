@@ -18,7 +18,7 @@ export default function Home() {
 
      if (checkingAuth) {
           return <div className="h-screen w-screen flex items-center justify-center">
-               <p className="text-black text-lg">Loading...</p>
+               <p className="text-black text-lg"></p>
           </div>;
      }
 
