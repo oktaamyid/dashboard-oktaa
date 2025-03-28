@@ -34,20 +34,22 @@ export default function Sidebar({
                {/* Sidebar */}
                <div
                     className={`
-                         fixed top-0 left-0 bottom-0 z-50
-                         bg-gray-800 text-white 
-                         transition-all duration-300
-                         md:relative
-                         ${isOpen ? 'w-64 translate-x-0' : '-translate-x-full md:w-16 md:translate-x-0'}
-                    `}
+          fixed top-0 left-0 bottom-0 z-50
+          bg-gray-800 text-white 
+          transition-all duration-300
+          md:relative
+          min-h-screen
+          overflow-y-auto
+          ${isOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-16'}
+        `}
                >
                     <nav>
                          <div className="flex items-center justify-between py-6 px-4">
                               <Link
                                    href="/dashboard"
-                                   className={`text-2xl font-bold ${isOpen ? "" : "hidden "}`}
+                                   className={`text-2xl font-bold ${isOpen ? "" : "hidden md:block"}`}
                               >
-                                   Oktaa
+                                   {isOpen ? 'Oktaa' : ''}
                               </Link>
 
                               {/* Close button for mobile */}
@@ -65,7 +67,7 @@ export default function Sidebar({
                               {sidebarItems.map((item) => (
                                    <li key={item.name}>
                                         <Link
-                                             href={`/dashboard/${item.href}`}
+                                             href={`/dashboard${item.href}`}
                                              className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg"
                                         >
                                              <item.icon className="h-6 w-6" />
