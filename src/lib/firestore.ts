@@ -1,7 +1,8 @@
 // lib/firestore.ts
 import { db } from "./firebaseConfig";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, serverTimestamp, Timestamp } from "firebase/firestore";
 import { Experience, Project, Link } from "@/app/types";
+import { format } from 'date-fns';
 
 
 export const getExperiences = async (): Promise<Experience[]> => {
@@ -21,24 +22,17 @@ export const getLinks = async (): Promise<Link[]> => {
           const data = doc.data();
           return {
                id: doc.id,
-               originalUrl: data.originalUrl || "",
-               shortUrl: data.shortUrl || "",
-               createdAt: data.createdAt || new Date().toISOString(),
-               clicks: data.clicks || 0,
-
-               // Statistik
-               deviceStats: data.deviceStats || { desktop: 0, mobile: 0, tablet: 0 },
-               geoStats: data.geoStats || {},
-               refererStats: data.refererStats || {},
-
-               // Confirmation Page
-               showConfirmationPage: data.showConfirmationPage ?? false,
-               confirmationPageSettings: data.confirmationPageSettings || {
-                    customMessage: data.customMessage || "",
-               }
+               ...data,
+               createdAt: data.createdAt instanceof Timestamp 
+                    ? format(data.createdAt.toDate(), "dd MMM yyyy HH:mm:ss") 
+                    : data.createdAt,
+               updatedAt: data.updatedAt instanceof Timestamp 
+                    ? format(data.updatedAt.toDate(), "dd MMM yyyy HH:mm:ss") 
+                    : data.updatedAt,
           } as Link;
      });
 };
+
 
 export const checkShortUrlExists = async (shortUrl: string, excludeId?: string): Promise<boolean> => {
      const q = query(collection(db, "links"), where("shortUrl", "==", shortUrl));
