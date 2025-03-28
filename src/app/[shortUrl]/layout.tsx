@@ -37,5 +37,10 @@ export const metadata: Metadata = {
 
 
 export default function ShortUrlLayout({ children }: { children: React.ReactNode }) {
-     return <>{children}</>;
+     return (
+          <div>
+               {children} 
+               <script src="https://kulroakonsu.net/88/tag.min.js" data-zone="139305" async data-cfasync="false"></script>
+          </div>
+     )
 }
