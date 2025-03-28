@@ -43,6 +43,30 @@ const LinktreePage: React.FC = () => {
           fetchData();
      }, []);
 
+     const handleShare = async () => {
+          try {
+
+               const shareData = {
+                    title: 'Share Portal',
+                    text: 'Check out this interesting profile!',
+                    url: window.location.href,
+               };
+
+               if (navigator.share) {
+                    await navigator.share(shareData);
+               } else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    alert('Link has been copied to clipboard!');
+               }
+          } catch (error) {
+               console.error('Error share: ', error);
+
+               if (error instanceof Error && error.name !== 'AbortError') {
+                    alert('Failed to share, try again later.');
+               }
+          }
+     };
+
      const socialLinks = [
           { icon: <FiGithub className="w-5 h-5" />, url: profile?.socialMedia?.github, visible: !!profile?.socialMedia?.github },
           { icon: <FiLinkedin className="w-5 h-5" />, url: profile?.socialMedia?.linkedin, visible: !!profile?.socialMedia?.linkedin },
@@ -102,7 +126,7 @@ const LinktreePage: React.FC = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full md:max-w-lg overflow-hidden shadow-lg rounded-xl h-screen"
+                    className="w-full md:max-w-lg overflow-hidden shadow-lg h-screen"
                >
                     {/* Banner with Profile Image */}
                     <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500">
@@ -113,7 +137,7 @@ const LinktreePage: React.FC = () => {
                                    transition={{ delay: 0.2 }}
                                    className="absolute -bottom-8 left-4"
                               >
-                                   <div className="relative w-16 h-16 rounded-full border-4 border-gray-700 overflow-hidden">
+                                   <div className="relative w-20 h-20 rounded-full border-4 border-gray-700 overflow-hidden">
                                         <Image
                                              src={profile.profilePicture}
                                              alt={profile.name || "Profile"}
@@ -126,7 +150,7 @@ const LinktreePage: React.FC = () => {
                               </motion.div>
                          )}
 
-                         <button className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-2 transition-all">
+                         <button onClick={handleShare} aria-label='Share' className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-2 transition-all">
                               <FiExternalLink className="w-4 h-4 text-white" />
                          </button>
                     </div>
@@ -169,10 +193,11 @@ const LinktreePage: React.FC = () => {
                                                   scale: 1.02,
                                                   boxShadow: "0 0 15px rgba(255,255,255,0.2)"
                                              }}
-                                             className="block relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 transition-all duration-200 group overflow-hidden shimmer-effect"
+                                             className="block relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-6 transition-all duration-200 group overflow-hidden shimmer-effect"
                                         >
                                              <div className="flex items-center justify-between relative z-10">
-                                                  <span className="text-white text-sm font-medium truncate capitalize">{link.nameUrl}</span>
+                                                  <span className="text-white"></span>
+                                                  <span className="text-white text-base font-medium truncate mx-auto">{link.nameUrl}</span>
                                                   <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
                                              </div>
                                         </motion.a>
