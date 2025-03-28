@@ -18,9 +18,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                {isDashboard ? (
                     <div className="antialiased bg-gradient-to-br from-gray-700 to-black/80">
                          <div className="flex min-h-screen">
-                              <Sidebar isOpen={isOpen} />
+                              <Sidebar
+                                   isOpen={isOpen}
+                                   onCloseSidebar={() => setIsOpen(false)}
+                              />
                               <div className="flex-1">
-                                   <Header isOpen={isOpen} onToggleSidebar={() => setIsOpen(!isOpen)} />
+                                   <Header
+                                        isOpen={isOpen}
+                                        onToggleSidebar={() => setIsOpen(!isOpen)}
+                                   />
                                    <div className="p-6">{children}</div>
                               </div>
                          </div>

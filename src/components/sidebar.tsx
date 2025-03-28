@@ -4,6 +4,7 @@ import {
      FolderIcon,
      LinkIcon,
      BriefcaseIcon,
+     XMarkIcon
 } from '@heroicons/react/24/solid';
 
 const sidebarItems = [
@@ -13,30 +14,68 @@ const sidebarItems = [
      { name: "Experiences", icon: BriefcaseIcon, href: "/experiences" },
 ];
 
-export default function Sidebar({ isOpen }: { isOpen: boolean }) {
+export default function Sidebar({
+     isOpen,
+     onCloseSidebar
+}: {
+     isOpen: boolean,
+     onCloseSidebar?: () => void
+}) {
      return (
-          <div
-               className={`bg-gray-800 text-white h-auto ${isOpen ? "w-64" : "w-16"
-                    } transition-all duration-300`}
-          >
-               <nav>
-                    <div className="flex items-center justify-center py-6">
-                         <Link href="/dashboard" className={`text-2xl font-bold ${isOpen ? "" : "hidden"} `}>Oktaa</Link>
-                    </div>
-                    <ul className="space-y-2">
-                         {sidebarItems.map((item) => (
-                              <li key={item.name}>
-                                   <Link
-                                        href={`/dashboard/${item.href}`}
-                                        className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg"
+          <>
+               {/* Mobile Overlay */}
+               {isOpen && (
+                    <div
+                         className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                         onClick={onCloseSidebar}
+                    />
+               )}
+
+               {/* Sidebar */}
+               <div
+                    className={`
+                         fixed top-0 left-0 bottom-0 z-50
+                         bg-gray-800 text-white 
+                         transition-all duration-300
+                         md:relative
+                         ${isOpen ? 'w-64 translate-x-0' : '-translate-x-full md:w-16 md:translate-x-0'}
+                    `}
+               >
+                    <nav>
+                         <div className="flex items-center justify-between py-6 px-4">
+                              <Link
+                                   href="/dashboard"
+                                   className={`text-2xl font-bold ${isOpen ? "" : "hidden "}`}
+                              >
+                                   Oktaa
+                              </Link>
+
+                              {/* Close button for mobile */}
+                              {isOpen && (
+                                   <button
+                                        onClick={onCloseSidebar}
+                                        className="md:hidden"
                                    >
-                                        <item.icon className="h-6 w-6" />
-                                        {isOpen && <span className="ml-2">{item.name}</span>}
-                                   </Link>
-                              </li>
-                         ))}
-                    </ul>
-               </nav>
-          </div>
+                                        <XMarkIcon className="h-6 w-6" />
+                                   </button>
+                              )}
+                         </div>
+
+                         <ul className="space-y-2">
+                              {sidebarItems.map((item) => (
+                                   <li key={item.name}>
+                                        <Link
+                                             href={`/dashboard/${item.href}`}
+                                             className="flex items-center w-full p-3 hover:bg-gray-700 rounded-lg"
+                                        >
+                                             <item.icon className="h-6 w-6" />
+                                             {isOpen && <span className="ml-2">{item.name}</span>}
+                                        </Link>
+                                   </li>
+                              ))}
+                         </ul>
+                    </nav>
+               </div>
+          </>
      );
 }
