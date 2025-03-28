@@ -9,9 +9,10 @@ interface LinkTableProps {
      links: Link[];
      onEdit: (link: Link) => void;
      onDelete: (id: string) => void;
+     isLoading?: boolean;
 }
 
-export default function LinkTable({ links, onEdit, onDelete }: LinkTableProps) {
+export default function LinkTable({ links, onEdit, onDelete, isLoading = false }: LinkTableProps) {
      const columns = ["id", "shortUrl", "originalUrl", "clicks", "actions"];
      const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -55,9 +56,12 @@ export default function LinkTable({ links, onEdit, onDelete }: LinkTableProps) {
                     >
                          {copiedId === link.id ? "Copied!" : "Copy"}
                     </Button>
+                    <Button type="button" variant="primary">
+                         Detail
+                    </Button>
                </div>
           ),
      }));
 
-     return <Table columns={columns} data={tableData} />;
+     return <Table columns={columns} data={tableData} isLoading={isLoading} />;
 }

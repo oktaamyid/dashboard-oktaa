@@ -8,12 +8,22 @@ import { Project } from "@/app/types";
 
 export default function Projects() {
      const [data, setData] = useState<Project[]>([]);
+     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
-          const fetchData = async () => {
-               const projects = await getProjects();
-               setData(projects);
-          };
+          async function fetchData() {
+               try {
+                    setLoading(true);
+                    const projects = await getProjects();
+                    setData(projects);
+               }
+               catch (error) {
+                    console.error("Error fetching data: ", error);
+               }
+               finally {
+                    setLoading(false);
+               }
+          }
 
           fetchData();
      }, []);
@@ -24,6 +34,7 @@ export default function Projects() {
                <Table
                     data={data}
                     columns={["id", "title", "description", "technology"]}
+                    isLoading={loading}
                />
           </div>
      );

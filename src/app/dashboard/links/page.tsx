@@ -10,12 +10,20 @@ export default function LinksPage() {
      const [links, setLinks] = useState<Link[]>([]);
      const [editingLink, setEditingLink] = useState<Link | null>(null);
      const [isFormVisible, setFormVisible] = useState(false);
+     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
-          const fetchData = async () => {
-               const data = await getLinks();
-               setLinks(data);
-          };
+          async function fetchData() {
+               try {
+                    setLoading(true);
+                    const data = await getLinks();
+                    setLinks(data);
+               } catch (error) {
+                    console.error("Error fetching data: ", error);
+               } finally {
+                    setLoading(false);
+               }
+          }
 
           fetchData();
      }, []);
@@ -70,6 +78,7 @@ export default function LinksPage() {
                          setFormVisible(true);
                     }}
                     onDelete={handleDelete}
+                    isLoading={loading}
                />
           </div>
      );

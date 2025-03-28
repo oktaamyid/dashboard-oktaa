@@ -8,12 +8,20 @@ import { Experience } from "@/app/types";
 
 export default function Experiences() {
      const [data, setData] = useState<Experience[]>([]);
+     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
-          const fetchData = async () => {
-               const experiences = await getExperiences();
-               setData(experiences);
-          };
+          async function fetchData() {
+               try {
+                    setLoading(true);                    
+                    const experiences = await getExperiences();
+                    setData(experiences);
+               } catch (error) {
+                    console.error("Error fetching data: ", error);
+               } finally {
+                    setLoading(false);
+               }
+          }
 
           fetchData();
      }, []);
@@ -24,6 +32,7 @@ export default function Experiences() {
                <Table
                     data={data}
                     columns={["id", "company", "role", "year", "techStack"]}
+                    isLoading={loading}
                />
           </div>
      );
