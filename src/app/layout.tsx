@@ -16,6 +16,7 @@ export const metadata: Metadata = {
      description: "Oktaa is the domain name from Firtiansyah Okta, and then use the Okta for brand identity name.",
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",
+          "monetag": "4295e4a45e975c12564f05a2fa041ea0",
      }
 };
 
