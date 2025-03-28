@@ -122,7 +122,7 @@ const LinktreePage: React.FC = () => {
                                         className="block bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 transition-all duration-200 group"
                                    >
                                         <div className="flex items-center justify-between">
-                                             <span className="text-white text-sm font-medium truncate">{link.shortUrl}</span>
+                                             <span className="text-white text-sm font-medium truncate capitalize">{link.shortUrl}</span>
                                              <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
                                         </div>
                                    </motion.a>
