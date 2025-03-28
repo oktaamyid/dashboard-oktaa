@@ -1,9 +1,24 @@
 // lib/firestore.ts
 import { db } from "./firebaseConfig";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, serverTimestamp, Timestamp } from "firebase/firestore";
-import { Experience, Project, Link } from "@/app/types";
+import { Experience, Project, Link, Profile } from "@/app/types";
 import { format } from 'date-fns';
 
+const PROFILE_ID = "Z1EYXQESzJttuFME0wuT";
+
+export const getProfiles = async (): Promise<Profile[]> => {
+     const querySnapshot = await getDocs(collection(db, "profile"));
+     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Profile));
+}
+
+export const updateProfile = async (updatedData: Partial<Profile>) => {
+     if (!updatedData.id) throw new Error("Profile ID is required");
+
+     return await updateDoc(doc(db, "profile", PROFILE_ID), {
+          ...updatedData,
+          updatedAt: serverTimestamp(),
+     });
+};
 
 export const getExperiences = async (): Promise<Experience[]> => {
      const querySnapshot = await getDocs(collection(db, "experience"));
@@ -23,16 +38,15 @@ export const getLinks = async (): Promise<Link[]> => {
           return {
                id: doc.id,
                ...data,
-               createdAt: data.createdAt instanceof Timestamp 
-                    ? format(data.createdAt.toDate(), "dd MMM yyyy HH:mm:ss") 
+               createdAt: data.createdAt instanceof Timestamp
+                    ? format(data.createdAt.toDate(), "dd MMM yyyy HH:mm:ss")
                     : data.createdAt,
-               updatedAt: data.updatedAt instanceof Timestamp 
-                    ? format(data.updatedAt.toDate(), "dd MMM yyyy HH:mm:ss") 
+               updatedAt: data.updatedAt instanceof Timestamp
+                    ? format(data.updatedAt.toDate(), "dd MMM yyyy HH:mm:ss")
                     : data.updatedAt,
           } as Link;
      });
 };
-
 
 export const checkShortUrlExists = async (shortUrl: string, excludeId?: string): Promise<boolean> => {
      const q = query(collection(db, "links"), where("shortUrl", "==", shortUrl));
@@ -42,7 +56,6 @@ export const checkShortUrlExists = async (shortUrl: string, excludeId?: string):
 
      return querySnapshot.docs.some((doc) => doc.id !== excludeId);
 };
-
 
 export const createLink = async (linkData: Omit<Link, "id">) => {
      if (!linkData.shortUrl) throw new Error("Short URL is required");

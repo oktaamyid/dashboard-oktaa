@@ -25,6 +25,7 @@ export interface Link {
      createdAt?: string;
      updatedAt?: string;
      clicks?: number;
+     showToPortal?: boolean;
 
      // Statistik
      deviceStats?: {
@@ -45,4 +46,21 @@ export interface Link {
      };
 }
 
-export type TableData = Experience | Project | Link;
+export interface Profile {
+     id: string;
+     name: string;
+     updatedAt?: string;
+     profilePicture?: string;
+     socialMedia?: {
+          instagram?: string;
+          linkedin?: string;
+          spotify?: string;
+          github?: string;
+          mail?: string;
+          tiktok?: string;
+     }
+     bio?: string;
+     website?: string;
+}
+
+export type TableData = Experience | Project | Link | Profile;

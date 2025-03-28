@@ -24,6 +24,10 @@ export default function Header({
           router.push("/login");
      };
 
+     const profileEdit = async () => {
+          router.push("/dashboard/profile");
+     }
+
      return (
           <header className="bg-gray-800 shadow p-4 flex justify-between items-center">
                <div className="flex items-center space-x-4">
@@ -50,6 +54,9 @@ export default function Header({
                     />
                     {isDropdownOpen && (
                          <div className="absolute right-0 mt-2 w-48 bg-gray-700 text-white rounded-lg shadow-lg">
+                              <button onClick={profileEdit} className="block w-full px-4 py-2 text-left hover:bg-gray-600">
+                                   Profile
+                              </button>
                               <button onClick={handleLogout} className="block w-full px-4 py-2 text-left hover:bg-gray-600">
                                    Logout
                               </button>
