@@ -11,7 +11,7 @@ const raleway = Raleway({
 export const metadata: Metadata = {
      metadataBase: new URL("https://oktaa.my.id"),
      title: "Oktaa.", // <- Seharusnya ini mengubah title
-     icons: "/oktaa-white.svg",
+     icons: "https://oktaa.my.id/oktaa-white.svg",
      authors: [{ name: "Firtiansyah Okta Resama", url: "https://firtiansyah.oktaa.my.id" }],
      description: "Oktaa is the domain name from Firtiansyah Okta, and then use the Okta for brand identity name.",
      other: {
