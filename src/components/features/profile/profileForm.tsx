@@ -120,6 +120,14 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
                                    value={formData.name}
                                    onChange={handleChange}
                               />
+
+                              <Input
+                                   label="Username"
+                                   name="username"
+                                   required
+                                   value={formData.username}
+                                   onChange={handleChange}
+                              />
                          </div>
 
                          <div>

@@ -132,9 +132,10 @@ const LinktreePage: React.FC = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="pt-12 px-5 pb-6">
+                    <div className="pt-6 px-5 pb-5">
                          <div className="text-center mb-6">
-                              <h1 className="text-xl font-bold text-white">{profile.name}</h1>
+                              <h1 className="text-xl font-bold text-white">@{profile.username}</h1>
+                              <p className="text-gray-500 text-sm my-1">{profile.name}</p>
                               {profile.bio && (
                                    <p className="text-gray-400 mt-1 text-sm">{profile.bio}</p>
                               )}

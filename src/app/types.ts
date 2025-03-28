@@ -50,6 +50,7 @@ export interface Link {
 export interface Profile {
      id: string;
      name: string;
+     username: string;
      updatedAt?: string;
      profilePicture?: string;
      socialMedia?: {
