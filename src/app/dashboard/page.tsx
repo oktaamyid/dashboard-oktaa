@@ -5,6 +5,7 @@ import Table from "@/components/ui/table";
 import { getExperiences, getProjects, getLinks } from "@/lib/firestore";
 import { Experience, Project, Link, TableData } from "@/app/types";
 import Card from '@/components/ui/card';
+import Select from '@/components/ui/select';
 
 export default function Overview() {
      const [selectedTable, setSelectedTable] = useState<"Projects" | "Links" | "Experiences">("Projects");
@@ -40,7 +41,7 @@ export default function Overview() {
 
      const columnsToShow: Record<"Projects" | "Links" | "Experiences", string[]> = {
           Projects: ["title", "description", "technology"],
-          Links: ["originalUrl", "createdAt"],
+          Links: ["originalUrl", "shortUrl", "createdAt", "updatedAt"],
           Experiences: ["company", "role", "year"],
      };
 
@@ -59,31 +60,24 @@ export default function Overview() {
 
                <div className="mt-6">
                     {/* 🔹 Dropdown Select Table */}
-                    <div className="mt-6 flex items-center gap-4">
-                         <label htmlFor="table-select" className="text-gray-300 text-sm font-semibold">
-                              Pilih Tabel:
-                         </label>
-                         <select
-                              id="table-select"
-                              value={selectedTable}
-                              onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
-                              className="bg-gray-700 text-gray-300 p-2 rounded-lg border border-gray-500 shadow-md focus:ring-2 focus:ring-gray-400 transition-all duration-300"
-                         >
-                              <option value="Projects">Projects</option>
-                              <option value="Links">Links</option>
-                              <option value="Experiences">Experiences</option>
-                         </select>
-                    </div>
-
+                    <Select
+                         label="Choose Table:"
+                         options={[
+                              { label: "Projects", value: "Projects" },
+                              { label: "Links", value: "Links" },
+                              { label: "Experiences", value: "Experiences" },
+                         ]}
+                         value={selectedTable}
+                         onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
+                         className="w-48"
+                    />
 
                     {/* 🔹 Show data by selected table */}
-                    {loading ? (
-                         <p className="mt-4">Loading...</p>
-                    ) : tableData.length > 0 ? (
-                         <Table data={tableData} columns={columns} />
-                    ) : (
-                         <p className="mt-4">No data available.</p>
-                    )}
+
+                    <Table 
+                         data={tableData} 
+                         columns={columns} 
+                         isLoading={loading}/>
                </div>
           </div>
      );
