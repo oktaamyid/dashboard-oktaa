@@ -58,26 +58,31 @@ export default function Overview() {
                     <Card title="Total Experiences" value={experiences.length.toString()} />
                </div>
 
-               <div className="mt-6">
+               <div className="mt-6 space-y-4">
                     {/* 🔹 Dropdown Select Table */}
-                    <Select
-                         label="Choose Table:"
-                         options={[
-                              { label: "Projects", value: "Projects" },
-                              { label: "Links", value: "Links" },
-                              { label: "Experiences", value: "Experiences" },
-                         ]}
-                         value={selectedTable}
-                         onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
-                         className="w-48"
-                    />
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+                         <Select
+                              label="Choose Table:"
+                              options={[
+                                   { label: "Projects", value: "Projects" },
+                                   { label: "Links", value: "Links" },
+                                   { label: "Experiences", value: "Experiences" },
+                              ]}
+                              value={selectedTable}
+                              onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
+                              className="w-full sm:w-48"
+                         />
+                         {/* Opsional: Tambahkan tombol atau aksi tambahan di sini */}
+                    </div>
 
                     {/* 🔹 Show data by selected table */}
-
-                    <Table 
-                         data={tableData} 
-                         columns={columns} 
-                         isLoading={loading}/>
+                    <div className="w-full overflow-hidden rounded-lg shadow-md">
+                         <Table
+                              data={tableData}
+                              columns={columns}
+                              isLoading={loading}
+                         />
+                    </div>
                </div>
           </div>
      );
