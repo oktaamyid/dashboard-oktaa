@@ -21,13 +21,13 @@ export async function generateMetadata(): Promise<Metadata> {
                openGraph: {
                     title: `@${profile.username} | Oktaa Portal`,
                     description: profile.bio || 'Personal Link Sharing Platform',
-                    images: 'https://oktaa.my.id/oktaa-white.svg'
+                    images: 'https://oktaa.my.id/banner.png'
                },
                twitter: {
                     card: 'summary_large_image',
                     title: `@${profile.username} | Oktaa Portal`,
                     description: profile.bio || 'Personal Link Sharing Platform',
-                    images: 'https://oktaa.my.id/oktaa-white.svg'
+                    images: 'https://oktaa.my.id/banner.png'
                }
           };
      } catch (error) {
