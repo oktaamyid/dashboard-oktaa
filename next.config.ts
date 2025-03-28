@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
                     hostname: 'placehold.co',
                     pathname: '**'
                },
+               {
+                    protocol: "https",
+                    hostname: 'i.ibb.co.com',
+                    pathname: '**'
+               }
           ],
           dangerouslyAllowSVG: true,
      },
