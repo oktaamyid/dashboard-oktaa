@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
                openGraph: {
                     title: `@${profile.username} | Oktaa Portal`,
                     description: profile.bio || 'Personal Link Sharing Platform',
-                    images: profile.profilePicture ? [{ url: profile.profilePicture }] : []
+                    images: 'https://oktaa.my.id/oktaa-white.svg'
                },
                twitter: {
                     card: 'summary_large_image',
