@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { deleteCookie } from "cookies-next";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
+import Breadcrumbs from '@/components/ui/breadcrumbs';
 
 export default function Header({
      isOpen,
@@ -34,10 +35,9 @@ export default function Header({
                               <ArrowRightIcon className="h-6 w-6" />
                          )}
                     </button>
-                    <div className="flex space-x-3 space-y-1">
-                         <h1 className="text-xl font-bold text-white">Dashboard</h1>
-                         <span className="text-xl text-gray-400">/ Overview</span>
-                    </div>
+
+                    {/* Breadcrumbs */}
+                    <Breadcrumbs />
                </div>
                <div className="relative">
                     <Image
