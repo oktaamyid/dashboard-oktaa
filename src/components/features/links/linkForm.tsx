@@ -16,6 +16,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
           originalUrl: initialData?.originalUrl || "",
           shortUrl: initialData?.shortUrl || "",
           showToPortal: initialData?.showToPortal || false,
+          nameUrl: initialData?.nameUrl || "",
           showConfirmationPage: initialData?.showConfirmationPage || false,
           confirmationPageSettings: {
                customMessage: initialData?.confirmationPageSettings?.customMessage || "",
@@ -87,6 +88,17 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                               />
                          <span>Show to Portal?</span>
                     </label>
+
+                    {/* Name URL for Portal */}
+                    {formData.showToPortal && (
+                         <Input
+                              label="Name for Portal"
+                              name="nameUrl"
+                              type="text"
+                              value={formData.nameUrl || ""}
+                              onChange={handleChange}
+                         />
+                    )}
 
                     {/* Show Confirmation Page Checkbox */}
                     <label className="flex items-center space-x-2 text-white">

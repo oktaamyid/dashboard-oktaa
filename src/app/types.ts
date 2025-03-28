@@ -26,6 +26,7 @@ export interface Link {
      updatedAt?: string;
      clicks?: number;
      showToPortal?: boolean;
+     nameUrl?: string;
 
      // Statistik
      deviceStats?: {
