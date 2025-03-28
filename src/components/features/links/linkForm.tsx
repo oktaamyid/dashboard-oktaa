@@ -15,6 +15,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
      const [formData, setFormData] = useState<Omit<Link, "id">>({
           originalUrl: initialData?.originalUrl || "",
           shortUrl: initialData?.shortUrl || "",
+          showToPortal: initialData?.showToPortal || false,
           showConfirmationPage: initialData?.showConfirmationPage || false,
           confirmationPageSettings: {
                customMessage: initialData?.confirmationPageSettings?.customMessage || "",
@@ -74,6 +75,18 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          value={formData.shortUrl}
                          onChange={handleChange}
                     />
+
+                    {/* Show URL to Portal Checkbox */}
+                    <label className="flex items-center space-x-2 text-white">
+                         <input 
+                              type="checkbox" 
+                              name="showToPortal" 
+                              checked={formData.showToPortal}
+                              onChange={handleChange}
+                              className="w-4 h-4"
+                              />
+                         <span>Show to Portal?</span>
+                    </label>
 
                     {/* Show Confirmation Page Checkbox */}
                     <label className="flex items-center space-x-2 text-white">
