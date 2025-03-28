@@ -6,12 +6,12 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
      options: { label: string; value: string }[];
 }
 
-export default function Select({ label, options, className, ...props }: SelectProps) {
+export default function Select({ label, options, className = "", ...props }: SelectProps) {
      return (
           <div className="flex flex-col space-y-1">
-               {label && <label className="text-gray-300 text-sm">{label}</label>}
+               {label && <label className="text-gray-300 text-sm font-semibold">{label}</label>}
                <select
-                    className={`bg-gray-800 text-white p-2 rounded-md border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500/50 ${className}`}
+                    className={`bg-gray-700 text-gray-300 p-2 rounded-lg border border-gray-500 shadow-md focus:ring-2 focus:ring-gray-400 transition-all duration-300 ${className}`}
                     {...props}
                >
                     {options.map((option) => (
