@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
                     card: 'summary_large_image',
                     title: `@${profile.username} | Oktaa Portal`,
                     description: profile.bio || 'Personal Link Sharing Platform',
-                    images: profile.profilePicture ? [profile.profilePicture] : []
+                    images: 'https://oktaa.my.id/oktaa-white.svg'
                }
           };
      } catch (error) {
