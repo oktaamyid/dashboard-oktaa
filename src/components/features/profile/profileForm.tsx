@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Profile } from "@/app/types";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { updateProfile } from '@/lib/firestore';
+import Image from 'next/image';
 
 interface ProfileFormProps {
      initialData: Profile;
@@ -14,6 +15,8 @@ interface ProfileFormProps {
 export default function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
      const [formData, setFormData] = useState<Profile>(initialData);
      const [isSubmitting, setIsSubmitting] = useState(false);
+     const [previewImage, setPreviewImage] = useState<string | null>(null);
+     const fileInputRef = useRef<HTMLInputElement>(null);
 
      useEffect(() => {
           setFormData(initialData);
@@ -40,6 +43,46 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
           }
      };
 
+     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          // Validasi tipe file
+          if (!file.type.startsWith('image/')) {
+               alert('Silakan upload file gambar');
+               return;
+          }
+
+          // Validasi ukuran file (max 2MB)
+          if (file.size > 5 * 1024 * 1024) {
+               alert('Ukuran file terlalu besar (maksimal 2MB)');
+               return;
+          }
+
+          // Konversi ke Base64 untuk preview dan simpan sebagai URL data
+          const reader = new FileReader();
+          reader.onload = () => {
+               const base64 = reader.result as string;
+               setPreviewImage(base64);
+               setFormData(prev => ({
+                    ...prev,
+                    profilePicture: base64
+               }));
+          };
+          reader.readAsDataURL(file);
+     };
+
+     const handleRemoveImage = () => {
+          setPreviewImage(null);
+          setFormData(prev => ({
+               ...prev,
+               profilePicture: ""
+          }));
+          if (fileInputRef.current) {
+               fileInputRef.current.value = '';
+          }
+     };
+
      const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           setIsSubmitting(true);
@@ -60,21 +103,56 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
 
                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <Input
-                              label="Full Name"
-                              name="name"
-                              required
-                              value={formData.name}
-                              onChange={handleChange}
-                         />
+                         <div>
+                              <Input
+                                   label="Nama Lengkap"
+                                   name="name"
+                                   required
+                                   value={formData.name}
+                                   onChange={handleChange}
+                              />
+                         </div>
 
-                         <Input
-                              label="Profile Picture URL"
-                              name="profilePicture"
-                              type="url"
-                              value={formData.profilePicture || ""}
-                              onChange={handleChange}
-                         />
+                         <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-1">
+                                   Foto Profil
+                              </label>
+                              <div className="flex items-center space-x-4">
+                                   {(previewImage || formData.profilePicture) && (
+                                        <div className="relative">
+                                             <Image
+                                                  src={previewImage || formData.profilePicture || ""}
+                                                  alt="Preview"
+                                                  width={64}
+                                                  height={64}
+                                                  className="w-16 h-16 rounded-full object-cover"
+                                             />
+                                             <button
+                                                  type="button"
+                                                  onClick={handleRemoveImage}
+                                                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                                             >
+                                                  ✕
+                                             </button>
+                                        </div>
+                                   )}
+                                   <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                        id="profilePicture"
+                                   />
+                                   <label
+                                        htmlFor="profilePicture"
+                                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500 transition cursor-pointer"
+                                   >
+                                        {(previewImage || formData.profilePicture) ? 'Ganti Foto' : 'Pilih Foto'}
+                                   </label>
+                              </div>
+                              <p className="text-xs text-gray-400 mt-1">Format: JPG/PNG (maks. 5MB)</p>
+                         </div>
                     </div>
 
                     <Input
