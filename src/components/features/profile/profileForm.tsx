@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import { Profile } from "@/app/types";
+import { updateProfile } from "@/lib/firestore";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
-import { updateProfile } from '@/lib/firestore';
-import Image from 'next/image';
+import ImageUploader from "@/components/ui/imageUpload";
+import Alert from '@/components/ui/alert';
 
 interface ProfileFormProps {
      initialData: Profile;
@@ -16,57 +17,53 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
      const [formData, setFormData] = useState<Profile>(initialData);
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [previewImage, setPreviewImage] = useState<string | null>(null);
-     const fileInputRef = useRef<HTMLInputElement>(null);
+     const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error", message: string } | null>(null);
 
      useEffect(() => {
           setFormData(initialData);
+          if (initialData.profilePicture) {
+               setPreviewImage(initialData.profilePicture);
+          }
      }, [initialData]);
 
      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const { name, value } = e.target;
 
-          // Handle nested socialMedia fields
           if (name.startsWith("socialMedia.")) {
                const field = name.split(".")[1];
-               setFormData(prev => ({
+               setFormData((prev) => ({
                     ...prev,
                     socialMedia: {
                          ...prev.socialMedia,
-                         [field]: value
-                    }
+                         [field]: value,
+                    },
                }));
           } else {
-               setFormData(prev => ({
+               setFormData((prev) => ({
                     ...prev,
-                    [name]: value
+                    [name]: value,
                }));
           }
      };
 
-     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-          const file = e.target.files?.[0];
-          if (!file) return;
-
-          // Validasi tipe file
-          if (!file.type.startsWith('image/')) {
-               alert('Silakan upload file gambar');
+     const handleFileChange = (file: File) => {
+          if (!file.type.startsWith("image/")) {
+               alert("Silakan upload file gambar");
                return;
           }
 
-          // Validasi ukuran file (max 2MB)
           if (file.size > 5 * 1024 * 1024) {
-               alert('Ukuran file terlalu besar (maksimal 2MB)');
+               alert("Ukuran file terlalu besar (maksimal 5MB)");
                return;
           }
 
-          // Konversi ke Base64 untuk preview dan simpan sebagai URL data
           const reader = new FileReader();
           reader.onload = () => {
                const base64 = reader.result as string;
                setPreviewImage(base64);
-               setFormData(prev => ({
+               setFormData((prev) => ({
                     ...prev,
-                    profilePicture: base64
+                    profilePicture: base64,
                }));
           };
           reader.readAsDataURL(file);
@@ -74,23 +71,27 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
 
      const handleRemoveImage = () => {
           setPreviewImage(null);
-          setFormData(prev => ({
+          setFormData((prev) => ({
                ...prev,
-               profilePicture: ""
+               profilePicture: "",
           }));
-          if (fileInputRef.current) {
-               fileInputRef.current.value = '';
-          }
      };
 
      const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           setIsSubmitting(true);
+          setAlertMessage(null);
           try {
                await updateProfile(formData);
-               alert("Profile updated successfully!");
+               setAlertMessage({
+                    type: "success",
+                    message: "Profile updated succesfully"
+               });
           } catch (error) {
-               alert("Failed to update profile");
+               setAlertMessage({
+                    type: "success",
+                    message: "Failed to update profile"
+               });
                console.error(error);
           } finally {
                setIsSubmitting(false);
@@ -99,6 +100,14 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
 
      return (
           <div className="bg-gray-800 p-6 rounded-lg shadow-md mx-auto">
+               {alertMessage && (
+                    <div className="mb-4">
+                         <Alert variant={alertMessage.type}>
+                              {alertMessage.message}
+                         </Alert>
+                    </div>
+               )}
+               
                <h2 className="text-xl font-semibold text-white mb-6">Edit Profile</h2>
 
                <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,44 +123,11 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
                          </div>
 
                          <div>
-                              <label className="block text-sm font-medium text-gray-300 mb-1">
-                                   Foto Profil
-                              </label>
-                              <div className="flex items-center space-x-4">
-                                   {(previewImage || formData.profilePicture) && (
-                                        <div className="relative">
-                                             <Image
-                                                  src={previewImage || formData.profilePicture || ""}
-                                                  alt="Preview"
-                                                  width={64}
-                                                  height={64}
-                                                  className="w-16 h-16 rounded-full object-cover"
-                                             />
-                                             <button
-                                                  type="button"
-                                                  onClick={handleRemoveImage}
-                                                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                                             >
-                                                  ✕
-                                             </button>
-                                        </div>
-                                   )}
-                                   <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                        className="hidden"
-                                        id="profilePicture"
-                                   />
-                                   <label
-                                        htmlFor="profilePicture"
-                                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500 transition cursor-pointer"
-                                   >
-                                        {(previewImage || formData.profilePicture) ? 'Ganti Foto' : 'Pilih Foto'}
-                                   </label>
-                              </div>
-                              <p className="text-xs text-gray-400 mt-1">Format: JPG/PNG (maks. 5MB)</p>
+                              <ImageUploader
+                                   previewImage={previewImage}
+                                   onFileChange={handleFileChange}
+                                   onRemoveImage={handleRemoveImage}
+                              />
                          </div>
                     </div>
 
