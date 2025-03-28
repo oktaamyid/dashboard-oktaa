@@ -1,12 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe } from 'react-icons/fi';
 import { FaSpotify, FaTiktok } from "react-icons/fa";
 import { getLinks, getProfiles } from '@/lib/firestore';
 import { Link, Profile } from '@/app/types';
+
+// Skeleton Component
+const LinkSkeleton = () => (
+     <div className="bg-gray-700 animate-pulse rounded-lg px-4 py-3 mb-3">
+          <div className="h-4 bg-gray-600 rounded w-3/4"></div>
+     </div>
+);
 
 const LinktreePage: React.FC = () => {
      const [links, setLinks] = useState<Link[]>([]);
@@ -21,7 +28,6 @@ const LinktreePage: React.FC = () => {
                          getLinks()
                     ]);
 
-                    // Assuming getProfiles returns an array, take the first profile
                     if (profileData.length > 0) {
                          setProfile(profileData[0]);
                     }
@@ -37,7 +43,6 @@ const LinktreePage: React.FC = () => {
           fetchData();
      }, []);
 
-     // Create social links from profile data
      const socialLinks = [
           { icon: <FiGithub className="w-5 h-5" />, url: profile?.socialMedia?.github, visible: !!profile?.socialMedia?.github },
           { icon: <FiLinkedin className="w-5 h-5" />, url: profile?.socialMedia?.linkedin, visible: !!profile?.socialMedia?.linkedin },
@@ -51,7 +56,34 @@ const LinktreePage: React.FC = () => {
      if (loading) {
           return (
                <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-                    <div className="text-white">Loading...</div>
+                    <motion.div
+                         initial={{ opacity: 0, scale: 0.95 }}
+                         animate={{ opacity: 1, scale: 1 }}
+                         transition={{ duration: 0.3 }}
+                         className="w-full md:max-w-lg overflow-hidden shadow-lg rounded-xl"
+                    >
+                         {/* Skeleton Profile Image */}
+                         <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500">
+                              <div className="absolute -bottom-8 left-4">
+                                   <div className="w-16 h-16 rounded-full bg-gray-700 animate-pulse"></div>
+                              </div>
+                         </div>
+
+                         {/* Skeleton Content */}
+                         <div className="pt-12 px-5 pb-6">
+                              <div className="text-center mb-6">
+                                   <div className="h-6 bg-gray-700 rounded w-1/2 mx-auto mb-2 animate-pulse"></div>
+                                   <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto animate-pulse"></div>
+                              </div>
+
+                              {/* Skeleton Links */}
+                              <div className="space-y-3 mb-6">
+                                   {[1, 2, 3, 4].map((_, index) => (
+                                        <LinkSkeleton key={index} />
+                                   ))}
+                              </div>
+                         </div>
+                    </motion.div>
                </div>
           );
      }
@@ -108,25 +140,43 @@ const LinktreePage: React.FC = () => {
                               )}
                          </div>
 
-                         {/* Links */}
+                         {/* Links with Shimmer Effect */}
                          <div className="space-y-3 mb-6">
-                              {links.map((link, index) => (
-                                   <motion.a
-                                        key={link.id}
-                                        href={link.originalUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.1 + index * 0.05 }}
-                                        className="block bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 transition-all duration-200 group"
-                                   >
-                                        <div className="flex items-center justify-between">
-                                             <span className="text-white text-sm font-medium truncate capitalize">{link.nameUrl}</span>
-                                             <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
-                                        </div>
-                                   </motion.a>
-                              ))}
+                              <AnimatePresence>
+                                   {links.map((link, index) => (
+                                        <motion.a
+                                             key={link.id}
+                                             href={link.originalUrl}
+                                             target="_blank"
+                                             rel="noopener noreferrer"
+                                             initial={{
+                                                  opacity: 0,
+                                                  x: -20,
+                                                  scale: 0.95
+                                             }}
+                                             animate={{
+                                                  opacity: 1,
+                                                  x: 0,
+                                                  scale: 1,
+                                                  transition: {
+                                                       delay: 0.1 + index * 0.1,
+                                                       type: "spring",
+                                                       stiffness: 100
+                                                  }
+                                             }}
+                                             whileHover={{
+                                                  scale: 1.02,
+                                                  boxShadow: "0 0 15px rgba(255,255,255,0.2)"
+                                             }}
+                                             className="block relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 transition-all duration-200 group overflow-hidden shimmer-effect"
+                                        >
+                                             <div className="flex items-center justify-between relative z-10">
+                                                  <span className="text-white text-sm font-medium truncate capitalize">{link.nameUrl}</span>
+                                                  <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
+                                             </div>
+                                        </motion.a>
+                                   ))}
+                              </AnimatePresence>
                          </div>
 
                          {/* Social Media Links */}
@@ -138,7 +188,19 @@ const LinktreePage: React.FC = () => {
                                              href={social.url}
                                              target="_blank"
                                              rel="noopener noreferrer"
-                                             whileHover={{ y: -3 }}
+                                             initial={{ opacity: 0, y: 20 }}
+                                             animate={{
+                                                  opacity: 1,
+                                                  y: 0,
+                                                  transition: {
+                                                       delay: 0.5 + index * 0.1
+                                                  }
+                                             }}
+                                             whileHover={{
+                                                  scale: 1.2,
+                                                  rotate: [0, -10, 10, 0],
+                                                  transition: { duration: 0.3 }
+                                             }}
                                              className="text-gray-400 hover:text-white transition-colors"
                                              aria-label={`Social link ${index}`}
                                         >
