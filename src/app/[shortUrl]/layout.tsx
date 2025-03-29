@@ -25,7 +25,6 @@ export const metadata: Metadata = {
           description: "Easily verify and manage your shorten links securely through Oktaa.",
           images: ["https://oktaa.my.id/banner.png"],
      },
-     themeColor: "#1e2939",
      icons: {
           icon: "https://oktaa.my.id/favicon.ico",
           apple: "https://oktaa.my.id/apple-touch-icon.png",
