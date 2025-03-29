@@ -28,7 +28,8 @@ interface AnalyticsUpdates {
      [key: string]: ReturnType<typeof increment>;
 }
 
-export async function GET(request: Request, { params }: { params: Params }) {
+export async function GET(request: Request, props: { params: Promise<Params> }) {
+     const params = await props.params;
      const shortUrl = params?.shortUrl || "";
 
      if (!shortUrl) {
