@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe } from 'react-icons/fi';
 import { FaSpotify, FaTiktok } from "react-icons/fa";
-import { getLinks, getProfiles } from '@/lib/firestore';
+import { getLinks, getProfiles } from '@/lib/service';
 import { Link, Profile } from '@/app/types';
 
 // Skeleton Component

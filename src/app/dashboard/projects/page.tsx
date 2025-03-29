@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
-import { getProjects } from "@/lib/firestore";
+import { getProjects } from "@/lib/service";
 import { Project } from "@/app/types";
 
 export default function Projects() {

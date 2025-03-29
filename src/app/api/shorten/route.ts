@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createLink, checkShortUrlExists } from "@/lib/firestore";
+import { createLink, checkShortUrlExists } from "@/lib/service";
 
 export async function POST(req: Request) {
      try {

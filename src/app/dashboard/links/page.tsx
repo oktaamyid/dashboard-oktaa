@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import LinkTable from "@/components/features/links/linkTable";
 import LinkForm from "@/components/features/links/linkForm";
-import { getLinks, createLink, updateLink, deleteLink } from "@/lib/firestore";
+import { getLinks, createLink, updateLink, deleteLink } from "@/lib/service";
 import { Link } from "@/app/types";
 
 export default function LinksPage() {

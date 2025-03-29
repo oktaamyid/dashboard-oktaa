@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
-import { getExperiences, getProjects, getLinks } from "@/lib/firestore";
+import { getExperiences, getProjects, getLinks } from "@/lib/service";
 import { Experience, Project, Link, TableData } from "@/app/types";
 import Select from '@/components/ui/select';
 import Input from '@/components/ui/input';

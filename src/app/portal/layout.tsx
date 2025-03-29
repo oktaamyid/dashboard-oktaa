@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getProfiles } from '@/lib/firestore';
+import { getProfiles } from '@/lib/service';
 
 export async function generateMetadata(): Promise<Metadata> {
      try {

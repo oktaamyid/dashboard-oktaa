@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ProfileForm from "@/components/features/profile/profileForm";
-import { getProfiles } from "@/lib/firestore";
+import { getProfiles } from "@/lib/service";
 import { Profile } from '@/app/types';
 
 export default function EditProfilePage() {

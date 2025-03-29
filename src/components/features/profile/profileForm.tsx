@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Profile } from "@/app/types";
-import { updateProfile } from "@/lib/firestore";
+import { updateProfile } from "@/lib/service";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import ImageUploader from "@/components/ui/imageUpload";

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
-import { getExperiences } from "@/lib/firestore";
+import { getExperiences } from "@/lib/service";
 import { Experience } from "@/app/types";
 
 export default function Experiences() {
