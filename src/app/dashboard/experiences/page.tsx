@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
 import { getExperiences } from "@/lib/service";
 import { Experience } from "@/app/types";
+import { formatArrayCell } from "@/lib/utils/formatArray";
 
 export default function Experiences() {
      const [data, setData] = useState<Experience[]>([]);
@@ -13,7 +14,7 @@ export default function Experiences() {
      useEffect(() => {
           async function fetchData() {
                try {
-                    setLoading(true);                    
+                    setLoading(true);
                     const experiences = await getExperiences();
                     setData(experiences);
                } catch (error) {
@@ -33,6 +34,10 @@ export default function Experiences() {
                     data={data}
                     columns={["id", "company", "role", "year", "techStack"]}
                     isLoading={loading}
+                    renderCell={(column, row) => {
+                         if (column == "techStack") return formatArrayCell(row[column]);
+                         return row[column as keyof Experience] as React.ReactNode;
+                    }}
                />
           </div>
      );

@@ -9,6 +9,7 @@ import Input from '@/components/ui/input';
 import { LinkIcon, FolderIcon, BriefcaseIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
+import { formatArrayCell } from "@/lib/utils/formatArray";
 
 export default function Overview() {
      const [selectedTable, setSelectedTable] = useState<"Projects" | "Links" | "Experiences">("Projects");
@@ -70,7 +71,13 @@ export default function Overview() {
      const columnsToShow: Record<"Projects" | "Links" | "Experiences", string[]> = {
           Projects: ["title", "description", "technology"],
           Links: ["originalUrl", "shortUrl", "createdAt"],
-          Experiences: ["company", "role", "year"],
+          Experiences: ["company", "role", "year", "techStack"],
+     };
+
+     const arrayColumnsMap: Record<"Projects" | "Links" | "Experiences", string[]> = {
+          Projects: ["technology"],
+          Links: [],
+          Experiences: ["techStack"],
      };
 
      const columns = columnsToShow[selectedTable];
@@ -132,6 +139,12 @@ export default function Overview() {
                               data={filteredData}
                               columns={columns}
                               isLoading={loading}
+                              renderCell={(column, row) => {
+                                   if (arrayColumnsMap[selectedTable].includes(column)) {
+                                        return formatArrayCell(row[column as keyof typeof row]);
+                                   }
+                                   return row[column as keyof typeof row] as React.ReactNode;
+                              }}
                          />
                     </div>
                </div>

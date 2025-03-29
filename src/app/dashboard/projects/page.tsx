@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
 import { getProjects } from "@/lib/service";
 import { Project } from "@/app/types";
+import { formatArrayCell } from "@/lib/utils/formatArray";
 
 export default function Projects() {
      const [data, setData] = useState<Project[]>([]);
@@ -35,6 +36,10 @@ export default function Projects() {
                     data={data}
                     columns={["id", "title", "description", "technology"]}
                     isLoading={loading}
+                    renderCell={(column, row) => {
+                         if (column == "technology") return formatArrayCell(row[column]);
+                         return row[column as keyof Project] as React.ReactNode;
+                    }}
                />
           </div>
      );
