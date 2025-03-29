@@ -110,36 +110,34 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
                     {/* Referer Stats */}
                     <div className="bg-gray-800 rounded-lg p-4 shadow">
                          <h4 className="font-medium text-gray-300 mb-3">Top Referrers</h4>
-                         <>
-                              {refererData.length >= 0 ? (
-                                   <div className="space-y-3">
-                                        {refererData.map((item) => (
-                                             <div key={item.referer} className="space-y-1">
-                                                  <div className="flex justify-between text-sm">
-                                                       <span className="text-gray-400 truncate max-w-[120px]" title={item.referer}>
-                                                            {item.referer || "Direct"}
-                                                       </span>
-                                                       <span className="text-gray-200 font-medium">
-                                                            {item.count} ({Math.round((item.count / (link.clicks || 1)) * 100)}%)
-                                                       </span>
-                                                  </div>
-                                                  <div className="w-full bg-gray-700 rounded-full h-2">
-                                                       <div
-                                                            className="bg-pink-500 h-2 rounded-full"
-                                                            style={{
-                                                                 width: `${Math.min(100, (item.count / (link.clicks || 1)) * 100)}%`
-                                                            }}
-                                                       ></div>
-                                                  </div>
+                         {refererData.length > 0 ? (
+                              <div className="space-y-3">
+                                   {refererData.map((item) => (
+                                        <div key={item.referer} className="space-y-1">
+                                             <div className="flex justify-between text-sm">
+                                                  <span className="text-gray-400 truncate max-w-[120px]" title={item.referer}>
+                                                       {item.referer || "Direct"}
+                                                  </span>
+                                                  <span className="text-gray-200 font-medium">
+                                                       {item.count} ({Math.round((item.count / (link.clicks || 1)) * 100)}%)
+                                                  </span>
                                              </div>
-                                        ))}
-                                   </div>
-                              ) : (
-                                   <div className="text-gray-500 italic text-sm">
-                                        No referrer data available
-                                   </div>
-                              )}
-                         </>
+                                             <div className="w-full bg-gray-700 rounded-full h-2">
+                                                  <div
+                                                       className="bg-pink-500 h-2 rounded-full"
+                                                       style={{
+                                                            width: `${Math.min(100, (item.count / (link.clicks || 1)) * 100)}%`
+                                                       }}
+                                                  ></div>
+                                             </div>
+                                        </div>
+                                   ))}
+                              </div>
+                         ) : (
+                              <div className="text-gray-500 italic text-sm">
+                                   No referrer data available
+                              </div>
+                         )}
                     </div>
                </div>
           </div>

@@ -5,34 +5,98 @@ import LinkTable from "@/components/features/links/linkTable";
 import LinkForm from "@/components/features/links/linkForm";
 import { getLinks, createLink, updateLink, deleteLink } from "@/lib/service";
 import { Link } from "@/app/types";
+import Card from '@/components/ui/card';
+import DivContainer from '@/components/ui/container';
+import { CursorArrowRippleIcon, ChartBarIcon, DevicePhoneMobileIcon, GlobeAltIcon, MapIcon } from '@heroicons/react/24/solid';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+
+// Analytics interfaces
+interface AnalyticsSummary {
+     totalClicks: number;
+     averageClicks: number;
+     topLinks: { name: string; clicks: number }[];
+     deviceDistribution: { name: string; value: number }[];
+     referrerDistribution: { name: string; value: number }[];
+     geoDistribution: { name: string; value: number }[];
+}
 
 export default function LinksPage() {
      const [links, setLinks] = useState<Link[]>([]);
      const [editingLink, setEditingLink] = useState<Link | null>(null);
      const [isFormVisible, setFormVisible] = useState(false);
      const [loading, setLoading] = useState(true);
-     const [analyticsView, setAnalyticsView] = useState(false);
+     const [analyticsView, setAnalyticsView] = useState(true);
+     const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null);
 
-     useEffect(() => {
-          async function fetchData() {
-               try {
-                    setLoading(true);
-                    const data = await getLinks();
-                    setLinks(data);
-               } catch (error) {
-                    console.error("Error fetching data: ", error);
-               } finally {
-                    setLoading(false);
+     // Calculate analytics data
+     const calculateAnalytics = (links: Link[]): AnalyticsSummary => {
+          const totalClicks = links.reduce((sum, link) => sum + (link.clicks || 0), 0);
+          const averageClicks = links.length > 0 ? totalClicks / links.length : 0;
+
+          // Top 5 performing links
+          const topLinks = [...links]
+               .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+               .slice(0, 5)
+               .map(link => ({
+                    name: link.nameUrl || link.shortUrl || 'Unnamed',
+                    clicks: link.clicks || 0
+               }));
+
+          // Device distribution
+          const deviceStats = links.reduce((acc, link) => {
+               if (link.deviceStats) {
+                    acc.desktop = (acc.desktop || 0) + (link.deviceStats.desktop || 0);
+                    acc.mobile = (acc.mobile || 0) + (link.deviceStats.mobile || 0);
+                    acc.tablet = (acc.tablet || 0) + (link.deviceStats.tablet || 0);
                }
-          }
+               return acc;
+          }, { desktop: 0, mobile: 0, tablet: 0 });
 
-          fetchData();
+          const deviceDistribution = [
+               { name: 'Desktop', value: deviceStats.desktop },
+               { name: 'Mobile', value: deviceStats.mobile },
+               { name: 'Tablet', value: deviceStats.tablet }
+          ].filter(item => item.value > 0);
 
-          // Set up refresh interval for analytics (every minute)
-          const intervalId = setInterval(fetchData, 60000);
+          // Referrer distribution
+          const referrerStats = links.reduce((acc, link) => {
+               if (link.refererStats) {
+                    Object.entries(link.refererStats).forEach(([referrer, count]) => {
+                         acc[referrer] = (acc[referrer] || 0) + count;
+                    });
+               }
+               return acc;
+          }, {} as Record<string, number>);
 
-          return () => clearInterval(intervalId);
-     }, []);
+          const referrerDistribution = Object.entries(referrerStats)
+               .sort((a, b) => b[1] - a[1])
+               .slice(0, 5)
+               .map(([name, value]) => ({ name, value }));
+
+          // Geo distribution
+          const geoStats = links.reduce((acc, link) => {
+               if (link.geoStats) {
+                    Object.entries(link.geoStats).forEach(([location, count]) => {
+                         acc[location] = (acc[location] || 0) + count;
+                    });
+               }
+               return acc;
+          }, {} as Record<string, number>);
+
+          const geoDistribution = Object.entries(geoStats)
+               .sort((a, b) => b[1] - a[1])
+               .slice(0, 5)
+               .map(([name, value]) => ({ name, value }));
+
+          return {
+               totalClicks,
+               averageClicks,
+               topLinks,
+               deviceDistribution,
+               referrerDistribution,
+               geoDistribution
+          };
+     };
 
      const handleCreateOrUpdate = async (linkData: Omit<Link, "id">) => {
           if (editingLink) {
@@ -55,6 +119,33 @@ export default function LinksPage() {
           await deleteLink(id);
           setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
      };
+
+     useEffect(() => {
+          async function fetchData() {
+               try {
+                    setLoading(true);
+                    const data = await getLinks();
+                    setLinks(data);
+                    setAnalyticsData(calculateAnalytics(data));
+               } catch (error) {
+                    console.error("Error fetching data: ", error);
+               } finally {
+                    setLoading(false);
+               }
+          }
+
+          fetchData();
+
+          // Set up refresh interval for analytics (every minute)
+          const intervalId = setInterval(fetchData, 60000);
+
+          return () => clearInterval(intervalId);
+     }, []);
+
+     // ... rest of your existing functions (handleCreateOrUpdate, handleDelete) ...
+
+     // Color palette for charts
+     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
      return (
           <div>
@@ -105,6 +196,156 @@ export default function LinksPage() {
                          isLoading={loading}
                     />
                )}
+
+               {analyticsView && analyticsData && (
+                    <div className="my-6 space-y-6">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* Summary Cards */}
+                              <Card
+                                   title="Total Click"
+                                   value={analyticsData.totalClicks}
+                                   icon={CursorArrowRippleIcon}
+                              />
+
+                              <Card
+                                   title="Average Clicks per Link"
+                                   value={analyticsData.averageClicks.toFixed(1)}
+                                   icon={ChartBarIcon}
+                              />
+
+                         </div>
+
+                         {/* Top Links Chart */}
+                         <DivContainer className="p-4" hoverEffect={false}>
+                              <h3 className="font-medium text-gray-300 mb-4">Top Performing Links</h3>
+                              <div className="h-64">
+                                   <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={analyticsData.topLinks}>
+                                             <XAxis dataKey="name" stroke="#d1d5db" />
+                                             <YAxis stroke="#d1d5db" />
+                                             <Tooltip
+                                                  contentStyle={{
+                                                       backgroundColor: '#374151',
+                                                       borderColor: '#4b5563',
+                                                       borderRadius: '0.5rem'
+                                                  }}
+                                             />
+                                             <Legend />
+                                             <Bar
+                                                  dataKey="clicks"
+                                                  fill="#8884d8"
+                                                  name="Clicks"
+                                                  radius={[4, 4, 0, 0]}
+                                             />
+                                        </BarChart>
+                                   </ResponsiveContainer>
+                              </div>
+                         </DivContainer>
+
+                         {/* Distribution Charts */}
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              {/* Device Distribution */}
+                              <DivContainer className="p-4" hoverEffect={false} icon={DevicePhoneMobileIcon}>
+                                   <h3 className="font-medium text-gray-300 mb-4">Device Distribution</h3>
+                                   <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                             <PieChart>
+                                                  <Pie
+                                                       data={analyticsData.deviceDistribution}
+                                                       cx="50%"
+                                                       cy="50%"
+                                                       labelLine={false}
+                                                       outerRadius={80}
+                                                       fill="#8884d8"
+                                                       dataKey="value"
+                                                       nameKey="name"
+                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                  >
+                                                       {analyticsData.deviceDistribution.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                       ))}
+                                                  </Pie>
+                                                  <Tooltip
+                                                       contentStyle={{
+                                                            backgroundColor: '#374151',
+                                                            borderColor: '#4b5563',
+                                                            borderRadius: '0.5rem'
+                                                       }}
+                                                  />
+                                             </PieChart>
+                                        </ResponsiveContainer>
+                                   </div>
+                              </DivContainer>
+
+                              {/* Referrer Distribution */}
+                              <DivContainer className="p-4" hoverEffect={false} icon={GlobeAltIcon}>
+                                   <h3 className="font-medium text-gray-300 mb-4">Top Referrers</h3>
+                                   <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                             <PieChart>
+                                                  <Pie
+                                                       data={analyticsData.referrerDistribution}
+                                                       cx="50%"
+                                                       cy="50%"
+                                                       labelLine={false}
+                                                       outerRadius={80}
+                                                       fill="#8884d8"
+                                                       dataKey="value"
+                                                       nameKey="name"
+                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                  >
+                                                       {analyticsData.referrerDistribution.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                       ))}
+                                                  </Pie>
+                                                  <Tooltip
+                                                       contentStyle={{
+                                                            backgroundColor: '#374151',
+                                                            borderColor: '#4b5563',
+                                                            borderRadius: '0.5rem'
+                                                       }}
+                                                  />
+                                             </PieChart>
+                                        </ResponsiveContainer>
+                                   </div>
+                              </DivContainer>
+
+                              {/* Geo Distribution */}
+                              <DivContainer className="p-4" hoverEffect={false} icon={MapIcon}>
+                                   <h3 className="font-medium text-gray-300 mb-4">Top Locations</h3>
+                                   <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                             <PieChart>
+                                                  <Pie
+                                                       data={analyticsData.geoDistribution}
+                                                       cx="50%"
+                                                       cy="50%"
+                                                       labelLine={false}
+                                                       outerRadius={80}
+                                                       fill="#8884d8"
+                                                       dataKey="value"
+                                                       nameKey="name"
+                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                  >
+                                                       {analyticsData.geoDistribution.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                       ))}
+                                                  </Pie>
+                                                  <Tooltip
+                                                       contentStyle={{
+                                                            backgroundColor: '#374151',
+                                                            borderColor: '#4b5563',
+                                                            borderRadius: '0.5rem'
+                                                       }}
+                                                  />
+                                             </PieChart>
+                                        </ResponsiveContainer>
+                                   </div>
+                              </DivContainer>
+                         </div>
+                    </div>
+               )}
+
           </div>
      );
 }

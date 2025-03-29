@@ -78,7 +78,9 @@ async function trackAnalytics(request: Request, docRef: DocumentReference) {
 
           // Get referrer
           const referer = request.headers.get("referer") || "direct";
-          const simplifiedReferer = simplifyReferer(referer);
+          let simplifiedReferer = simplifyReferer(referer);
+      
+          simplifiedReferer = simplifiedReferer.replace(/\./g, '_dot_');
 
           // Get country
           const country = request.headers.get("x-vercel-ip-country") ||
@@ -105,7 +107,16 @@ function simplifyReferer(referer: string): string {
      try {
           if (referer === "direct") return "direct";
           const url = new URL(referer);
-          return url.hostname;
+
+          // Handle khusus untuk domain seperti oktaa.my.id
+          const hostname = url.hostname;
+
+          // Jika mengandung titik lebih dari satu (subdomain)
+          if ((hostname.match(/\./g) || []).length > 1) {
+               return hostname; 
+          }
+
+          return hostname;
      } catch {
           return "unknown";
      }

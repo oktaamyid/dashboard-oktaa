@@ -45,12 +45,6 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false }
           const link = links.find(l => l.id === row.id)!;
 
           switch (column) {
-               case 'id':
-                    return (
-                         <span className="truncate max-w-xs block" title={link.id}>
-                              {link.id}
-                         </span>
-                    )
                case 'name':
                     return link.nameUrl || '-';
                case 'originalUrl':
