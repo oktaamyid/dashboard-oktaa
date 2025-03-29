@@ -41,7 +41,7 @@ export interface Link {
           [key: string]: number;
      };
 
-     showConfirmationPage: boolean;
+     showConfirmationPage?: boolean;
      confirmationPageSettings?: {
           customMessage?: string;
      };
@@ -65,4 +65,10 @@ export interface Profile {
      website?: string;
 }
 
+export interface TableRenderData {
+     id: string;
+     [key: string]: string | number | boolean | React.ReactNode;
+}
+
+// Union type utama yang sudah ada
 export type TableData = Experience | Project | Link | Profile;

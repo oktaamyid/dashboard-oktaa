@@ -1,9 +1,12 @@
+// components/link-table.tsx
 "use client";
 
 import { useState } from "react";
 import Table from "@/components/ui/table";
 import Button from "@/components/ui/button";
+import LinkAnalytics from "@/components/features/links/linkAnalytics";
 import { Link } from "@/app/types";
+import { PencilIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
 interface LinkTableProps {
      links: Link[];
@@ -12,56 +15,149 @@ interface LinkTableProps {
      isLoading?: boolean;
 }
 
+interface LinkTableRow {
+     id: string;
+     name: string;
+     originalUrl: string;
+     shortUrl: string;
+     clicks: number;
+     showToPortal: boolean;
+     showConfirmationPage: boolean;
+}
+
 export default function LinkTable({ links, onEdit, onDelete, isLoading = false }: LinkTableProps) {
-     const columns = ["id", "shortUrl", "originalUrl", "clicks", "actions"];
-     const [copiedId, setCopiedId] = useState<string | null>(null);
+     const [expandedLinkId, setExpandedLinkId] = useState<string | null>(null);
 
-     const handleCopy = async (shortUrl: string | undefined, id: string) => {
-          if (!shortUrl) return;
-          
-          const fullUrl = `${window.location.origin}/${shortUrl}`;
+     const toggleAnalytics = (id: string) => {
+          setExpandedLinkId(expandedLinkId === id ? null : id);
+     };
 
-          try {
-               await navigator.clipboard.writeText(fullUrl);
-               setCopiedId(id);
-               setTimeout(() => setCopiedId(null), 2000);
-          } catch (err) {
-               console.error("Failed to copy:", err);
+     const columns = [
+          "name",
+          "originalUrl",
+          "shortUrl",
+          "clicks",
+          "status",
+          "actions"
+     ];
+
+     const renderCell = (column: string, row: LinkTableRow) => {
+          const link = links.find(l => l.id === row.id)!;
+
+          switch (column) {
+               case 'id':
+                    return (
+                         <span className="truncate max-w-xs block" title={link.id}>
+                              {link.id}
+                         </span>
+                    )
+               case 'name':
+                    return link.nameUrl || '-';
+               case 'originalUrl':
+                    return (
+                         <span className="truncate max-w-xs block" title={link.originalUrl}>
+                              {link.originalUrl}
+                         </span>
+                    );
+               case 'shortUrl':
+                    return link.shortUrl ? (
+                         <a
+                              href={`/${link.shortUrl}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                         >
+                              /{link.shortUrl}
+                         </a>
+                    ) : '-';
+               case 'clicks':
+                    return (
+                         <div
+                              className="flex items-center cursor-pointer"
+                              onClick={() => toggleAnalytics(link.id)}
+                         >
+                              {link.clicks || 0}
+                              {expandedLinkId === link.id ? (
+                                   <ChevronUpIcon className="w-4 h-4 ml-1" />
+                              ) : (
+                                   <ChevronDownIcon className="w-4 h-4 ml-1" />
+                              )}
+                         </div>
+                    );
+               case 'status':
+                    return (
+                         <div className="flex flex-col">
+                              <span>Portal: {link.showToPortal ? "Yes" : "No"}</span>
+                              <span>Confirm: {link.showConfirmationPage ? "Yes" : "No"}</span>
+                         </div>
+                    );
+               case 'actions':
+                    return (
+                         <div className="flex space-x-2">
+                              <Button
+                                   variant="secondary"
+                                   onClick={() => onEdit(link)}
+                                   className="p-1"
+                                   aria-label="Edit"
+                              >
+                                   <PencilIcon className="w-5 h-5" />
+                              </Button>
+                              <Button
+                                   variant="danger"
+                                   onClick={() => {
+                                        if (confirm("Are you sure you want to delete this link?")) {
+                                             onDelete(link.id);
+                                        }
+                                   }}
+                                   className="p-1"
+                                   aria-label="Delete"
+                              >
+                                   <TrashIcon className="w-5 h-5" />
+                              </Button>
+                         </div>
+                    );
+               default:
+                    return row[column as keyof LinkTableRow] as React.ReactNode;
           }
      };
 
-     const tableData = links.map((link) => ({
-          id: link.id,
-          shortUrl: link.shortUrl || "-",
-          originalUrl: link.originalUrl,
-          clicks: link.clicks || 0,
-          showConfirmationPage: link.showConfirmationPage || false, // Tetap ada agar tidak error
-          actions: (
-               <div className="flex space-x-2">
-                    <Button variant="secondary" onClick={() => onEdit(link)}>Edit</Button>
-                    <Button
-                         variant="danger"
-                         onClick={() => {
-                              if (confirm("Are you sure you want to delete this link?")) {
-                                   onDelete(link.id);
-                              }
-                         }}
-                    >
-                         Delete
-                    </Button>
-                    <Button
-                         variant="primary"
-                         disabled={!link.shortUrl}
-                         onClick={() => handleCopy(link.shortUrl, link.id)}
-                    >
-                         {copiedId === link.id ? "Copied!" : "Copy"}
-                    </Button>
-                    <Button type="button" variant="primary">
-                         Detail
-                    </Button>
-               </div>
-          ),
-     }));
+     const renderExpandedRow = (row: LinkTableRow) => {
+          const link = links.find(l => l.id === row.id);
+          return link ? <LinkAnalytics link={link} /> : null;
+     };
 
-     return <Table columns={columns} data={tableData} isLoading={isLoading} />;
+     return (
+          <div className="mt-6">
+               {isLoading ? (
+                    <Table
+                         columns={columns}
+                         data={[]}
+                         isLoading={true}
+                         expandedRowId={null}
+                         renderExpandedRow={renderExpandedRow}
+                         renderCell={renderCell}
+                    />
+               ) : links.length === 0 ? (
+                    <div className="text-center py-8 text-gray-300">No links found. Add your first link!</div>
+               ) : (
+                    <Table<LinkTableRow>
+                         columns={columns}
+                         data={links.map(link => ({
+                              id: link.id,
+                              name: link.nameUrl || '',
+                              originalUrl: link.originalUrl,
+                              shortUrl: link.shortUrl || '',
+                              clicks: link.clicks || 0,
+                              showToPortal: link.showToPortal || false,
+                              showConfirmationPage: link.showConfirmationPage || false
+                         }))}
+                         isLoading={false}
+                         expandedRowId={expandedLinkId}
+                         renderExpandedRow={renderExpandedRow}
+                         renderCell={renderCell}
+                    />
+               )}
+          </div>
+     );
 }

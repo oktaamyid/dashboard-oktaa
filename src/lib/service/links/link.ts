@@ -1,23 +1,49 @@
 import { db } from "../../firebaseConfig";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, serverTimestamp, Timestamp } from "firebase/firestore";
+import {
+     collection,
+     doc,
+     addDoc,
+     getDocs,
+     getDoc,
+     updateDoc,
+     deleteDoc,
+     serverTimestamp,
+     QueryDocumentSnapshot,
+     where,
+     query,
+     Timestamp
+} from "firebase/firestore";
 import { Link } from "@/app/types";
 import { format } from 'date-fns';
 
+// Convert Firestore document to Link type
+const convertDoc = (doc: QueryDocumentSnapshot): Link => {
+     const data = doc.data();
+     return {
+          id: doc.id,
+          originalUrl: data.originalUrl,
+          shortUrl: data.shortUrl,
+          createdAt: data.createdAt instanceof Timestamp
+               ? format(data.createdAt.toDate(), "dd MMM yyyy HH:mm:ss")
+               : data.createdAt,
+          updatedAt: data.updatedAt instanceof Timestamp
+               ? format(data.updatedAt.toDate(), "dd MMM yyyy HH:mm:ss")
+               : data.updatedAt,
+          clicks: data.clicks || 0,
+          showToPortal: data.showToPortal || false,
+          nameUrl: data.nameUrl || "",
+          deviceStats: data.deviceStats || {},
+          geoStats: data.geoStats || {},
+          refererStats: data.refererStats || {},
+          showConfirmationPage: data.showConfirmationPage || false,
+          confirmationPageSettings: data.confirmationPageSettings || {}
+     };
+};
+
+// Get all links
 export const getLinks = async (): Promise<Link[]> => {
      const querySnapshot = await getDocs(collection(db, "links"));
-     return querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-               id: doc.id,
-               ...data,
-               createdAt: data.createdAt instanceof Timestamp
-                    ? format(data.createdAt.toDate(), "dd MMM yyyy HH:mm:ss")
-                    : data.createdAt,
-               updatedAt: data.updatedAt instanceof Timestamp
-                    ? format(data.updatedAt.toDate(), "dd MMM yyyy HH:mm:ss")
-                    : data.updatedAt,
-          } as Link;
-     });
+     return querySnapshot.docs.map(convertDoc);
 };
 
 export const checkShortUrlExists = async (shortUrl: string, excludeId?: string): Promise<boolean> => {
@@ -27,29 +53,69 @@ export const checkShortUrlExists = async (shortUrl: string, excludeId?: string):
      return querySnapshot.docs.some((doc) => doc.id !== excludeId);
 };
 
-export const createLink = async (linkData: Omit<Link, "id">) => {
-     if (!linkData.shortUrl) throw new Error("Short URL is required");
-     const isExists = await checkShortUrlExists(linkData.shortUrl);
-     if (isExists) throw new Error("Short URL is already taken");
-     const docRef = await addDoc(collection(db, "links"), {
+// Create a new link
+export const createLink = async (linkData: Omit<Link, "id">): Promise<{ id: string }> => {
+     const now = serverTimestamp();
+
+     // Initialize analytics fields
+     const dataToSave = {
           ...linkData,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-     });
-     return { id: docRef.id, ...linkData, createdAt: new Date(), updatedAt: new Date() };
+          createdAt: now,
+          updatedAt: now,
+          clicks: 0,
+          deviceStats: {
+               desktop: 0,
+               mobile: 0,
+               tablet: 0
+          },
+          geoStats: {},
+          refererStats: {}
+     };
+
+     const docRef = await addDoc(collection(db, "links"), dataToSave);
+     return { id: docRef.id };
 };
 
-export const updateLink = async (id: string, updatedData: Partial<Link>) => {
-     if (updatedData.shortUrl) {
-          const isExists = await checkShortUrlExists(updatedData.shortUrl, id);
-          if (isExists) throw new Error("Short URL is already taken");
+// Update an existing link
+export const updateLink = async (id: string, linkData: Partial<Omit<Link, "id">>): Promise<void> => {
+     const docRef = doc(db, "links", id);
+
+     await updateDoc(docRef, {
+          ...linkData,
+          updatedAt: serverTimestamp()
+     });
+};
+
+// Delete a link
+export const deleteLink = async (id: string): Promise<void> => {
+     await deleteDoc(doc(db, "links", id));
+};
+
+// Get a single link
+export const getLink = async (id: string): Promise<Link | null> => {
+     const docRef = doc(db, "links", id);
+     const docSnap = await getDoc(docRef);
+
+     if (docSnap.exists()) {
+          return {
+               id: docSnap.id,
+               ...docSnap.data()
+          } as Link;
      }
-     return await updateDoc(doc(db, "links", id), {
-          ...updatedData,
-          updatedAt: serverTimestamp(),
-     });
+
+     return null;
 };
 
-export const deleteLink = async (id: string) => {
-     return await deleteDoc(doc(db, "links", id));
+// Get a link by short URL
+export const getLinkByShortUrl = async (shortUrl: string): Promise<Link | null> => {
+     const linksRef = collection(db, "links");
+     const querySnapshot = await getDocs(linksRef);
+
+     const match = querySnapshot.docs.find(doc => doc.data().shortUrl === shortUrl);
+
+     if (match) {
+          return convertDoc(match);
+     }
+
+     return null;
 };
