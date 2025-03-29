@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "@/app/types";
+import { denormalizeReferer } from '@/lib/utils/normalizeReferer';
 
 interface LinkAnalyticsProps {
      link: Link;
@@ -21,9 +22,12 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
 
      // Prepare data for referrer stats (top 5 referrers)
      const refererData = Object.entries(link.refererStats || {})
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([referer, count]) => ({ referer, count }));
+          .map(([referer, count]) => ({
+               referer: denormalizeReferer(referer), 
+               count: Number(count)
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
 
      if (!link.clicks) {
           return (

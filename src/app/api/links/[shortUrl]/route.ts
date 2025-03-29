@@ -10,6 +10,7 @@ import {
      DocumentReference
 } from "firebase/firestore";
 import { UAParser } from "ua-parser-js";
+import { normalizeReferer } from '@/lib/utils/normalizeReferer';
 
 interface Params {
      shortUrl?: string;
@@ -78,10 +79,8 @@ async function trackAnalytics(request: Request, docRef: DocumentReference) {
 
           // Get referrer
           const referer = request.headers.get("referer") || "direct";
-          let simplifiedReferer = simplifyReferer(referer);
+          const simplifiedReferer = normalizeReferer(referer);
       
-          simplifiedReferer = simplifiedReferer.replace(/\./g, '_dot_');
-
           // Get country
           const country = request.headers.get("x-vercel-ip-country") ||
                request.headers.get("cf-ipcountry") ||
@@ -99,25 +98,5 @@ async function trackAnalytics(request: Request, docRef: DocumentReference) {
           await updateDoc(docRef, updates);
      } catch (error) {
           console.error("Error tracking analytics:", error);
-     }
-}
-
-// Simplify referrer to just the domain
-function simplifyReferer(referer: string): string {
-     try {
-          if (referer === "direct") return "direct";
-          const url = new URL(referer);
-
-          // Handle khusus untuk domain seperti oktaa.my.id
-          const hostname = url.hostname;
-
-          // Jika mengandung titik lebih dari satu (subdomain)
-          if ((hostname.match(/\./g) || []).length > 1) {
-               return hostname; 
-          }
-
-          return hostname;
-     } catch {
-          return "unknown";
      }
 }
