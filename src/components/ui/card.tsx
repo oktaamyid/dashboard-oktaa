@@ -10,10 +10,10 @@ export default function Card({
      className?: string
 }) {
      return (
-          <div className={`bg-gray-700 p-4 sm:p-6 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300 flex items-center space-x-4 relative overflow-hidden ${className}`}>
-               {/* Background Icon */}
+          <div className={`group bg-gray-700 p-4 sm:p-6 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300 flex items-center space-x-4 relative overflow-hidden ${className}`}>
+               {/* Background Icon with hover effect */}
                {Icon && (
-                    <div className="absolute -right-2 -bottom-2 opacity-10">
+                    <div className="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-all duration-500 group-hover:scale-125 transform origin-bottom-right">
                          <Icon className="h-16 w-16 text-white" />
                     </div>
                )}

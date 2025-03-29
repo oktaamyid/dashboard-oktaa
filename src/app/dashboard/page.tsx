@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
 import { getExperiences, getProjects, getLinks } from "@/lib/firestore";
 import { Experience, Project, Link, TableData } from "@/app/types";
-import Card from '@/components/ui/card';
 import Select from '@/components/ui/select';
 import Input from '@/components/ui/input';
 import { LinkIcon, FolderIcon, BriefcaseIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 
 export default function Overview() {
      const [selectedTable, setSelectedTable] = useState<"Projects" | "Links" | "Experiences">("Projects");
@@ -81,20 +81,23 @@ export default function Overview() {
 
                {/* Card Statistics */}
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <Card
+                    <AnimatedStatsCard
                          title="Total Projects"
-                         value={projects.length.toString()}
+                         finalValue={projects.length}
                          icon={FolderIcon}
+                         isLoading={loading}
                     />
-                    <Card
+                    <AnimatedStatsCard
                          title="Total Links"
-                         value={links.length.toString()}
+                         finalValue={links.length}
                          icon={LinkIcon}
+                         isLoading={loading}
                     />
-                    <Card
+                    <AnimatedStatsCard
                          title="Total Experiences"
-                         value={experiences.length.toString()}
+                         finalValue={experiences.length}
                          icon={BriefcaseIcon}
+                         isLoading={loading}
                     />
                </div>
 
@@ -112,7 +115,7 @@ export default function Overview() {
                                    onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
                                    className="w-48"
                               />
-                              
+
                               <Input
                                    type="text"
                                    placeholder="Type to search..."
