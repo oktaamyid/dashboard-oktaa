@@ -5,10 +5,12 @@ import LinkTable from "@/components/features/links/linkTable";
 import LinkForm from "@/components/features/links/linkForm";
 import { getLinks, createLink, updateLink, deleteLink } from "@/lib/service";
 import { Link } from "@/app/types";
-import Card from '@/components/ui/card';
+import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 import DivContainer from '@/components/ui/container';
-import { CursorArrowRippleIcon, ChartBarIcon, DevicePhoneMobileIcon, GlobeAltIcon, MapIcon } from '@heroicons/react/24/solid';
+import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, MapIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { denormalizeReferer } from "@/lib/utils/normalizeReferer";
+import Card from "@/components/ui/card";
 
 // Analytics interfaces
 interface AnalyticsSummary {
@@ -71,7 +73,10 @@ export default function LinksPage() {
           const referrerDistribution = Object.entries(referrerStats)
                .sort((a, b) => b[1] - a[1])
                .slice(0, 5)
-               .map(([name, value]) => ({ name, value }));
+               .map(([name, value]) => ({
+                    name: denormalizeReferer(name),
+                    value: Number(value)
+               }))
 
           // Geo distribution
           const geoStats = links.reduce((acc, link) => {
@@ -142,7 +147,6 @@ export default function LinksPage() {
           return () => clearInterval(intervalId);
      }, []);
 
-     // ... rest of your existing functions (handleCreateOrUpdate, handleDelete) ...
 
      // Color palette for charts
      const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -201,9 +205,9 @@ export default function LinksPage() {
                     <div className="my-6 space-y-6">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {/* Summary Cards */}
-                              <Card
+                              <AnimatedStatsCard
                                    title="Total Click"
-                                   value={analyticsData.totalClicks}
+                                   finalValue={analyticsData.totalClicks}
                                    icon={CursorArrowRippleIcon}
                               />
 
@@ -245,7 +249,7 @@ export default function LinksPage() {
                          {/* Distribution Charts */}
                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               {/* Device Distribution */}
-                              <DivContainer className="p-4" hoverEffect={false} icon={DevicePhoneMobileIcon}>
+                              <DivContainer className="p-4" hoverEffect={false} icon={DeviceTabletIcon}>
                                    <h3 className="font-medium text-gray-300 mb-4">Device Distribution</h3>
                                    <div className="h-64">
                                         <ResponsiveContainer width="100%" height="100%">
