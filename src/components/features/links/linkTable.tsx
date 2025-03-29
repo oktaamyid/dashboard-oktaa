@@ -7,6 +7,7 @@ import Button from "@/components/ui/button";
 import LinkAnalytics from "@/components/features/links/linkAnalytics";
 import { Link } from "@/app/types";
 import { PencilIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import Input from "@/components/ui/input";
 
 interface LinkTableProps {
      links: Link[];
@@ -27,6 +28,7 @@ interface LinkTableRow {
 
 export default function LinkTable({ links, onEdit, onDelete, isLoading = false }: LinkTableProps) {
      const [expandedLinkId, setExpandedLinkId] = useState<string | null>(null);
+     const [searchTerm, setSearchTerm] = useState("");
 
      const toggleAnalytics = (id: string) => {
           setExpandedLinkId(expandedLinkId === id ? null : id);
@@ -40,6 +42,18 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false }
           "status",
           "actions"
      ];
+
+     const filteredData = links.filter(link => {
+          return Object.values({
+               name: link.nameUrl || '',
+               originalUrl: link.originalUrl,
+               shortUrl: link.shortUrl || '',
+               clicks: String(link.clicks || 0),
+               status: `${link.showToPortal ? "Yes" : "No"}, ${link.showConfirmationPage ? "Yes" : "No"}`,
+          }).some(value =>
+               value.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+     });
 
      const renderCell = (column: string, row: LinkTableRow) => {
           const link = links.find(l => l.id === row.id)!;
@@ -123,6 +137,14 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false }
 
      return (
           <div className="mt-6">
+               <Input
+                    type="text"
+                    placeholder="Type to search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    label="Search"
+               />
+
                {isLoading ? (
                     <Table
                          columns={columns}
@@ -137,7 +159,7 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false }
                ) : (
                     <Table<LinkTableRow>
                          columns={columns}
-                         data={links.map(link => ({
+                         data={filteredData.map(link => ({
                               id: link.id,
                               name: link.nameUrl || '',
                               originalUrl: link.originalUrl,
