@@ -5,7 +5,7 @@ export default function Card({
      className
 }: {
      title: string;
-     value: string;
+     value: string | number;
      icon?: React.ComponentType<{ className?: string }>;
      className?: string
 }) {
