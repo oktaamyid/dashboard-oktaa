@@ -26,6 +26,7 @@ const LinktreePage: React.FC = () => {
 
                     const portalLinks = linksData.filter(link => link.showToPortal);
                     setLinks(portalLinks);
+
                } catch (error) {
                     console.error("Error fetching data:", error);
                } finally {
@@ -153,7 +154,7 @@ const LinktreePage: React.FC = () => {
                                         >
                                              <div className="flex items-center justify-between relative z-10">
                                                   <span className="text-white"></span>
-                                                  <span className="text-white text-base font-medium truncate mx-auto">{link.nameUrl}</span>
+                                                  <span className="text-white text-base font-medium truncate mx-auto">{link.nameUrl || link.shortUrl}</span>
                                                   <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
                                              </div>
                                         </motion.a>
