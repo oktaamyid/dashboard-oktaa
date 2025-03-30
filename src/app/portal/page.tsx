@@ -3,22 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe } from 'react-icons/fi';
+import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe, FiCoffee } from 'react-icons/fi';
 import { FaSpotify, FaTiktok } from "react-icons/fa";
 import { getLinks, getProfiles } from '@/lib/service';
 import { Link, Profile } from '@/app/types';
 
-// Skeleton Component
-const LinkSkeleton = () => (
-     <div className="bg-gray-700 animate-pulse rounded-lg px-4 py-3 mb-3">
-          <div className="h-4 bg-gray-600 rounded w-3/4"></div>
-     </div>
-);
-
 const LinktreePage: React.FC = () => {
      const [links, setLinks] = useState<Link[]>([]);
      const [profile, setProfile] = useState<Profile | null>(null);
-     const [loading, setLoading] = useState(true);
 
      useEffect(() => {
           const fetchData = async () => {
@@ -37,7 +29,6 @@ const LinktreePage: React.FC = () => {
                } catch (error) {
                     console.error("Error fetching data:", error);
                } finally {
-                    setLoading(false);
                }
           };
           fetchData();
@@ -77,56 +68,21 @@ const LinktreePage: React.FC = () => {
           { icon: <FiGlobe className="w-5 h-5" />, url: profile?.website, visible: !!profile?.website }
      ].filter(link => link.visible);
 
-     if (loading) {
-          return (
-               <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-                    <motion.div
-                         initial={{ opacity: 0, scale: 0.95 }}
-                         animate={{ opacity: 1, scale: 1 }}
-                         transition={{ duration: 0.3 }}
-                         className="w-full md:max-w-lg overflow-hidden shadow-lg rounded-xl"
-                    >
-                         {/* Skeleton Profile Image */}
-                         <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500">
-                              <div className="absolute -bottom-8 left-4">
-                                   <div className="w-16 h-16 rounded-full bg-gray-700 animate-pulse"></div>
-                              </div>
-                         </div>
-
-                         {/* Skeleton Content */}
-                         <div className="pt-12 px-5 pb-6">
-                              <div className="text-center mb-6">
-                                   <div className="h-6 bg-gray-700 rounded w-1/2 mx-auto mb-2 animate-pulse"></div>
-                                   <div className="h-4 bg-gray-700 rounded w-3/4 mx-auto animate-pulse"></div>
-                              </div>
-
-                              {/* Skeleton Links */}
-                              <div className="space-y-3 mb-6">
-                                   {[1, 2, 3, 4].map((_, index) => (
-                                        <LinkSkeleton key={index} />
-                                   ))}
-                              </div>
-                         </div>
-                    </motion.div>
-               </div>
-          );
-     }
 
      if (!profile) {
           return (
                <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-                    <div className="text-white">No profile found</div>
                </div>
           );
      }
 
      return (
-          <div className="min-h-screen bg-gray-800 flex items-center justify-center">
+          <div className="flex flex-col min-h-screen bg-gray-800 items-center justify-center">
                <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full md:max-w-lg overflow-hidden shadow-lg h-screen"
+                    className="w-full md:max-w-lg overflow-hidden shadow-lg flex flex-col flex-grow mx-auto"
                >
                     {/* Banner with Profile Image */}
                     <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500">
@@ -193,7 +149,7 @@ const LinktreePage: React.FC = () => {
                                                   scale: 1.02,
                                                   boxShadow: "0 0 15px rgba(255,255,255,0.2)"
                                              }}
-                                             className="block relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-6 transition-all duration-200 group overflow-hidden shimmer-effect"
+                                             className="block relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 md:py-5 transition-all duration-200 group overflow-hidden shimmer-effect"
                                         >
                                              <div className="flex items-center justify-between relative z-10">
                                                   <span className="text-white"></span>
@@ -202,6 +158,37 @@ const LinktreePage: React.FC = () => {
                                              </div>
                                         </motion.a>
                                    ))}
+                                   <motion.a
+                                        href='https://oktaa.my.id/saweria'
+                                        target='_blank'
+                                        rel='noopener noreferrer'
+                                        initial={{
+                                             opacity: 0,
+                                             x: -20,
+                                             scale: 0.95
+                                        }}
+                                        animate={{
+                                             opacity: 1,
+                                             x: 0,
+                                             scale: 1,
+                                             transition: {
+                                                  delay: 0.1 + 1 * 0.1,
+                                                  type: "spring",
+                                                  stiffness: 100
+                                             }
+                                        }}
+                                        whileHover={{
+                                             scale: 1.02,
+                                             boxShadow: "0 0 15px rgba(255,255,255,0.2)"
+                                        }}
+                                        className="block relative bg-blue-600 hover:bg-blue-500 rounded-lg px-4 py-3 md:py-5 transition-all duration-200 group overflow-hidden shimmer-effect"
+                                   >
+                                        <div className="flex items-center justify-between relative z-10">
+                                             <FiCoffee className='text-gray-400 group-hover:text-white w-4 h-4'></FiCoffee>
+                                             <span className="text-white text-base font-medium truncate mx-auto">Buy me a coffee</span>
+                                             <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
+                                        </div>
+                                   </motion.a>
                               </AnimatePresence>
                          </div>
 
@@ -238,17 +225,8 @@ const LinktreePage: React.FC = () => {
 
                          {/* Footer */}
                          <div className="flex flex-col items-center">
-                              <div className="relative w-6 h-6 mb-2">
-                                   <Image
-                                        src="/oktaa-white.svg"
-                                        alt="Oktaa"
-                                        width={24}
-                                        height={24}
-                                        className="object-contain"
-                                   />
-                              </div>
-                              <p className="text-gray-500 text-xs">
-                                   © {new Date().getFullYear()} Oktaa
+                              <p className="text-gray-500 text-xs font-semibold">
+                                   Copyright {new Date().getFullYear()} - oktaa.my.id
                               </p>
                          </div>
                     </div>
