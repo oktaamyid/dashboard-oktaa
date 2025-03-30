@@ -7,7 +7,7 @@ import { getLinks, createLink, updateLink, deleteLink } from "@/lib/service";
 import { Link } from "@/app/types";
 import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 import DivContainer from '@/components/ui/container';
-import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, MapIcon } from '@heroicons/react/24/solid';
+import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, MapIcon, LinkIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { denormalizeReferer } from "@/lib/utils/normalizeReferer";
 import Card from "@/components/ui/card";
@@ -20,6 +20,7 @@ interface AnalyticsSummary {
      deviceDistribution: { name: string; value: number }[];
      referrerDistribution: { name: string; value: number }[];
      geoDistribution: { name: string; value: number }[];
+     browserDistribution: { name: string, value: number}[];
 }
 
 export default function LinksPage() {
@@ -93,13 +94,28 @@ export default function LinksPage() {
                .slice(0, 5)
                .map(([name, value]) => ({ name, value }));
 
+          const browserStats = links.reduce((acc, link) => {
+               if (link.browserStats) {
+                    Object.entries(link.browserStats).forEach(([browser, count]) => {
+                         acc[browser] = (acc[browser] || 0) + count;
+                    })
+               }
+               return acc;
+          }, {} as Record<string, number>);
+
+          const browserDistribution = Object.entries(browserStats)
+               .sort((a, b) => b[1] - a[1])
+               .slice(0, 5)
+               .map(([name, value]) => ({ name, value }));
+
           return {
                totalClicks,
                averageClicks,
                topLinks,
                deviceDistribution,
                referrerDistribution,
-               geoDistribution
+               geoDistribution,
+               browserDistribution
           };
      };
 
@@ -259,7 +275,7 @@ export default function LinksPage() {
                                                        cx="50%"
                                                        cy="50%"
                                                        labelLine={false}
-                                                       outerRadius={80}
+                                                       outerRadius={70}
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
@@ -282,7 +298,7 @@ export default function LinksPage() {
                               </DivContainer>
 
                               {/* Referrer Distribution */}
-                              <DivContainer className="p-4" hoverEffect={false} icon={GlobeAltIcon}>
+                              <DivContainer className="p-4" hoverEffect={false} icon={LinkIcon}>
                                    <h3 className="font-medium text-gray-300 mb-4">Top Referrers</h3>
                                    <div className="h-64">
                                         <ResponsiveContainer width="100%" height="100%">
@@ -292,7 +308,7 @@ export default function LinksPage() {
                                                        cx="50%"
                                                        cy="50%"
                                                        labelLine={false}
-                                                       outerRadius={80}
+                                                       outerRadius={70}
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
@@ -325,13 +341,46 @@ export default function LinksPage() {
                                                        cx="50%"
                                                        cy="50%"
                                                        labelLine={false}
-                                                       outerRadius={80}
+                                                       outerRadius={70}
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
                                                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                                                   >
                                                        {analyticsData.geoDistribution.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                       ))}
+                                                  </Pie>
+                                                  <Tooltip
+                                                       contentStyle={{
+                                                            backgroundColor: '#374151',
+                                                            borderColor: '#4b5563',
+                                                            borderRadius: '0.5rem'
+                                                       }}
+                                                  />
+                                             </PieChart>
+                                        </ResponsiveContainer>
+                                   </div>
+                              </DivContainer>
+
+                              {/* Browser Distribution */}
+                              <DivContainer className="p-4" hoverEffect={false} icon={GlobeAltIcon}>
+                                   <h3 className="font-medium text-gray-300 mb-4">Top Browsers</h3>
+                                   <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                             <PieChart>
+                                                  <Pie
+                                                       data={analyticsData.browserDistribution}
+                                                       cx="50%"
+                                                       cy="50%"
+                                                       labelLine={false}
+                                                       outerRadius={70}
+                                                       fill="#8884d8"
+                                                       dataKey="value"
+                                                       nameKey="name"
+                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                  >
+                                                       {analyticsData.browserDistribution.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                        ))}
                                                   </Pie>

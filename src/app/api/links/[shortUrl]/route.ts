@@ -69,6 +69,7 @@ async function trackAnalytics(request: Request, docRef: DocumentReference) {
           const userAgent = request.headers.get("user-agent") || "";
           const parser = new UAParser(userAgent);
           const device = parser.getDevice();
+          const browser = parser.getBrowser();
 
           // Determine device type
           type DeviceType = "mobile" | "tablet" | "desktop";
@@ -76,6 +77,9 @@ async function trackAnalytics(request: Request, docRef: DocumentReference) {
           if (device.type === "mobile") deviceType = "mobile";
           else if (device.type === "tablet") deviceType = "tablet";
           else deviceType = "desktop";
+
+          // Get Browser type
+          const browserName = browser.name ? browser.name.toLowerCase() : "unknown";
 
           // Get referrer
           const referer = request.headers.get("referer") || "direct";
@@ -90,6 +94,7 @@ async function trackAnalytics(request: Request, docRef: DocumentReference) {
           const updates: AnalyticsUpdates = {
                clicks: increment(1),
                [`deviceStats.${deviceType}`]: increment(1),
+               [`browserStats.${browserName}`]: increment(1),
                [`geoStats.${country}`]: increment(1),
                [`refererStats.${simplifiedReferer}`]: increment(1)
           };

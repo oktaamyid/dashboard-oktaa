@@ -33,6 +33,7 @@ const convertDoc = (doc: QueryDocumentSnapshot): Link => {
           showToPortal: data.showToPortal || false,
           nameUrl: data.nameUrl || "",
           deviceStats: data.deviceStats || {},
+          browserStats: data.browserStats || {},
           geoStats: data.geoStats || {},
           refererStats: data.refererStats || {},
           showConfirmationPage: data.showConfirmationPage || false,

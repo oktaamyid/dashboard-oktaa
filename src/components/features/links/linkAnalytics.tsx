@@ -14,6 +14,12 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
           { name: "Tablet", value: link.deviceStats?.tablet || 0, color: "bg-purple-500" }
      ].filter(item => item.value > 0);
 
+     // Prepare data for browser stats (top 5 browser)
+     const browserData = Object.entries(link.browserStats || {})
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([browser, count]) => ({ browser, count }));
+
      // Prepare data for geo stats (top 5 countries)
      const geoData = Object.entries(link.geoStats || {})
           .sort((a, b) => b[1] - a[1])
@@ -23,7 +29,7 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
      // Prepare data for referrer stats (top 5 referrers)
      const refererData = Object.entries(link.refererStats || {})
           .map(([referer, count]) => ({
-               referer: denormalizeReferer(referer), 
+               referer: denormalizeReferer(referer),
                count: Number(count)
           }))
           .sort((a, b) => b.count - a.count)
@@ -76,6 +82,37 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
                          ) : (
                               <div className="text-gray-500 italic text-sm">
                                    No device data available
+                              </div>
+                         )}
+                    </div>
+
+                    {/* Browser Stats */}
+                    <div className="bg-gray-800 rounded-lg p-4 shadow">
+                         <h4 className="font-medium text-gray-300 mb-3">Top Browsers</h4>
+                         {browserData.length > 0 ? (
+                              <div className="space-y-3">
+                                   {browserData.map((item) => (
+                                        <div key={item.browser} className="space-y-1">
+                                             <div className="flex justify-between text-sm">
+                                                  <span className="text-gray-400">{item.browser}</span>
+                                                  <span className="text-gray-200 font-medium">
+                                                       {item.count} ({Math.round((item.count / (link.clicks || 1)) * 100)}%)
+                                                  </span>
+                                             </div>
+                                             <div className="w-full bg-gray-700 rounded-full h-2">
+                                                  <div
+                                                       className="bg-cyan-500 h-2 rounded-full"
+                                                       style={{
+                                                            width: `${Math.min(100, (item.count / (link.clicks || 1)) * 100)}%`
+                                                       }}
+                                                  ></div>
+                                             </div>
+                                        </div>
+                                   ))}
+                              </div>
+                         ) : (
+                              <div className="text-gray-500 italic text-sm">
+                                   No browser data available
                               </div>
                          )}
                     </div>

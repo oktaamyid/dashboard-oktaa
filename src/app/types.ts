@@ -34,6 +34,9 @@ export interface Link {
           mobile?: number;
           tablet?: number;
      };
+     browserStats?: {
+          [key: string]: number;
+     }
      geoStats?: {
           [key: string]: number;
      };
