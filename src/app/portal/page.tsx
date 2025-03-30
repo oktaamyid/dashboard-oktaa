@@ -8,7 +8,7 @@ import { FaSpotify, FaTiktok } from "react-icons/fa";
 import { getLinks, getProfiles } from '@/lib/service';
 import { Link, Profile } from '@/app/types';
 
-const LinktreePage: React.FC = () => {
+const PortalPage: React.FC = () => {
      const [links, setLinks] = useState<Link[]>([]);
      const [profile, setProfile] = useState<Profile | null>(null);
 
@@ -236,4 +236,4 @@ const LinktreePage: React.FC = () => {
      );
 };
 
-export default LinktreePage;
+export default PortalPage;
