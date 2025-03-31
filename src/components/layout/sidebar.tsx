@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {
-     HomeIcon,
+     ChartPieIcon,
      FolderIcon,
      LinkIcon,
      BriefcaseIcon,
@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/solid';
 
 const sidebarItems = [
-     { name: "Overview", icon: HomeIcon, href: "/" },
+     { name: "Overview", icon: ChartPieIcon, href: "/" },
      { name: "Projects", icon: FolderIcon, href: "/projects" },
      { name: "Links", icon: LinkIcon, href: "/links" },
      { name: "Experiences", icon: BriefcaseIcon, href: "/experiences" },
