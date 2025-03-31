@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { Link } from "@/app/types";
 import { format } from 'date-fns';
+import { formatShortUrl, validateShortUrl } from "@/lib/utils/formatUrl";
 
 // Convert Firestore document to Link type
 const convertDoc = (doc: QueryDocumentSnapshot): Link => {
@@ -58,9 +59,24 @@ export const checkShortUrlExists = async (shortUrl: string, excludeId?: string):
 export const createLink = async (linkData: Omit<Link, "id">): Promise<{ id: string }> => {
      const now = serverTimestamp();
 
+     // Format short URL
+     const formattedShortUrl = formatShortUrl(linkData.shortUrl || '');
+
+     if (!validateShortUrl(formattedShortUrl)) {
+          throw new Error('Short URL contains invalid characters');
+     }
+
+     // Check if short URL exists
+     const isExists = await checkShortUrlExists(formattedShortUrl);
+
+     if (isExists) {
+          throw new Error('Short URL is already exists.');
+     }
+
      // Initialize analytics fields
      const dataToSave = {
           ...linkData,
+          shortUrl: formattedShortUrl,
           createdAt: now,
           updatedAt: now,
           clicks: 0,
@@ -79,8 +95,24 @@ export const createLink = async (linkData: Omit<Link, "id">): Promise<{ id: stri
 
 // Update an existing link
 export const updateLink = async (id: string, linkData: Partial<Omit<Link, "id">>): Promise<void> => {
-     const docRef = doc(db, "links", id);
 
+     if (linkData.shortUrl) {
+          const formattedShortUrl = formatShortUrl(linkData.shortUrl);
+
+          if (!validateShortUrl(formattedShortUrl)) {
+               throw new Error('Short URL contains invalid characters');
+          }
+
+          // Check if short URL exists (excluding current doc)
+          const exists = await checkShortUrlExists(formattedShortUrl, id);
+          if (exists) {
+               throw new Error('Short URL already exists');
+          }
+
+          linkData.shortUrl = formattedShortUrl;
+     }
+
+     const docRef = doc(db, "links", id);
      await updateDoc(docRef, {
           ...linkData,
           updatedAt: serverTimestamp()
