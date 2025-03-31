@@ -18,6 +18,7 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [previewImage, setPreviewImage] = useState<string | null>(null);
      const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error", message: string } | null>(null);
+     const [uploadProgress, setUploadProgress] = useState<number>(0);
 
      useEffect(() => {
           setFormData(initialData);
@@ -48,12 +49,18 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
 
      const handleFileChange = (file: File) => {
           if (!file.type.startsWith("image/")) {
-               alert("Silakan upload file gambar");
+               setAlertMessage({
+                    type: "error",
+                    message: "Please upload an image file"
+               });
                return;
           }
 
           if (file.size > 5 * 1024 * 1024) {
-               alert("Ukuran file terlalu besar (maksimal 5MB)");
+               setAlertMessage({
+                    type: "error",
+                    message: "File size is too large (maximum 5MB)"
+               });
                return;
           }
 
@@ -81,15 +88,33 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
           e.preventDefault();
           setIsSubmitting(true);
           setAlertMessage(null);
+          setUploadProgress(0);
+
           try {
+               // Start upload progress animation
+               const progressInterval = setInterval(() => {
+                    setUploadProgress((prev) => {
+                         if (prev >= 95) {
+                              clearInterval(progressInterval);
+                              return 95;
+                         }
+                         return prev + 5;
+                    });
+               }, 100);
+
                await updateProfile(formData);
+
+               // Complete progress
+               clearInterval(progressInterval);
+               setUploadProgress(100);
+
                setAlertMessage({
                     type: "success",
-                    message: "Profile updated succesfully"
+                    message: "Profile updated successfully"
                });
           } catch (error) {
                setAlertMessage({
-                    type: "success",
+                    type: "error",
                     message: "Failed to update profile"
                });
                console.error(error);
@@ -107,7 +132,7 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
                          </Alert>
                     </div>
                )}
-               
+
                <h2 className="text-xl font-semibold text-white mb-6">Edit Profile</h2>
 
                <form onSubmit={handleSubmit} className="space-y-4">
@@ -136,6 +161,14 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
                                    onFileChange={handleFileChange}
                                    onRemoveImage={handleRemoveImage}
                               />
+                              {isSubmitting && previewImage && previewImage !== initialData.profilePicture && (
+                                   <div className="mt-2">
+                                        <div className="w-full bg-gray-700 rounded-full h-2.5">
+                                             <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-1">Uploading image: {uploadProgress}%</p>
+                                   </div>
+                              )}
                          </div>
                     </div>
 

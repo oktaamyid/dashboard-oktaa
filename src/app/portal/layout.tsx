@@ -1,11 +1,9 @@
 import { Metadata } from 'next';
-import { getProfiles } from '@/lib/service';
+import { getProfile } from '@/lib/service';
 
 export async function generateMetadata(): Promise<Metadata> {
      try {
-          const profiles = await getProfiles();
-
-          const profile = profiles[0];
+          const profile = await getProfile();
 
           if (!profile) {
                return {

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe, FiCoffee } from 'react-icons/fi';
 import { FaSpotify, FaTiktok } from "react-icons/fa";
-import { getLinks, getProfiles } from '@/lib/service';
+import { getLinks, getProfile } from '@/lib/service';
 import { Link, Profile } from '@/app/types';
 
 const PortalPage: React.FC = () => {
@@ -16,13 +16,11 @@ const PortalPage: React.FC = () => {
           const fetchData = async () => {
                try {
                     const [profileData, linksData] = await Promise.all([
-                         getProfiles(),
+                         getProfile(),
                          getLinks()
                     ]);
 
-                    if (profileData.length > 0) {
-                         setProfile(profileData[0]);
-                    }
+                    setProfile(profileData);
 
                     const portalLinks = linksData.filter(link => link.showToPortal);
                     setLinks(portalLinks);
@@ -94,13 +92,13 @@ const PortalPage: React.FC = () => {
                                    transition={{ delay: 0.2 }}
                                    className="absolute -bottom-8 left-4"
                               >
-                                   <div className="relative w-20 h-20 rounded-full border-4 border-gray-700 overflow-hidden">
+                                   <div className="flex relative w-16 h-16 rounded-full border-4 items-center justify-center border-gray-700 overflow-hidden">
                                         <Image
                                              src={profile.profilePicture}
                                              alt={profile.name || "Profile"}
                                              width={64}
                                              height={64}
-                                             className="object-cover"
+                                             className="object-cover rounded-full"
                                              priority
                                         />
                                    </div>

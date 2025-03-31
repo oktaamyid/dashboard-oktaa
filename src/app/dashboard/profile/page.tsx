@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ProfileForm from "@/components/features/profile/profileForm";
-import { getProfiles } from "@/lib/service";
+import { getProfile } from "@/lib/service";
 import { Profile } from '@/app/types';
 
 export default function EditProfilePage() {
@@ -12,10 +12,8 @@ export default function EditProfilePage() {
      useEffect(() => {
           const fetchProfile = async () => {
                try {
-                    const profileData = await getProfiles();
-                    if (profileData.length > 0) {
-                         setProfile(profileData[0]);
-                    }
+                    const profileData = await getProfile();
+                    setProfile(profileData);
                } catch (error) {
                     console.error("Failed to fetch profile:", error);
                } finally {
