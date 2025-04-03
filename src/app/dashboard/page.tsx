@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
 import { getExperiences, getProjects, getLinks } from "@/lib/service";
-import { Experience, Project, Link, TableData } from "@/app/types";
+import { Experience, Project, Link } from "@/app/types";
 import Select from '@/components/ui/select';
 import Input from '@/components/ui/input';
 import { LinkIcon, FolderIcon, BriefcaseIcon } from '@heroicons/react/24/solid';
@@ -58,7 +58,7 @@ export default function Overview() {
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);  // Top 5 technologies
 
-     const tableData: TableData[] =
+     const tableData: (Project | Link | Experience)[] =
           selectedTable === "Projects" ? projects :
                selectedTable === "Links" ? links : experiences;
 
@@ -70,7 +70,7 @@ export default function Overview() {
 
      const columnsToShow: Record<"Projects" | "Links" | "Experiences", string[]> = {
           Projects: ["title", "description", "technology"],
-          Links: ["originalUrl", "shortUrl", "createdAt"],
+          Links: ["nameUrl", "originalUrl", "shortUrl", "clicks", "status"],
           Experiences: ["company", "role", "year", "techStack"],
      };
 
@@ -81,6 +81,56 @@ export default function Overview() {
      };
 
      const columns = columnsToShow[selectedTable];
+
+     const renderCell = (column: string, row: Project | Link | Experience) => {
+          if (selectedTable === "Links") {
+               const link = row as Link;
+               switch (column) {
+                    case 'nameUrl':
+                         return (
+                              <span className="text-white">
+                                   {link.nameUrl || '-'}
+                              </span>
+                         );
+                    case 'originalUrl':
+                         return (
+                              <span className="text-gray-300 truncate max-w-xs block" title={link.originalUrl}>
+                                   {link.originalUrl}
+                              </span>
+                         );
+                    case 'shortUrl':
+                         return (
+                              <a
+                                   href={`/${link.shortUrl}`}
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="text-blue-400 hover:underline"
+                              >
+                                   /{link.shortUrl}
+                              </a>
+                         );
+                    case 'clicks':
+                         return (
+                              <span className="text-white">
+                                   {link.clicks || 0}
+                              </span>
+                         );
+                    case 'status':
+                         return (
+                              <div className="flex flex-col text-sm text-gray-300">
+                                   <span>Portal: {link.showToPortal ? "Yes" : "No"}</span>
+                                   <span>Confirm: {link.showConfirmationPage ? "Yes" : "No"}</span>
+                              </div>
+                         );
+               }
+          }
+
+          if (arrayColumnsMap[selectedTable].includes(column)) {
+               return formatArrayCell(row[column as keyof typeof row]);
+          }
+
+          return row[column as keyof typeof row] as React.ReactNode;
+     };
 
      return (
           <div>
@@ -110,7 +160,7 @@ export default function Overview() {
 
                <div className="mt-6 space-y-4">
                     <div className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0">
-                         <div className="flex space-x-4 w-full">
+                         <div className="flex flex-col sm:flex-row sm:space-x-4 w-full space-y-4 sm:space-y-0">
                               <Select
                                    label="Choose Table:"
                                    options={[
@@ -120,7 +170,7 @@ export default function Overview() {
                                    ]}
                                    value={selectedTable}
                                    onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
-                                   className="w-48"
+                                   className="w-full sm:w-48"
                               />
 
                               <Input
@@ -129,33 +179,31 @@ export default function Overview() {
                                    value={searchTerm}
                                    onChange={(e) => setSearchTerm(e.target.value)}
                                    label="Search"
-                                   className=""
+                                   className="w-full"
                               />
                          </div>
                     </div>
 
-                    <div className="w-full overflow-hidden rounded-lg shadow-md">
+                    <div className="w-full rounded-lg shadow-md">
                          <Table
                               data={filteredData}
                               columns={columns}
                               isLoading={loading}
-                              renderCell={(column, row) => {
-                                   if (arrayColumnsMap[selectedTable].includes(column)) {
-                                        return formatArrayCell(row[column as keyof typeof row]);
-                                   }
-                                   return row[column as keyof typeof row] as React.ReactNode;
-                              }}
+                              renderCell={renderCell}
                          />
                     </div>
                </div>
 
                {/* Technology Distribution Chart */}
-               <div className="mt-6 bg-gray-700 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold mb-4">Top Technologies</h3>
+               <div className="mt-6 bg-gray-800 rounded-lg p-4 border border-gray-700">
+                    <h3 className="text-lg font-semibold text-white mb-4">Top Technologies</h3>
                     <ResponsiveContainer width="100%" height={200}>
                          <BarChart data={technologyChartData} width={50}>
-                              <XAxis dataKey="name" />
-                              <Tooltip />
+                              <XAxis dataKey="name" stroke="#fff" />
+                              <Tooltip
+                                   contentStyle={{ backgroundColor: '#374151', borderColor: '#4B5563' }}
+                                   itemStyle={{ color: '#fff' }}
+                              />
                               <Bar dataKey="count" fill="#8884d8" />
                          </BarChart>
                     </ResponsiveContainer>
