@@ -33,24 +33,24 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                     const res = await fetch(`/api/links/${encodeURIComponent(params.shortUrl || "")}`);
                     if (!res.ok) {
                          setError(true);
-                         router.replace('/404');
+                         window.location.replace('/404');
                          return;
                     }
 
                     const data = await res.json();
 
+                    if (!data.showConfirmationPage) {
+                         window.location.replace(data.originalUrl);
+                         return;
+                    }
+
                     setOriginalUrl(data.originalUrl);
                     setShowConfirmationPage(data.showConfirmationPage ?? false);
                     setCustomMessage(data.confirmationPageSettings?.customMessage);
-
-                    if (!data.showConfirmationPage) {
-                         window.location.href = data.originalUrl;
-                         return;
-                    }
                } catch (error) {
                     console.error("❌ Fetch error:", error);
                     setError(true);
-                    router.replace('/404');
+                    window.location.replace('/404');
                } finally {
                     setLoading(false);
                }
