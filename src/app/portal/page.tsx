@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe, FiCoffee } from 'react-icons/fi';
+import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe } from 'react-icons/fi';
 import { FaSpotify, FaTiktok } from "react-icons/fa";
 import { getLinks, getProfile } from '@/lib/service';
 import { Link, Profile } from '@/app/types';
@@ -84,34 +84,34 @@ const PortalPage: React.FC = () => {
                     className="w-full md:max-w-lg overflow-hidden shadow-lg flex flex-col flex-grow mx-auto"
                >
                     {/* Banner with Profile Image */}
-                    <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500">
-                         {profile.profilePicture && (
-                              <motion.div
-                                   initial={{ opacity: 0, y: 20 }}
-                                   animate={{ opacity: 1, y: 0 }}
-                                   transition={{ delay: 0.2 }}
-                                   className="absolute -bottom-8 left-4"
-                              >
-                                   <div className="flex relative w-16 h-16 rounded-full border-4 items-center justify-center border-gray-700 overflow-hidden">
-                                        <Image
-                                             src={profile.profilePicture}
-                                             alt={profile.name || "Profile"}
-                                             width={64}
-                                             height={64}
-                                             className="object-cover rounded-full"
-                                             priority
-                                        />
-                                   </div>
-                              </motion.div>
-                         )}
+                    <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
+                           {profile.profilePicture && (
+                                   <motion.div
+                                          initial={{ opacity: 0, y: 20 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ delay: 0.2 }}
+                                          className="absolute -bottom-10"
+                                   >
+                                          <div className="flex relative w-20 h-20 rounded-full border-4 items-center justify-center border-gray-700 overflow-hidden">
+                                                   <Image
+                                                          src={profile.profilePicture}
+                                                          alt={profile.name || "Profile"}
+                                                          width={80}
+                                                          height={80}
+                                                          className="object-cover rounded-full"
+                                                          priority
+                                                   />
+                                          </div>
+                                   </motion.div>
+                           )}
 
-                         <button onClick={handleShare} aria-label='Share' className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-2 transition-all">
-                              <FiExternalLink className="w-4 h-4 text-white" />
-                         </button>
+                           <button onClick={handleShare} aria-label='Share' className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-2 transition-all">
+                                   <FiExternalLink className="w-4 h-4 text-white" />
+                           </button>
                     </div>
 
                     {/* Content */}
-                    <div className="pt-6 px-5 pb-5">
+                    <div className="pt-12 px-5 pb-5">
                          <div className="text-center mb-6">
                               <h1 className="text-xl font-bold text-white">@{profile.username}</h1>
                               <p className="text-gray-500 text-sm my-1">{profile.name}</p>
@@ -157,37 +157,6 @@ const PortalPage: React.FC = () => {
                                              </div>
                                         </motion.a>
                                    ))}
-                                   <motion.a
-                                        href='https://oktaa.my.id/saweria'
-                                        target='_blank'
-                                        rel='noopener noreferrer'
-                                        initial={{
-                                             opacity: 0,
-                                             x: -20,
-                                             scale: 0.95
-                                        }}
-                                        animate={{
-                                             opacity: 1,
-                                             x: 0,
-                                             scale: 1,
-                                             transition: {
-                                                  delay: 0.1 + 1 * 0.1,
-                                                  type: "spring",
-                                                  stiffness: 100
-                                             }
-                                        }}
-                                        whileHover={{
-                                             scale: 1.02,
-                                             boxShadow: "0 0 15px rgba(255,255,255,0.2)"
-                                        }}
-                                        className="block relative bg-blue-600 hover:bg-blue-500 rounded-lg px-4 py-3 md:py-5 transition-all duration-200 group overflow-hidden shimmer-effect"
-                                   >
-                                        <div className="flex items-center justify-between relative z-10">
-                                             <FiCoffee className='text-gray-400 group-hover:text-white w-4 h-4'></FiCoffee>
-                                             <span className="text-white text-base font-medium truncate mx-auto">Buy me a coffee</span>
-                                             <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
-                                        </div>
-                                   </motion.a>
                               </AnimatePresence>
                          </div>
 
