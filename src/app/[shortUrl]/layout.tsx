@@ -26,7 +26,7 @@ export const metadata: Metadata = {
           images: ["https://oktaa.my.id/banner.png"],
      },
      icons: {
-          icon: "https://oktaa.my.id/favicon.ico",
+          icon: "https://oktaa.my.id/oktaa-black.png",
           apple: "https://oktaa.my.id/apple-touch-icon.png",
      },
      other: {
@@ -39,7 +39,6 @@ export default function ShortUrlLayout({ children }: { children: React.ReactNode
      return (
           <div>
                {children} 
-               <script src="https://kulroakonsu.net/88/tag.min.js" data-zone="139305" async data-cfasync="false"></script>
           </div>
      )
 }
