@@ -12,7 +12,7 @@ export const metadata: Metadata = {
           type: "website",
           images: [
                {
-                    url: "https://oktaa.my.id/banner.png",
+                    url: "https://cdn.oktaa.my.id/banner.png",
                     width: 1200,
                     height: 630,
                     alt: "Shorten Link Verification - Oktaa",
@@ -23,11 +23,11 @@ export const metadata: Metadata = {
           card: "summary_large_image",
           title: "Shorten Link Verification - Oktaa",
           description: "Easily verify and manage your shorten links securely through Oktaa.",
-          images: ["https://oktaa.my.id/banner.png"],
+          images: ["https://cdn.oktaa.my.id/banner.png"],
      },
      icons: {
-          icon: "https://oktaa.my.id/oktaa-black.png",
-          apple: "https://oktaa.my.id/apple-touch-icon.png",
+          icon: "https://cdn.oktaa.my.id/favicon.ico",
+          apple: "https://cdn.oktaa.my.id/apple-touch-icon.png",
      },
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",
