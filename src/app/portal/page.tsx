@@ -238,7 +238,7 @@ const PortalPage: React.FC = () => {
                                         filteredLinks.map((link, index) => (
                                              <motion.a
                                                   key={link.id}
-                                                  href={link.originalUrl}
+                                                  href={`/${link.shortUrl}`}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
                                                   initial={{
