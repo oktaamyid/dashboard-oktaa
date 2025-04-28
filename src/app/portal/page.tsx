@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe } from 'react-icons/fi';
@@ -22,6 +22,16 @@ const PortalPage: React.FC = () => {
      const [activeTab, setActiveTab] = useState<string>('all');
      const [filteredLinks, setFilteredLinks] = useState<Link[]>([]);
      const [categories, setCategories] = useState<Category[]>([{ id: 'all', name: 'All' }]);
+
+     // Filter links based on active tab
+     const filterLinksByCategory = useCallback((category: string, linksList = links) => {
+          if (category === 'all') {
+            setFilteredLinks(linksList);
+          } else {
+            const filtered = linksList.filter(link => link.category && link.category.toLowerCase().replace(/\s+/g, '-') === category);
+            setFilteredLinks(filtered);
+          }
+     }, [links]);
 
      useEffect(() => {
           // Initial data fetch
@@ -107,17 +117,7 @@ const PortalPage: React.FC = () => {
                unsubscribeProfile();
                unsubscribeLinks();
           };
-     }, []);
-
-     // Filter links based on active tab
-     const filterLinksByCategory = (category: string, linksList = links) => {
-          if (category === 'all') {
-               setFilteredLinks(linksList);
-          } else {
-               const filtered = linksList.filter(link => link.category && link.category.toLowerCase().replace(/\s+/g, '-') === category);
-               setFilteredLinks(filtered);
-          }
-     };
+     }, [activeTab, filterLinksByCategory]);
 
      // Handle tab change
      const handleTabChange = (tabId: string) => {
