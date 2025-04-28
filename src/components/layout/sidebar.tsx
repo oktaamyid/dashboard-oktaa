@@ -4,7 +4,8 @@ import {
      FolderIcon,
      LinkIcon,
      BriefcaseIcon,
-     XMarkIcon
+     XMarkIcon,
+     GlobeAltIcon
 } from '@heroicons/react/24/solid';
 
 const sidebarItems = [
@@ -12,6 +13,7 @@ const sidebarItems = [
      { name: "Projects", icon: FolderIcon, href: "/projects" },
      { name: "Links", icon: LinkIcon, href: "/links" },
      { name: "Experiences", icon: BriefcaseIcon, href: "/experiences" },
+     { name: "Go to Portal", icon: GlobeAltIcon, href: "/portal" }
 ];
 
 export default function Sidebar({
