@@ -38,7 +38,8 @@ const convertDoc = (doc: QueryDocumentSnapshot): Link => {
           geoStats: data.geoStats || {},
           refererStats: data.refererStats || {},
           showConfirmationPage: data.showConfirmationPage || false,
-          confirmationPageSettings: data.confirmationPageSettings || {}
+          confirmationPageSettings: data.confirmationPageSettings || {},
+          category: data.category || "",
      };
 };
 
