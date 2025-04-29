@@ -16,7 +16,6 @@
     "cookies-next": "^5.1.0",
     "date-fns": "^4.1.0",
     "detect-browser": "^5.3.0",
-    "eslint-plugin-react-hooks": "^6.1.0-canary-143d3e1b-20250425",
     "firebase": "^11.4.0",
     "firebase-functions": "^6.3.2",
     "framer-motion": "^12.6.2",
