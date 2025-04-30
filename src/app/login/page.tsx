@@ -47,9 +47,10 @@ export default function LoginPage() {
                               height={80} 
                               className="mx-auto mb-4 rounded-full"
                          />
-                         <p className="text-sm text-gray-400">
+                         <h1 className="text-2xl font-bold text-white text-center mb-4">Sign In to Oktaa</h1>
+                         {/* <p className="text-sm text-gray-400">
                               &quot;Sign in to access your dashboard. Don&apos;t worry, we won&apos;t judge your password choices... much.&quot;
-                         </p>
+                         </p> */}
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">
