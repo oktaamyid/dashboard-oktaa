@@ -11,7 +11,8 @@ import {
      QueryDocumentSnapshot,
      where,
      query,
-     Timestamp
+     Timestamp,
+     writeBatch
 } from "firebase/firestore";
 import { Link } from "@/app/types";
 import { format } from 'date-fns';
@@ -152,4 +153,29 @@ export const getLinkByShortUrl = async (shortUrl: string): Promise<Link | null> 
      }
 
      return null;
+};
+
+export const resetLinkAnalytics = async (): Promise<void> => {
+     try {
+         const linksCollection = collection(db, "links");
+         const querySnapshot = await getDocs(linksCollection);
+         const batch = writeBatch(db);
+ 
+         querySnapshot.docs.forEach((docSnapshot) => {
+             const linkRef = doc(db, "links", docSnapshot.id);
+             batch.update(linkRef, {
+                 clicks: 0,
+                 deviceStats: { desktop: 0, mobile: 0, tablet: 0 },
+                 browserStats: {},
+                 geoStats: {},
+                 refererStats: {}
+             });
+         });
+ 
+         await batch.commit();
+         console.log("Successfully reset analytics for all links.");
+     } catch (error) {
+         console.error("Error resetting link analytics: ", error);
+         throw new Error("Failed to reset link analytics");
+     }
 };

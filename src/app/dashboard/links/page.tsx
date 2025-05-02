@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import LinkTable from "@/components/features/links/linkTable";
 import LinkForm from "@/components/features/links/linkForm";
-import { getLinks, createLink, updateLink, deleteLink } from "@/lib/service";
+import { resetLinkAnalytics, createLink, updateLink, deleteLink } from "@/lib/service";
 import { Link } from "@/app/types";
 import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 import DivContainer from '@/components/ui/container';
@@ -11,6 +11,8 @@ import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, Ma
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { denormalizeReferer } from "@/lib/utils/normalizeReferer";
 import Card from "@/components/ui/card";
+import { onSnapshot, query, collection } from "firebase/firestore";
+import { db } from '@/lib/firebaseConfig';
 
 // Analytics interfaces
 interface AnalyticsSummary {
@@ -20,7 +22,7 @@ interface AnalyticsSummary {
      deviceDistribution: { name: string; value: number }[];
      referrerDistribution: { name: string; value: number }[];
      geoDistribution: { name: string; value: number }[];
-     browserDistribution: { name: string, value: number}[];
+     browserDistribution: { name: string, value: number }[];
 }
 
 export default function LinksPage() {
@@ -141,28 +143,43 @@ export default function LinksPage() {
           setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
      };
 
+     const handleResetAnalytics = async () => {
+          if (confirm("Are you sure you want to reset all link analytics? This cannot be undone.")) {
+              try {
+                  await resetLinkAnalytics();
+                  alert("Analytics reset successfully.");
+              } catch (error) {
+                  console.error("Error resetting analytics: ", error);
+                  alert("Failed to reset analytics.");
+              }
+          }
+     };
+
      useEffect(() => {
-          async function fetchData() {
+          // Set up real-time listener for Firestore
+          const q = query(collection(db, "links"));
+          const unsubscribe = onSnapshot(q, (snapshot) => {
                try {
                     setLoading(true);
-                    const data = await getLinks();
-                    setLinks(data);
-                    setAnalyticsData(calculateAnalytics(data));
+                    const linksData: Link[] = snapshot.docs.map(doc => ({
+                         id: doc.id,
+                         ...doc.data()
+                    })) as Link[];
+                    setLinks(linksData);
+                    setAnalyticsData(calculateAnalytics(linksData));
                } catch (error) {
-                    console.error("Error fetching data: ", error);
+                    console.error("Error fetching real-time data: ", error);
                } finally {
                     setLoading(false);
                }
-          }
+          }, (error) => {
+               console.error("Firestore listener error: ", error);
+               setLoading(false);
+          });
 
-          fetchData();
-
-          // Set up refresh interval for analytics (every minute)
-          const intervalId = setInterval(fetchData, 60000);
-
-          return () => clearInterval(intervalId);
+          // Clean up listener on unmount
+          return () => unsubscribe();
      }, []);
-
 
      // Color palette for charts
      const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -193,6 +210,7 @@ export default function LinksPage() {
                               </svg>
                               {analyticsView ? "Hide Analytics" : "Show Analytics"}
                          </button>
+
                     </div>
                </div>
 
