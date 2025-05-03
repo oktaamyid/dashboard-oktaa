@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import LinkTable from "@/components/features/links/linkTable";
 import LinkForm from "@/components/features/links/linkForm";
-import { resetLinkAnalytics, createLink, updateLink, deleteLink } from "@/lib/service";
-import { Link } from "@/app/types";
+import { createLink, updateLink, deleteLink } from "@/lib/service";
+import { Link, AnalyticsSummary } from "@/app/types";
 import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 import DivContainer from '@/components/ui/container';
 import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, MapIcon, LinkIcon } from '@heroicons/react/24/solid';
@@ -13,17 +13,7 @@ import { denormalizeReferer } from "@/lib/utils/normalizeReferer";
 import Card from "@/components/ui/card";
 import { onSnapshot, query, collection } from "firebase/firestore";
 import { db } from '@/lib/firebaseConfig';
-
-// Analytics interfaces
-interface AnalyticsSummary {
-     totalClicks: number;
-     averageClicks: number;
-     topLinks: { name: string; clicks: number }[];
-     deviceDistribution: { name: string; value: number }[];
-     referrerDistribution: { name: string; value: number }[];
-     geoDistribution: { name: string; value: number }[];
-     browserDistribution: { name: string, value: number }[];
-}
+import Button from "@/components/ui/button";
 
 export default function LinksPage() {
      const [links, setLinks] = useState<Link[]>([]);
@@ -143,20 +133,19 @@ export default function LinksPage() {
           setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
      };
 
-     const handleResetAnalytics = async () => {
-          if (confirm("Are you sure you want to reset all link analytics? This cannot be undone.")) {
-              try {
-                  await resetLinkAnalytics();
-                  alert("Analytics reset successfully.");
-              } catch (error) {
-                  console.error("Error resetting analytics: ", error);
-                  alert("Failed to reset analytics.");
-              }
-          }
-     };
+     // const handleResetAnalytics = async () => {
+     //      if (confirm("Are you sure you want to reset all link analytics? This cannot be undone.")) {
+     //          try {
+     //              await resetLinkAnalytics();
+     //              alert("Analytics reset successfully.");
+     //          } catch (error) {
+     //              console.error("Error resetting analytics: ", error);
+     //              alert("Failed to reset analytics.");
+     //          }
+     //      }
+     // };
 
      useEffect(() => {
-          // Set up real-time listener for Firestore
           const q = query(collection(db, "links"));
           const unsubscribe = onSnapshot(q, (snapshot) => {
                try {
@@ -181,7 +170,6 @@ export default function LinksPage() {
           return () => unsubscribe();
      }, []);
 
-     // Color palette for charts
      const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
      return (
@@ -190,26 +178,28 @@ export default function LinksPage() {
                     <h1 className="text-2xl font-bold">Links</h1>
                     <div className="flex space-x-2">
                          {!isFormVisible && (
-                              <button
+                              <Button
                                    onClick={() => setFormVisible(true)}
-                                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+                                   className="flex items-center"
+                                   variant="primary"
                               >
                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                                    </svg>
                                    Add Link
-                              </button>
+                              </Button>
                          )}
 
-                         <button
+                         <Button
                               onClick={() => setAnalyticsView(!analyticsView)}
-                              className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded flex items-center"
+                              className="flex items-center"
+                              variant="secondary"
                          >
                               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                               </svg>
                               {analyticsView ? "Hide Analytics" : "Show Analytics"}
-                         </button>
+                         </Button>
 
                     </div>
                </div>

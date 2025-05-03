@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useRef } from "react";
 import Image from "next/image";
+import Button from "@/components/ui/button";
 
 interface ImageUploaderProps {
      previewImage: string | null;
@@ -36,13 +37,13 @@ export default function ImageUploader({
                                    height={64}
                                    className="w-16 h-16 rounded-full object-cover"
                               />
-                              <button
+                              <Button
                                    type="button"
                                    onClick={onRemoveImage}
                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
                               >
                                    ✕
-                              </button>
+                              </Button>
                          </div>
                     )}
                     <input

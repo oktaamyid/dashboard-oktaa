@@ -6,6 +6,7 @@ import { deleteCookie } from "cookies-next";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
 import Breadcrumbs from '@/components/ui/breadcrumbs';
+import Button from '@/components/ui/button';
 
 export default function Header({
      isOpen,
@@ -52,13 +53,13 @@ export default function Header({
      return (
           <header className="bg-gray-800 shadow p-4 flex justify-between items-center">
                <div className="flex items-center space-x-4">
-                    <button onClick={onToggleSidebar} className="text-white">
+                    <Button onClick={onToggleSidebar} className="text-white">
                          {isOpen ? (
                               <Bars3Icon className="h-6 w-6" />
                          ) : (
                               <ArrowRightIcon className="h-6 w-6" />
                          )}
-                    </button>
+                    </Button>
                     <Breadcrumbs />
                </div>
                <div className="relative" ref={dropdownRef}>
@@ -84,18 +85,18 @@ export default function Header({
                           >
                                 {auth.currentUser?.email || "Guest"}
                           </span>
-                          <button
+                          <Button
                                 onClick={profileEdit}
                                 className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
                           >
                                 Profile
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                                 onClick={handleLogout}
                                 className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
                           >
                                 Logout
-                          </button>
+                          </Button>
                     </div>
                </div>
           </header>

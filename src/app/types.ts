@@ -74,5 +74,15 @@ export interface TableRenderData {
      [key: string]: string | number | boolean | React.ReactNode;
 }
 
+export interface AnalyticsSummary {
+     totalClicks: number;
+     averageClicks: number;
+     topLinks: { name: string; clicks: number }[];
+     deviceDistribution: { name: string; value: number }[];
+     referrerDistribution: { name: string; value: number }[];
+     geoDistribution: { name: string; value: number }[];
+     browserDistribution: { name: string, value: number }[];
+}
+
 // Union type utama yang sudah ada
 export type TableData = Experience | Project | Link | Profile;
