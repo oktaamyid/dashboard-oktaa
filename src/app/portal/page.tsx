@@ -159,8 +159,69 @@ const PortalPage: React.FC = () => {
 
      if (!profile) {
           return (
-               <div className="min-h-screen bg-gray-800 flex items-center justify-center">
-                    <div className="animate-pulse text-white">Loading...</div>
+               <div className="flex flex-col min-h-screen bg-gray-800 items-center justify-center">
+                    <motion.div
+                         initial={{ opacity: 0, scale: 0.95 }}
+                         animate={{ opacity: 1, scale: 1 }}
+                         transition={{ duration: 0.3 }}
+                         className="w-full md:max-w-lg overflow-hidden shadow-lg flex flex-col flex-grow mx-auto"
+                    >
+                         {/* Skeleton for Banner */}
+                         <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
+                              <div className="absolute -bottom-10">
+                                   <div className="w-20 h-20 rounded-full border-4 border-gray-700 bg-gray-600 animate-pulse" />
+                              </div>
+                              <div className="absolute top-3 right-3 bg-white/10 rounded-full p-2">
+                                   <FiExternalLink className="w-4 h-4 text-white" />
+                              </div>
+                         </div>
+
+                         {/* Skeleton for Content */}
+                         <div className="pt-12 px-5 pb-5">
+                              <div className="text-center mb-6">
+                                   <div className="h-6 bg-gray-600 rounded w-1/3 mx-auto animate-pulse" />
+                                   <div className="h-4 bg-gray-600 rounded w-1/2 mx-auto mt-2 animate-pulse" />
+                                   <div className="h-4 bg-gray-600 rounded w-3/4 mx-auto mt-2 animate-pulse" />
+                              </div>
+
+                              {/* Skeleton for Tabs */}
+                              <div className="mb-6">
+                                   <div className="flex justify-center p-1">
+                                        {[...Array(3)].map((_, index) => (
+                                             <div
+                                                  key={index}
+                                                  className="h-8 bg-gray-600 rounded-full w-20 mx-1 animate-pulse"
+                                             />
+                                        ))}
+                                   </div>
+                              </div>
+
+                              {/* Skeleton for Links */}
+                              <div className="space-y-3 mb-6 min-h-56">
+                                   {[...Array(4)].map((_, index) => (
+                                        <div
+                                             key={index}
+                                             className="h-12 bg-gray-600 rounded-lg animate-pulse"
+                                        />
+                                   ))}
+                              </div>
+
+                              {/* Skeleton for Social Links */}
+                              <div className="flex justify-center space-x-5 mb-5">
+                                   {[...Array(3)].map((_, index) => (
+                                        <div
+                                             key={index}
+                                             className="h-5 w-5 bg-gray-600 rounded-full animate-pulse"
+                                        />
+                                   ))}
+                              </div>
+
+                              {/* Skeleton for Footer */}
+                              <div className="flex flex-col items-center">
+                                   <div className="h-4 bg-gray-600 rounded w-1/4 animate-pulse" />
+                              </div>
+                         </div>
+                    </motion.div>
                </div>
           );
      }
