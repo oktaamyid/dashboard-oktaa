@@ -2,20 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Table from "@/components/ui/table";
-import { getExperiences, getProjects, getLinks } from "@/lib/service";
-import { Experience, Project, Link } from "@/app/types";
+import { getExperiences, getProjects, getLinks, getSubdomains } from "@/lib/service";
+import { Experience, Project, Link, Subdomain } from "@/app/types";
 import Select from '@/components/ui/select';
 import Input from '@/components/ui/input';
-import { LinkIcon, FolderIcon, BriefcaseIcon } from '@heroicons/react/24/solid';
+import { LinkIcon, FolderIcon, BriefcaseIcon, GlobeAltIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 import { formatArrayCell } from "@/lib/utils/formatArray";
 
 export default function Overview() {
-     const [selectedTable, setSelectedTable] = useState<"Projects" | "Links" | "Experiences">("Projects");
+     const [selectedTable, setSelectedTable] = useState<"Projects" | "Links" | "Experiences" | "Subdomains">("Projects");
      const [projects, setProjects] = useState<Project[]>([]);
      const [links, setLinks] = useState<Link[]>([]);
      const [experiences, setExperiences] = useState<Experience[]>([]);
+     const [subdomains, setSubdomains] = useState<Subdomain[]>([]); 
      const [loading, setLoading] = useState(true);
      const [searchTerm, setSearchTerm] = useState("");
 
@@ -23,14 +24,16 @@ export default function Overview() {
           const fetchData = async () => {
                setLoading(true);
                try {
-                    const [projectsData, linksData, experiencesData] = await Promise.all([
+                    const [projectsData, linksData, experiencesData, subdomainsData] = await Promise.all([
                          getProjects(),
                          getLinks(),
                          getExperiences(),
+                         getSubdomains()
                     ]);
                     setProjects(projectsData);
                     setLinks(linksData);
                     setExperiences(experiencesData);
+                    setSubdomains(subdomainsData);
                } catch (error) {
                     console.error("Error fetching data: ", error);
                } finally {
@@ -58,9 +61,10 @@ export default function Overview() {
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);  // Top 5 technologies
 
-     const tableData: (Project | Link | Experience)[] =
+     const tableData: (Project | Link | Experience | Subdomain)[] =
           selectedTable === "Projects" ? projects :
-               selectedTable === "Links" ? links : experiences;
+               selectedTable === "Links" ? links :
+                    selectedTable === "Experiences" ? experiences : subdomains;
 
      const filteredData = tableData.filter(item =>
           Object.values(item).some(value =>
@@ -68,21 +72,23 @@ export default function Overview() {
           )
      );
 
-     const columnsToShow: Record<"Projects" | "Links" | "Experiences", string[]> = {
+     const columnsToShow: Record<"Projects" | "Links" | "Experiences" | "Subdomains", string[]> = {
           Projects: ["title", "description", "technology"],
           Links: ["nameUrl", "originalUrl", "shortUrl", "clicks", "status"],
           Experiences: ["company", "role", "year", "techStack"],
+          Subdomains: ["name", "type", "content"]
      };
 
-     const arrayColumnsMap: Record<"Projects" | "Links" | "Experiences", string[]> = {
+     const arrayColumnsMap: Record<"Projects" | "Links" | "Experiences" | "Subdomains", string[]> = {
           Projects: ["technology"],
           Links: [],
           Experiences: ["techStack"],
+          Subdomains: []
      };
 
      const columns = columnsToShow[selectedTable];
 
-     const renderCell = (column: string, row: Project | Link | Experience) => {
+     const renderCell = (column: string, row: Project | Link | Experience | Subdomain) => {
           if (selectedTable === "Links") {
                const link = row as Link;
                switch (column) {
@@ -137,7 +143,7 @@ export default function Overview() {
                <h1 className="text-2xl font-bold mb-6">Overview</h1>
 
                {/* Card Statistics */}
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <AnimatedStatsCard
                          title="Total Projects"
                          finalValue={projects.length}
@@ -156,6 +162,12 @@ export default function Overview() {
                          icon={BriefcaseIcon}
                          isLoading={loading}
                     />
+                    <AnimatedStatsCard
+                         title="Total Subdomains"
+                         finalValue={subdomains.length}
+                         icon={GlobeAltIcon}
+                         isLoading={loading}
+                    />
                </div>
 
                <div className="mt-6 space-y-4">
@@ -167,9 +179,10 @@ export default function Overview() {
                                         { label: "Projects", value: "Projects" },
                                         { label: "Links", value: "Links" },
                                         { label: "Experiences", value: "Experiences" },
+                                        { label: "Subdomains", value: "Subdomains" }
                                    ]}
                                    value={selectedTable}
-                                   onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences")}
+                                   onChange={(e) => setSelectedTable(e.target.value as "Projects" | "Links" | "Experiences" | "Subdomains")}
                                    className="w-full sm:w-48"
                               />
 

@@ -6,14 +6,16 @@ import {
      LinkIcon,
      BriefcaseIcon,
      XMarkIcon,
-     GlobeAltIcon
+     GlobeAltIcon,
+     CloudIcon
 } from '@heroicons/react/24/solid';
 
 const sidebarItems = [
      { name: "Overview", icon: ChartPieIcon, href: "/" },
      { name: "Projects", icon: FolderIcon, href: "/projects" },
      { name: "Links", icon: LinkIcon, href: "/links" },
-     { name: "Experiences", icon: BriefcaseIcon, href: "/experiences" }
+     { name: "Experiences", icon: BriefcaseIcon, href: "/experiences" },
+     { name: "Subdomains", icon: GlobeAltIcon, href: "/subdomains" }
 ];
 
 export default function Sidebar({
@@ -95,7 +97,7 @@ export default function Sidebar({
                                         className={`flex items-center w-full p-3 rounded-lg transition-colors ${pathname === '/portal' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'
                                              }`}
                                    >
-                                        <GlobeAltIcon className="h-6 w-6" />
+                                        <CloudIcon className="h-6 w-6" />
                                         {isOpen && <span className="ml-2">Go to Portal</span>}
                                    </Link>
                               </li>

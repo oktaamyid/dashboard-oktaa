@@ -84,5 +84,12 @@ export interface AnalyticsSummary {
      browserDistribution: { name: string, value: number }[];
 }
 
+export interface Subdomain {
+     id: string;
+     name: string;
+     type: string;
+     content: string;
+}
+
 // Union type utama yang sudah ada
-export type TableData = Experience | Project | Link | Profile;
+export type TableData = Experience | Project | Link | Profile | Subdomain;
