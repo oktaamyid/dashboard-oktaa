@@ -85,18 +85,18 @@ export default function Header({
                           >
                                 {auth.currentUser?.email || "Guest"}
                           </span>
-                          <Button
+                          <button
                                 onClick={profileEdit}
                                 className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
                           >
                                 Profile
-                          </Button>
-                          <Button
+                          </button>
+                          <button
                                 onClick={handleLogout}
                                 className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
                           >
                                 Logout
-                          </Button>
+                          </button>
                     </div>
                </div>
           </header>
