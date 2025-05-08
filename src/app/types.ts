@@ -91,5 +91,20 @@ export interface Subdomain {
      content: string;
 }
 
+export interface DnsRecord {
+     name: string;
+     type: "A" | "CNAME";
+     content: string;
+}
+
+export interface CloudflareResponse {
+     success: boolean;
+     result: {
+          name: string;
+          type: string;
+          content: string;
+     }[];
+}
+
 // Union type utama yang sudah ada
 export type TableData = Experience | Project | Link | Profile | Subdomain;
