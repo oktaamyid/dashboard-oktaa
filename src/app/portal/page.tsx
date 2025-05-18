@@ -319,7 +319,11 @@ const PortalPage: React.FC = () => {
                                                   onKeyDown={(e) => {
                                                        if (e.key === 'Enter' || e.key === ' ') {
                                                             e.preventDefault();
-                                                            link.useMultipleUrls ? toggleCard(link.id) : window.open(link.originalUrl, '_blank', 'noopener,noreferrer');
+                                                            if (link.useMultipleUrls) {
+                                                                 toggleCard(link.id);
+                                                            } else {
+                                                                 window.open(link.originalUrl, '_blank', 'noopener,noreferrer');
+                                                            }
                                                        }
                                                   }}
                                              >
