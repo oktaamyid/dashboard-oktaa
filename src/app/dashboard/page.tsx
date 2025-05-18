@@ -203,7 +203,7 @@ export default function Overview() {
                               columns={columns}
                               isLoading={loading}
                               renderCell={renderCell}
-                         />
+                         />   
                     </div>
                </div>
 
