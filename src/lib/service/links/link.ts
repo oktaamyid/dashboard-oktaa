@@ -25,6 +25,8 @@ const convertDoc = (doc: QueryDocumentSnapshot): Link => {
           id: doc.id,
           originalUrl: data.originalUrl,
           shortUrl: data.shortUrl,
+          multipleUrls: data.multipleUrls || [],
+          useMultipleUrls: data.useMultipleUrls || false,
           createdAt: data.createdAt instanceof Timestamp
                ? format(data.createdAt.toDate(), "dd MMM yyyy HH:mm:ss")
                : data.createdAt,
@@ -34,13 +36,15 @@ const convertDoc = (doc: QueryDocumentSnapshot): Link => {
           clicks: data.clicks || 0,
           showToPortal: data.showToPortal || false,
           nameUrl: data.nameUrl || "",
+          category: data.category || "",
+          description: data.description || "",
+          price: data.price || 0, // Include price
           deviceStats: data.deviceStats || {},
           browserStats: data.browserStats || {},
           geoStats: data.geoStats || {},
           refererStats: data.refererStats || {},
           showConfirmationPage: data.showConfirmationPage || false,
           confirmationPageSettings: data.confirmationPageSettings || {},
-          category: data.category || "",
      };
 };
 
@@ -88,7 +92,10 @@ export const createLink = async (linkData: Omit<Link, "id">): Promise<{ id: stri
                tablet: 0
           },
           geoStats: {},
-          refererStats: {}
+          refererStats: {},
+          multipleUrls: linkData.multipleUrls || [],
+          useMultipleUrls: linkData.useMultipleUrls || false,
+          price: linkData.price || 0
      };
 
      const docRef = await addDoc(collection(db, "links"), dataToSave);
@@ -157,25 +164,25 @@ export const getLinkByShortUrl = async (shortUrl: string): Promise<Link | null> 
 
 export const resetLinkAnalytics = async (): Promise<void> => {
      try {
-         const linksCollection = collection(db, "links");
-         const querySnapshot = await getDocs(linksCollection);
-         const batch = writeBatch(db);
- 
-         querySnapshot.docs.forEach((docSnapshot) => {
-             const linkRef = doc(db, "links", docSnapshot.id);
-             batch.update(linkRef, {
-                 clicks: 0,
-                 deviceStats: { desktop: 0, mobile: 0, tablet: 0 },
-                 browserStats: {},
-                 geoStats: {},
-                 refererStats: {}
-             });
-         });
- 
-         await batch.commit();
-         console.log("Successfully reset analytics for all links.");
+          const linksCollection = collection(db, "links");
+          const querySnapshot = await getDocs(linksCollection);
+          const batch = writeBatch(db);
+
+          querySnapshot.docs.forEach((docSnapshot) => {
+               const linkRef = doc(db, "links", docSnapshot.id);
+               batch.update(linkRef, {
+                    clicks: 0,
+                    deviceStats: { desktop: 0, mobile: 0, tablet: 0 },
+                    browserStats: {},
+                    geoStats: {},
+                    refererStats: {}
+               });
+          });
+
+          await batch.commit();
+          console.log("Successfully reset analytics for all links.");
      } catch (error) {
-         console.error("Error resetting link analytics: ", error);
-         throw new Error("Failed to reset link analytics");
+          console.error("Error resetting link analytics: ", error);
+          throw new Error("Failed to reset link analytics");
      }
 };

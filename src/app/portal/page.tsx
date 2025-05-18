@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe } from 'react-icons/fi';
+import { FiExternalLink, FiGithub, FiLinkedin, FiInstagram, FiMail, FiGlobe, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { FaSpotify, FaTiktok } from "react-icons/fa";
 import { getLinks, getProfile } from '@/lib/service';
 import { Link, Profile } from '@/app/types';
@@ -22,19 +22,18 @@ const PortalPage: React.FC = () => {
      const [activeTab, setActiveTab] = useState<string>('all');
      const [filteredLinks, setFilteredLinks] = useState<Link[]>([]);
      const [categories, setCategories] = useState<Category[]>([{ id: 'all', name: 'All' }]);
+     const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
-     // Filter links based on active tab
      const filterLinksByCategory = useCallback((category: string, linksList = links) => {
           if (category === 'all') {
-            setFilteredLinks(linksList);
+               setFilteredLinks(linksList);
           } else {
-            const filtered = linksList.filter(link => link.category && link.category.toLowerCase().replace(/\s+/g, '-') === category);
-            setFilteredLinks(filtered);
+               const filtered = linksList.filter(link => link.category && link.category.toLowerCase().replace(/\s+/g, '-') === category);
+               setFilteredLinks(filtered);
           }
      }, [links]);
 
      useEffect(() => {
-          // Initial data fetch
           const fetchData = async () => {
                try {
                     const [profileData, linksData] = await Promise.all([
@@ -53,12 +52,11 @@ const PortalPage: React.FC = () => {
                     const dynamicCategories: Category[] = [
                          { id: 'all', name: 'All' },
                          ...uniqueCategories.map(category => ({
-                              id: category!.toLowerCase().replace(/\s+/g, '-'), // Convert to kebab-case for ID
+                              id: category!.toLowerCase().replace(/\s+/g, '-'),
                               name: category!
                          }))
                     ];
                     setCategories(dynamicCategories);
-
                } catch (error) {
                     console.error("Error fetching data:", error);
                } finally {
@@ -67,11 +65,9 @@ const PortalPage: React.FC = () => {
           };
           fetchData();
 
-          // Setup realtime listeners for Firebase
           const profileRef = collection(db, 'profiles');
           const linksRef = collection(db, 'links');
 
-          // Listen for profile changes
           const unsubscribeProfile = onSnapshot(profileRef, (snapshot) => {
                snapshot.docChanges().forEach((change) => {
                     if (change.type === 'modified' || change.type === 'added') {
@@ -84,7 +80,6 @@ const PortalPage: React.FC = () => {
                console.error("Profile listener error:", error);
           });
 
-          // Listen for links changes
           const unsubscribeLinks = onSnapshot(linksRef, (snapshot) => {
                snapshot.docChanges().forEach((change) => {
                     if (change.type === 'modified' || change.type === 'added' || change.type === 'removed') {
@@ -93,14 +88,13 @@ const PortalPage: React.FC = () => {
                               setLinks(portalLinks);
                               filterLinksByCategory(activeTab, portalLinks);
 
-                              // Update categories based on new links data
                               const uniqueCategories = Array.from(
                                    new Set(portalLinks.map(link => link.category).filter(category => category))
                               );
                               const dynamicCategories: Category[] = [
                                    { id: 'all', name: 'All' },
                                    ...uniqueCategories.map(category => ({
-                                        id: category!.toLowerCase().replace(/\s+/g, '-'), // Convert to kebab-case for ID
+                                        id: category!.toLowerCase().replace(/\s+/g, '-'),
                                         name: category!
                                    }))
                               ];
@@ -112,17 +106,45 @@ const PortalPage: React.FC = () => {
                console.error("Links listener error:", error);
           });
 
-          // Cleanup listeners on unmount
           return () => {
                unsubscribeProfile();
                unsubscribeLinks();
           };
      }, [activeTab, filterLinksByCategory]);
 
-     // Handle tab change
+     // Add useEffect to handle URL hash changes
+     useEffect(() => {
+          const handleHashChange = () => {
+               const hash = window.location.hash.slice(1); // Remove the # symbol
+               if (hash) {
+                    const normalizedHash = hash.toLowerCase().replace(/\s+/g, '-');
+                    // Check if the hash matches any category
+                    const categoryExists = categories.some(cat => cat.id === normalizedHash);
+                    if (categoryExists) {
+                         setActiveTab(normalizedHash);
+                         filterLinksByCategory(normalizedHash);
+                    }
+               }
+          };
+
+          // Handle initial hash on mount
+          handleHashChange();
+
+          // Listen for hash changes
+          window.addEventListener('hashchange', handleHashChange);
+          return () => window.removeEventListener('hashchange', handleHashChange);
+     }, [categories, filterLinksByCategory]);
+
      const handleTabChange = (tabId: string) => {
           setActiveTab(tabId);
           filterLinksByCategory(tabId);
+          // Update URL hash without triggering a page reload
+          if (tabId === 'all') {
+               // Remove hash for "all" category
+               history.pushState(null, '', window.location.pathname);
+          } else {
+               window.location.hash = tabId;
+          }
      };
 
      const handleShare = async () => {
@@ -147,6 +169,10 @@ const PortalPage: React.FC = () => {
           }
      };
 
+     const toggleCard = (linkId: string) => {
+          setExpandedCard(expandedCard === linkId ? null : linkId);
+     };
+
      const socialLinks = [
           { icon: <FiGithub className="w-5 h-5" />, url: profile?.socialMedia?.github, visible: !!profile?.socialMedia?.github },
           { icon: <FiLinkedin className="w-5 h-5" />, url: profile?.socialMedia?.linkedin, visible: !!profile?.socialMedia?.linkedin },
@@ -166,7 +192,6 @@ const PortalPage: React.FC = () => {
                          transition={{ duration: 0.3 }}
                          className="w-full md:max-w-lg overflow-hidden shadow-lg flex flex-col flex-grow mx-auto"
                     >
-                         {/* Skeleton for Banner */}
                          <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
                               <div className="absolute -bottom-10">
                                    <div className="w-20 h-20 rounded-full border-4 border-gray-700 bg-gray-600 animate-pulse" />
@@ -175,16 +200,12 @@ const PortalPage: React.FC = () => {
                                    <FiExternalLink className="w-4 h-4 text-white" />
                               </div>
                          </div>
-
-                         {/* Skeleton for Content */}
                          <div className="pt-12 px-5 pb-5">
                               <div className="text-center mb-6">
                                    <div className="h-6 bg-gray-600 rounded w-1/3 mx-auto animate-pulse" />
                                    <div className="h-4 bg-gray-600 rounded w-1/2 mx-auto mt-2 animate-pulse" />
                                    <div className="h-4 bg-gray-600 rounded w-3/4 mx-auto mt-2 animate-pulse" />
                               </div>
-
-                              {/* Skeleton for Tabs */}
                               <div className="mb-6">
                                    <div className="flex justify-center p-1">
                                         {[...Array(3)].map((_, index) => (
@@ -195,8 +216,6 @@ const PortalPage: React.FC = () => {
                                         ))}
                                    </div>
                               </div>
-
-                              {/* Skeleton for Links */}
                               <div className="space-y-3 mb-6 min-h-56">
                                    {[...Array(4)].map((_, index) => (
                                         <div
@@ -205,8 +224,6 @@ const PortalPage: React.FC = () => {
                                         />
                                    ))}
                               </div>
-
-                              {/* Skeleton for Social Links */}
                               <div className="flex justify-center space-x-5 mb-5">
                                    {[...Array(3)].map((_, index) => (
                                         <div
@@ -215,8 +232,6 @@ const PortalPage: React.FC = () => {
                                         />
                                    ))}
                               </div>
-
-                              {/* Skeleton for Footer */}
                               <div className="flex flex-col items-center">
                                    <div className="h-4 bg-gray-600 rounded w-1/4 animate-pulse" />
                               </div>
@@ -234,7 +249,6 @@ const PortalPage: React.FC = () => {
                     transition={{ duration: 0.3 }}
                     className="w-full md:max-w-lg overflow-hidden shadow-lg flex flex-col flex-grow mx-auto"
                >
-                    {/* Banner with Profile Image */}
                     <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center">
                          {profile.profilePicture && (
                               <motion.div
@@ -260,7 +274,6 @@ const PortalPage: React.FC = () => {
                          </button>
                     </div>
 
-                    {/* Content */}
                     <div className="pt-12 px-5 pb-5">
                          <div className="text-center mb-6">
                               <h1 className="text-xl font-bold text-white">@{profile.username}</h1>
@@ -270,7 +283,6 @@ const PortalPage: React.FC = () => {
                               )}
                          </div>
 
-                         {/* Dynamic Categories Tabs */}
                          <div className="mb-6">
                               <div className="flex justify-center p-1">
                                    {categories.map((category) => (
@@ -288,7 +300,6 @@ const PortalPage: React.FC = () => {
                               </div>
                          </div>
 
-                         {/* Links with Shimmer Effect based on active tab */}
                          <div className="space-y-3 mb-6 min-h-56">
                               <AnimatePresence mode="wait">
                                    {loading ? (
@@ -297,46 +308,102 @@ const PortalPage: React.FC = () => {
                                         </div>
                                    ) : filteredLinks.length > 0 ? (
                                         filteredLinks.map((link, index) => (
-                                             <motion.a
+                                             <motion.div
                                                   key={link.id}
-                                                  href={`/${link.shortUrl}`}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  initial={{
-                                                       opacity: 0,
-                                                       x: -20,
-                                                       scale: 0.95
-                                                  }}
-                                                  animate={{
-                                                       opacity: 1,
-                                                       x: 0,
-                                                       scale: 1,
-                                                       transition: {
-                                                            delay: 0.1 + index * 0.1,
-                                                            type: "spring",
-                                                            stiffness: 100
+                                                  initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                                                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                                                  transition={{ delay: 0.1 + index * 0.1, type: "spring", stiffness: 100 }}
+                                                  className="relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 md:py-5 transition-all duration-200 group overflow-hidden shimmer-effect"
+                                                  role="button"
+                                                  tabIndex={0}
+                                                  onKeyDown={(e) => {
+                                                       if (e.key === 'Enter' || e.key === ' ') {
+                                                            e.preventDefault();
+                                                            link.useMultipleUrls ? toggleCard(link.id) : window.open(link.originalUrl, '_blank', 'noopener,noreferrer');
                                                        }
                                                   }}
-                                                  exit={{
-                                                       opacity: 0,
-                                                       x: 20,
-                                                       transition: {
-                                                            duration: 0.2
-                                                       }
-                                                  }}
-                                                  whileHover={{
-                                                       scale: 1.02,
-                                                       boxShadow: "0 0 15px rgba(255,255,255,0.2)"
-                                                  }}
-                                                  className="block relative bg-gray-600 hover:bg-gray-500 rounded-lg px-4 py-3 md:py-5 transition-all duration-200 group overflow-hidden shimmer-effect"
                                              >
-                                                  <div className="flex items-center justify-between relative z-10">
-                                                       <span className="text-white text-base font-medium truncate mx-auto">
-                                                            {link.nameUrl || link.shortUrl}
-                                                       </span>
-                                                       <FiExternalLink className="text-gray-400 group-hover:text-white w-4 h-4" />
-                                                  </div>
-                                             </motion.a>
+                                                  {link.useMultipleUrls ? (
+                                                       <div
+                                                            className="flex items-center justify-between relative z-10 cursor-pointer"
+                                                            onClick={() => toggleCard(link.id)}
+                                                            aria-expanded={expandedCard === link.id}
+                                                            aria-label={`Expand ${link.nameUrl || link.shortUrl} details`}
+                                                       >
+                                                            <div className="flex flex-col">
+                                                                 <span className="text-white text-base font-medium truncate">
+                                                                      {link.nameUrl || link.shortUrl}
+                                                                 </span>
+                                                            </div>
+                                                            <motion.div
+                                                                 animate={{ rotate: expandedCard === link.id ? 180 : 0 }}
+                                                                 transition={{ duration: 0.3 }}
+                                                            >
+                                                                 {expandedCard === link.id ? (
+                                                                      <FiChevronUp className="text-gray-400 group-hover:text-white w-5 h-5" />
+                                                                 ) : (
+                                                                      <FiChevronDown className="text-gray-400 group-hover:text-white w-5 h-5" />
+                                                                 )}
+                                                            </motion.div>
+                                                       </div>
+                                                  ) : (
+                                                       // Direct link for originalUrl
+                                                       <a
+                                                            href={link.originalUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center justify-between relative z-10"
+                                                            aria-label={`Visit ${link.nameUrl || link.shortUrl}`}
+                                                       >
+                                                            <div className="flex flex-col">
+                                                                 <span className="text-white text-base font-medium truncate">
+                                                                      {link.nameUrl || link.shortUrl}
+                                                                 </span>
+                                                                 <span className="text-gray-400 text-sm mt-1">
+                                                                      {link.description || ""}
+                                                                 </span>
+                                                            </div>
+                                                            <FiExternalLink className="text-gray-400 group-hover:text-white w-5 h-5" />
+                                                       </a>
+                                                  )}
+                                                  <AnimatePresence>
+                                                       {expandedCard === link.id && link.useMultipleUrls && (
+                                                            <motion.div
+                                                                 initial={{ height: 0, opacity: 0 }}
+                                                                 animate={{ height: "auto", opacity: 1 }}
+                                                                 exit={{ height: 0, opacity: 0 }}
+                                                                 transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                                 className="mt-3 border-t border-gray-500 pt-3"
+                                                            >
+                                                                 {link.description && (
+                                                                      <p className="text-gray-300 text-sm mb-3 px-2">{link.description}</p>
+                                                                 )}
+                                                                 {link.price !== undefined && link.price > 0 && (
+                                                                        <p className="text-white font-semibold mb-3 px-2">
+                                                                              Harga: Rp {link.price.toLocaleString('id-ID')}
+                                                                        </p>
+                                                                 )}
+                                                                 {link.multipleUrls && link.multipleUrls.length > 0 && (
+                                                                      <div className="space-y-2 px-2">
+                                                                           {link.multipleUrls.map((urlObj, idx) => (
+                                                                                <a
+                                                                                     key={idx}
+                                                                                     href={urlObj.url}
+                                                                                     target="_blank"
+                                                                                     rel="noopener noreferrer"
+                                                                                     className="flex items-center text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                                                                                     aria-label={`Visit ${urlObj.name || urlObj.url}`}
+                                                                                >
+                                                                                     <FiExternalLink className="mr-2 w-4 h-4" />
+                                                                                     <span className="truncate">{urlObj.name || urlObj.url}</span>
+                                                                                </a>
+                                                                           ))}
+                                                                      </div>
+                                                                 )}
+                                                            </motion.div>
+                                                       )}
+                                                  </AnimatePresence>
+                                             </motion.div>
                                         ))
                                    ) : (
                                         <motion.div
@@ -351,7 +418,6 @@ const PortalPage: React.FC = () => {
                               </AnimatePresence>
                          </div>
 
-                         {/* Social Media Links */}
                          {socialLinks.length > 0 && (
                               <div className="flex justify-center space-x-5 mb-5">
                                    {socialLinks.map((social, index) => (
@@ -364,9 +430,7 @@ const PortalPage: React.FC = () => {
                                              animate={{
                                                   opacity: 1,
                                                   y: 0,
-                                                  transition: {
-                                                       delay: 0.5 + index * 0.1
-                                                  }
+                                                  transition: { delay: 0.5 + index * 0.1 }
                                              }}
                                              whileHover={{
                                                   scale: 1.2,
@@ -382,7 +446,6 @@ const PortalPage: React.FC = () => {
                               </div>
                          )}
 
-                         {/* Footer */}
                          <div className="flex flex-col items-center">
                               <p className="text-gray-500 text-xs font-semibold">
                                    Copyright {new Date().getFullYear()} - oktaa.my.id
