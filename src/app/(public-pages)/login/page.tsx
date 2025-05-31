@@ -28,7 +28,7 @@ export default function LoginPage() {
 
                setCookie("token", token, { maxAge: 60 * 60 * 24, path: "/" });
 
-               router.push("/dashboard");
+               router.push("/");
           } catch (err) {
                console.error(err);
                setError("Login gagal, periksa email dan password!");
@@ -40,12 +40,12 @@ export default function LoginPage() {
           <div className="flex items-center justify-center min-h-screen bg-gray-800 p-4">
                <div className="w-full max-w-md bg-gray-900 rounded-xl shadow-xl p-8">
                     <div className="text-center mb-8">
-                         <Image 
-                              src="/oktaa-white.svg" 
-                              alt="Brand Logo" 
-                              width={80} 
-                              height={80} 
-                              className="mx-auto mb-4 rounded-full"
+                         <Image
+                              src="https://cdn.oktaa.my.id/logo-dark-theme.svg"
+                              alt="Brand Logo"
+                              width={80}
+                              height={80}
+                              className="mx-auto mb-4 "
                          />
                          <h1 className="text-2xl font-bold text-white text-center mb-4">Sign In to Oktaa</h1>
                          {/* <p className="text-sm text-gray-400">
