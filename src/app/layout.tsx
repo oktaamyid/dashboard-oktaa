@@ -9,62 +9,58 @@ const raleway = Raleway({
 });
 
 export const metadata: Metadata = {
+     title: "OKTAA~ | Unleash Your Digital Identity",
      metadataBase: new URL("https://oktaa.my.id"),
-     title: "Hawlo - Oktaa. | Personal Brand and Domain Name",
+     description: "OKTAA~ lets you unleash your digital identity with a sleek platform to manage content, projects, and more. Crafted by Firtiansyah Okta Resama for creators and innovators.",
      icons: {
           icon: "https://cdn.oktaa.my.id/favicon.ico",
           apple: "https://cdn.oktaa.my.id/apple-touch-icon.png"
      },
-     authors: [{ name: "Firtiansyah Okta Resama", url: "https://firtiansyah.oktaa.my.id" }],
-     description: "Oktaa is a personal brand and domain name owned by okta, representing his identity and projects.",
+     authors: [{ name: "Firtiansyah Okta Resama", url: "https://hi.oktaa.my.id" }],
      keywords: [
           "Firtiansyah Okta Resama",
-          "Web Developer",
-          "Programmer",
-          "Full-stack Engineer",
-          "Indonesia",
+          "Firtiansyah Okta Website",
           "Firtiansyah",
-          "Oktaa",
           "Siapa Firtiansyah Okta Resama",
-          "tian",
+          "Tian Website",
           "Firtiansyah adalah",
           "Firtiansyah Okta Portfolio Website",
           "Firtiansyah Website",
-          "Firtiansyah Personal Brand",
-          "Oktaa Brand"
+          "Firtiansyah Okta",
+          "CMS Firtiansyah Okta",
      ],
      openGraph: {
           type: "website",
           url: "https://oktaa.my.id",
-          title: "Hawlo - Oktaa. | Personal Brand and Domain Name",
-          description: "Oktaa is a personal brand and domain name owned by okta, representing his identity and projects.",
+          title: "OKTAA~ | Unleash Your Digital Identity",
+          description: "OKTAA~ lets you unleash your digital identity with a sleek platform to manage content, projects, and more. Crafted by Firtiansyah Okta Resama for creators and innovators.",
           images: [
                {
-                    url: "https://cdn.oktaa.my.id/banner.png",
+                    url: "https://cdn.oktaa.my.id/og-banner.png",
                     width: 1200,
                     height: 630,
-                    alt: "Oktaa Logo",
+                    alt: "OKTAA Logo",
                },
           ],
      },
      twitter: {
           card: "summary_large_image",
           site: "@oktaa",
-          title: "Hawlo - Oktaa. | Personal Brand and Domain Name",
-          description: "Oktaa is a personal brand and domain name owned by okta, representing his identity and projects.",
-          images: ["https://cdn.oktaa.my.id/banner.png"],
+          title: "OKTAA~ | Unleash Your Digital Identity",
+          description: "OKTAA~ lets you unleash your digital identity with a sleek platform to manage content, projects, and more. Crafted by Firtiansyah Okta Resama for creators and innovators.",
+          images: ["https://cdn.oktaa.my.id/og-banner.png"],
      },
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",
      }
 };
 
-export default function Layout({children}: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
      return (
           <html lang="en">
                <body className={raleway.variable}>
                     {children}
                </body>
           </html>
-     )
+     );
 }

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'; // Tambahkan ini
+import { usePathname } from 'next/navigation';
 import {
      ChartPieIcon,
      FolderIcon,
@@ -25,7 +25,7 @@ export default function Sidebar({
      isOpen: boolean,
      onCloseSidebar?: () => void
 }) {
-     const pathname = usePathname(); // Dapatkan path saat ini
+     const pathname = usePathname();
 
      return (
           <>
@@ -52,7 +52,7 @@ export default function Sidebar({
                     <nav>
                          <div className="flex items-center justify-between py-6 px-4">
                               <Link
-                                   href="/dashboard"
+                                   href="/" // Ganti ke / karena /dashboard tidak diperlukan
                                    className={`text-2xl font-bold ${isOpen ? "" : "hidden md:block"}`}
                               >
                                    {isOpen ? 'Oktaa' : ''}
@@ -71,13 +71,11 @@ export default function Sidebar({
 
                          <ul className="space-y-2">
                               {sidebarItems.map((item) => {
-                                   // Tentukan apakah item aktif berdasarkan pathname
-                                   const isActive = pathname === `/dashboard${item.href}` ||
-                                        (item.href === '/' && pathname === '/dashboard');
+                                   const isActive = pathname === item.href; // Perbaiki logika isActive
                                    return (
                                         <li key={item.name} className='px-2'>
                                              <Link
-                                                  href={`/dashboard${item.href}`}
+                                                  href={item.href} // Gunakan href langsung sesuai route group
                                                   className={`flex items-center w-full p-3 rounded-lg transition-colors ${isActive ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'
                                                        }`}
                                              >
@@ -93,7 +91,7 @@ export default function Sidebar({
                               </li>
                               <li className='px-2'>
                                    <Link
-                                        href={`/portal`}
+                                        href="/portal" // Tetap gunakan /portal, pastikan rute ini ada
                                         className={`flex items-center w-full p-3 rounded-lg transition-colors ${pathname === '/portal' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'
                                              }`}
                                    >
