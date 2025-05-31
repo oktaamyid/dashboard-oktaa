@@ -91,7 +91,8 @@ export default function Sidebar({
                               </li>
                               <li className='px-2'>
                                    <Link
-                                        href="/portal" // Tetap gunakan /portal, pastikan rute ini ada
+                                        target='_blank'
+                                        href="https://hi.oktaa.my.id/portal" // Tetap gunakan /portal, pastikan rute ini ada
                                         className={`flex items-center w-full p-3 rounded-lg transition-colors ${pathname === '/portal' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'
                                              }`}
                                    >

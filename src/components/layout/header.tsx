@@ -65,7 +65,7 @@ export default function Header({
                <div className="relative" ref={dropdownRef}>
                     <div className="flex gap-2">
                          <Image
-                              src="/oktaa-white.svg"
+                              src="https://cdn.oktaa.my.id/apple-touch-icon.png"
                               alt="Profile"
                               width={25}
                               height={25}
