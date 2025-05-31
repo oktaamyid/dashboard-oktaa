@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
                     protocol: 'https',
                     hostname: 'zbcld3vq1ntclyw4.public.blob.vercel-storage.com',
                     pathname: '**'
+               },
+               {
+                    protocol: 'https',
+                    hostname: 'cdn.oktaa.my.id',
+                    pathname: '**'
                }
           ],
           dangerouslyAllowSVG: true,
