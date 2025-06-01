@@ -65,41 +65,43 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
 
      if (loading) {
           return (
-               <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-                    <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
-                         {/* Brand Header Skeleton */}
-                         <div className="flex items-center gap-4 mb-6">
-                              <Skeleton circle width={50} height={50} />
-                              <Skeleton width={200} height={24} />
-                         </div>
+               <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 px-4">
+                    {/* Brand Icon & Header Skeleton */}
+                    <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 text-center sm:text-left">
+                         <Skeleton circle width={75} height={75} />
+                         <Skeleton width={200} height={24} />
+                    </div>
 
-                         {/* URL Box Skeleton */}
-                         <div className="space-y-4">
-                              <Skeleton width={120} height={16} />
-                              <Skeleton width="100%" height={24} />
-
-                              {/* Custom Message Skeleton (conditional) */}
-                              <div className="space-y-2">
-                                   <Skeleton width={180} height={16} />
-                                   <Skeleton width="100%" height={48} />
-                              </div>
-
-                              <Skeleton width={220} height={16} />
-                              <Skeleton width="100%" height={40} />
-
-                              {/* Buttons Skeleton */}
-                              <div className="flex gap-4 pt-2">
-                                   <Skeleton width="50%" height={40} />
-                                   <Skeleton width="50%" height={40} />
-                              </div>
-                         </div>
-
-                         {/* Ad Section Skeleton */}
-                         <div className="mt-6 space-y-2">
+                    {/* URL Box Skeleton */}
+                    <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-[90%] sm:max-w-md">
+                         <div className="text-center">
                               <Skeleton width={100} height={16} containerClassName="mx-auto" />
-                              <Skeleton width="100%" height={96} />
+                              <Skeleton width="80%" height={24} containerClassName="mx-auto mt-2" />
+                         </div>
+
+                         {/* Custom Message Skeleton */}
+                         <div className="mt-4 bg-gray-200 p-3 rounded-lg">
+                              <Skeleton width={160} height={16} />
+                              <Skeleton width="100%" height={16} containerClassName="mt-2" />
+                         </div>
+
+                         <div className="mt-4">
+                              <Skeleton width={140} height={16} containerClassName="mx-auto" />
+                              <Skeleton width="100%" height={40} containerClassName="mt-1" />
+                         </div>
+
+                         <div className="mt-4">
+                              <Skeleton width="90%" height={32} containerClassName="mx-auto" />
+                         </div>
+
+                         {/* Buttons Skeleton */}
+                         <div className="flex flex-col sm:flex-row justify-between mt-4 gap-2 sm:gap-4">
+                              <Skeleton width={120} height={40} containerClassName="w-full sm:w-auto" />
+                              <Skeleton width={120} height={40} containerClassName="w-full sm:w-auto" />
                          </div>
                     </div>
+
+                    
                </div>
           );
      }
@@ -148,7 +150,7 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                          />
                     </div>
                     <div className="mt-4">
-                          <p className="text-sm text-gray-500">By clicking &apos;Continue&apos;, you acknowledge that you&apos;ll be redirected to an external website. Please ensure you trust this destination.</p>
+                         <p className="text-sm text-gray-500">By clicking &apos;Continue&apos;, you acknowledge that you&apos;ll be redirected to an external website. Please ensure you trust this destination.</p>
                     </div>
 
                     {/* Buttons */}
