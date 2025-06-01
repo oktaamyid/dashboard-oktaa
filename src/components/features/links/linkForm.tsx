@@ -107,27 +107,16 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                     }}
                     className="space-y-4"
                >
-                    {/* Use Multiple URLs Checkbox */}
-                    <label className="flex items-center space-x-2 text-white">
-                         <input
-                              type="checkbox"
-                              name="useMultipleUrls"
-                              checked={formData.useMultipleUrls}
-                              onChange={handleChange}
-                              className="w-4 h-4"
-                         />
-                         <span>Use Multiple URLs (disables Original URL)</span>
-                    </label>
 
-                    {/* Original URL */}
                     <Input
-                         label="Original URL"
-                         name="originalUrl"
-                         type="url"
-                         required={!formData.useMultipleUrls} // Required only if not using multipleUrls
-                         value={formData.originalUrl}
-                         onChange={handleChange}
-                         disabled={formData.useMultipleUrls} // Disable if using multipleUrls
+                          label="Original URL (leave empty if using multiple URLs)"
+                          name="originalUrl"
+                          type="url"
+                          required={!formData.useMultipleUrls}
+                          value={formData.originalUrl}
+                          onChange={handleChange}
+                          disabled={formData.useMultipleUrls}
+                          placeholder={formData.useMultipleUrls ? "Not needed when using multiple URLs" : "Enter original URL"}
                     />
 
                     {/* Short URL */}
@@ -142,14 +131,42 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
 
                     {/* Show URL to Portal Checkbox */}
                     <label className="flex items-center space-x-2 text-white">
-                         <input
-                              type="checkbox"
-                              name="showToPortal"
-                              checked={formData.showToPortal}
-                              onChange={handleChange}
-                              className="w-4 h-4"
-                         />
-                         <span>Show to Portal?</span>
+                           <input
+                                   type="checkbox"
+                                   name="showToPortal"
+                                   checked={formData.showToPortal || formData.useMultipleUrls}
+                                   onChange={(e) => {
+                                        const isChecked = e.target.checked;
+                                        setFormData(prev => ({
+                                             ...prev,
+                                             showToPortal: isChecked,
+                                             useMultipleUrls: isChecked ? prev.useMultipleUrls : false, 
+                                             multipleUrls: isChecked ? prev.multipleUrls : [] 
+                                        }));
+                                   }}
+                                   className="w-4 h-4"
+                           />
+                           <span>Show to Portal?</span>
+                    </label>
+
+                    {/* Use Multiple URLs Checkbox */}
+                    <label className="flex items-center space-x-2 text-white">
+                           <input
+                                   type="checkbox"
+                                   name="useMultipleUrls"
+                                   checked={formData.useMultipleUrls}
+                                   onChange={(e) => {
+                                          const isChecked = e.target.checked;
+                                          setFormData(prev => ({
+                                                   ...prev,
+                                                   useMultipleUrls: isChecked,
+                                                   showToPortal: isChecked ? true : prev.showToPortal, 
+                                                   multipleUrls: isChecked ? prev.multipleUrls : []
+                                          }));
+                                   }}
+                                   className="w-4 h-4"
+                           />
+                           <span>Use Multiple URLs (disables Original URL)</span>
                     </label>
 
                     {/* Portal-specific Fields */}
