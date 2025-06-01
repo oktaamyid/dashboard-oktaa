@@ -14,7 +14,9 @@ interface LinkFormProps {
 
 export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormProps) {
      const [formData, setFormData] = useState<Omit<Link, "id">>({
-          originalUrl: initialData?.originalUrl || "",
+          originalUrl: initialData?.useMultipleUrls && initialData?.multipleUrls && initialData.multipleUrls.length > 0
+               ? initialData.multipleUrls[0].url
+               : initialData?.originalUrl || "",
           shortUrl: initialData?.shortUrl || "",
           multipleUrls: initialData?.multipleUrls || [],
           useMultipleUrls: initialData?.useMultipleUrls || false,
@@ -31,7 +33,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
 
      const [newUrl, setNewUrl] = useState<string>("");
      const [newUrlName, setNewUrlName] = useState<string>("");
-     const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track editing URL index
+     const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           const { name, value, type, checked } = e.target;
@@ -44,6 +46,20 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                               ...prev.confirmationPageSettings,
                               customMessage: value,
                          },
+                    };
+               }
+
+               if (name === "useMultipleUrls") {
+                    const isChecked = checked;
+                    const newOriginalUrl = isChecked && prev.multipleUrls && prev.multipleUrls.length > 0
+                         ? prev.multipleUrls[0].url
+                         : "";
+                    return {
+                         ...prev,
+                         useMultipleUrls: isChecked,
+                         showToPortal: isChecked ? true : prev.showToPortal,
+                         multipleUrls: isChecked ? prev.multipleUrls : [],
+                         originalUrl: newOriginalUrl,
                     };
                }
 
@@ -60,13 +76,16 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
           setFormData((prev) => {
                const updatedUrls = [...(prev.multipleUrls || [])];
                if (editingIndex !== null) {
-                    // Update existing URL
                     updatedUrls[editingIndex] = { url: newUrl, name: newUrlName || undefined };
                } else {
-                    // Add new URL
                     updatedUrls.push({ url: newUrl, name: newUrlName || undefined });
                }
-               return { ...prev, multipleUrls: updatedUrls };
+               const newOriginalUrl = prev.useMultipleUrls ? updatedUrls[0].url : prev.originalUrl;
+               return {
+                    ...prev,
+                    multipleUrls: updatedUrls,
+                    originalUrl: newOriginalUrl,
+               };
           });
           setNewUrl("");
           setNewUrlName("");
@@ -83,15 +102,29 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
      };
 
      const removeUrl = (index: number) => {
-          setFormData((prev) => ({
-               ...prev,
-               multipleUrls: prev.multipleUrls?.filter((_, i) => i !== index) || [],
-          }));
+          setFormData((prev) => {
+               const updatedUrls = prev.multipleUrls?.filter((_, i) => i !== index) || [];
+               const newOriginalUrl = prev.useMultipleUrls && updatedUrls.length > 0 ? updatedUrls[0].url : "";
+               return {
+                    ...prev,
+                    multipleUrls: updatedUrls,
+                    originalUrl: newOriginalUrl,
+               };
+          });
           if (editingIndex === index) {
                setNewUrl("");
                setNewUrlName("");
                setEditingIndex(null);
           }
+     };
+
+     const handleSubmit = (e: React.FormEvent) => {
+          e.preventDefault();
+          if (formData.useMultipleUrls && (!formData.multipleUrls || formData.multipleUrls.length === 0)) {
+               alert("Please add at least one URL when using multiple URLs.");
+               return;
+          }
+          onSubmit(formData);
      };
 
      return (
@@ -100,26 +133,18 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                     {initialData ? "Edit Link" : "Create New Link"}
                </h2>
 
-               <form
-                    onSubmit={(e) => {
-                         e.preventDefault();
-                         onSubmit(formData);
-                    }}
-                    className="space-y-4"
-               >
-
+               <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
-                          label="Original URL (leave empty if using multiple URLs)"
-                          name="originalUrl"
-                          type="url"
-                          required={!formData.useMultipleUrls}
-                          value={formData.originalUrl}
-                          onChange={handleChange}
-                          disabled={formData.useMultipleUrls}
-                          placeholder={formData.useMultipleUrls ? "Not needed when using multiple URLs" : "Enter original URL"}
+                         label="Original URL (leave empty if using multiple URLs)"
+                         name="originalUrl"
+                         type="url"
+                         required={!formData.useMultipleUrls}
+                         value={formData.originalUrl}
+                         onChange={handleChange}
+                         disabled={formData.useMultipleUrls}
+                         placeholder={formData.useMultipleUrls ? "Automatically set from multiple URLs" : "Enter original URL"}
                     />
 
-                    {/* Short URL */}
                     <Input
                          label="Short URL"
                          name="shortUrl"
@@ -129,47 +154,42 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          onChange={handleChange}
                     />
 
-                    {/* Show URL to Portal Checkbox */}
                     <label className="flex items-center space-x-2 text-white">
-                           <input
-                                   type="checkbox"
-                                   name="showToPortal"
-                                   checked={formData.showToPortal || formData.useMultipleUrls}
-                                   onChange={(e) => {
-                                        const isChecked = e.target.checked;
-                                        setFormData(prev => ({
+                         <input
+                              type="checkbox"
+                              name="showToPortal"
+                              checked={formData.showToPortal || formData.useMultipleUrls}
+                              onChange={(e) => {
+                                   const isChecked = e.target.checked;
+                                   setFormData((prev) => {
+                                        const newOriginalUrl = isChecked && prev.useMultipleUrls && (prev.multipleUrls ?? []).length > 0
+                                             ? (prev.multipleUrls ?? [])[0]?.url
+                                             : prev.originalUrl;
+                                        return {
                                              ...prev,
                                              showToPortal: isChecked,
-                                             useMultipleUrls: isChecked ? prev.useMultipleUrls : false, 
-                                             multipleUrls: isChecked ? prev.multipleUrls : [] 
-                                        }));
-                                   }}
-                                   className="w-4 h-4"
-                           />
-                           <span>Show to Portal?</span>
+                                             useMultipleUrls: isChecked ? prev.useMultipleUrls : false,
+                                             multipleUrls: isChecked ? prev.multipleUrls : [],
+                                             originalUrl: newOriginalUrl,
+                                        };
+                                   });
+                              }}
+                              className="w-4 h-4"
+                         />
+                         <span>Show to Portal?</span>
                     </label>
 
-                    {/* Use Multiple URLs Checkbox */}
                     <label className="flex items-center space-x-2 text-white">
-                           <input
-                                   type="checkbox"
-                                   name="useMultipleUrls"
-                                   checked={formData.useMultipleUrls}
-                                   onChange={(e) => {
-                                          const isChecked = e.target.checked;
-                                          setFormData(prev => ({
-                                                   ...prev,
-                                                   useMultipleUrls: isChecked,
-                                                   showToPortal: isChecked ? true : prev.showToPortal, 
-                                                   multipleUrls: isChecked ? prev.multipleUrls : []
-                                          }));
-                                   }}
-                                   className="w-4 h-4"
-                           />
-                           <span>Use Multiple URLs (disables Original URL)</span>
+                         <input
+                              type="checkbox"
+                              name="useMultipleUrls"
+                              checked={formData.useMultipleUrls}
+                              onChange={handleChange}
+                              className="w-4 h-4"
+                         />
+                         <span>Use Multiple URLs (disables Original URL)</span>
                     </label>
 
-                    {/* Portal-specific Fields */}
                     {formData.showToPortal && (
                          <>
                               <Input
@@ -206,10 +226,12 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                                    onChange={handleChange}
                               />
 
-                              {/* Multiple URLs Input */}
                               {formData.useMultipleUrls && (
                                    <div className="space-y-2">
                                         <label className="text-white text-sm font-medium">Additional URLs</label>
+                                        {(!formData.multipleUrls || formData.multipleUrls.length === 0) && (
+                                             <p className="text-yellow-400 text-sm">Please add at least one URL.</p>
+                                        )}
                                         <div className="flex space-x-2">
                                              <Input
                                                   type="url"
@@ -227,7 +249,6 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                                                   {editingIndex !== null ? <FiEdit className="w-4 h-4" /> : <FiPlus className="w-4 h-4" />}
                                              </Button>
                                         </div>
-                                        {/* Display Added URLs */}
                                         {formData.multipleUrls && formData.multipleUrls.length > 0 && (
                                              <div className="space-y-1">
                                                   {formData.multipleUrls.map((urlObj, index) => (
@@ -260,7 +281,6 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          </>
                     )}
 
-                    {/* Show Confirmation Page Checkbox */}
                     <label className="flex items-center space-x-2 text-white">
                          <input
                               type="checkbox"
@@ -272,7 +292,6 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          <span>Show Confirmation Page</span>
                     </label>
 
-                    {/* Confirmation Page Settings */}
                     {formData.showConfirmationPage && (
                          <Input
                               label="Custom Message"
@@ -283,7 +302,6 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          />
                     )}
 
-                    {/* Buttons */}
                     <div className="flex space-x-4">
                          <Button type="submit">
                               {initialData ? "Update Link" : "Create Link"}

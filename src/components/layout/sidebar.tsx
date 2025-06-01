@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -9,6 +11,7 @@ import {
      GlobeAltIcon,
      CloudIcon
 } from '@heroicons/react/24/solid';
+import { useEffect, useState } from 'react';
 
 const sidebarItems = [
      { name: "Overview", icon: ChartPieIcon, href: "/" },
@@ -25,7 +28,13 @@ export default function Sidebar({
      isOpen: boolean,
      onCloseSidebar?: () => void
 }) {
-     const pathname = usePathname();
+     const [pathname, setPathname] = useState<string | null>(null);
+     const currentPathname = usePathname();
+
+     // Set pathname on client side after mount
+     useEffect(() => {
+          setPathname(currentPathname);
+     }, [currentPathname]);
 
      return (
           <>
@@ -38,21 +47,13 @@ export default function Sidebar({
                )}
 
                {/* Sidebar */}
-               <div
-                    className={`
-          fixed top-0 left-0 bottom-0 z-50
-          bg-gray-800 text-white 
-          transition-all duration-300
-          md:relative
-          min-h-screen
-          overflow-y-auto
-          ${isOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-16'}
-        `}
+               <aside
+                    className={`fixed top-0 left-0 bottom-0 z-50 bg-gray-800 text-white transition-all duration-300 md:relative min-h-screen overflow-y-auto ${isOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-16'}`}
                >
                     <nav>
                          <div className="flex items-center justify-between py-6 px-4">
                               <Link
-                                   href="/" // Ganti ke / karena /dashboard tidak diperlukan
+                                   href="/"
                                    className={`text-2xl font-bold ${isOpen ? "" : "hidden md:block"}`}
                               >
                                    {isOpen ? 'Oktaa' : ''}
@@ -71,13 +72,13 @@ export default function Sidebar({
 
                          <ul className="space-y-2">
                               {sidebarItems.map((item) => {
-                                   const isActive = pathname === item.href; // Perbaiki logika isActive
+                                   // Use pathname only after it's set on client
+                                   const isActive = pathname === item.href;
                                    return (
                                         <li key={item.name} className='px-2'>
                                              <Link
-                                                  href={item.href} // Gunakan href langsung sesuai route group
-                                                  className={`flex items-center w-full p-3 rounded-lg transition-colors ${isActive ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'
-                                                       }`}
+                                                  href={item.href}
+                                                  className={`flex items-center w-full p-3 rounded-lg transition-colors ${isActive ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'}`}
                                              >
                                                   <item.icon className="h-6 w-6" />
                                                   {isOpen && <span className="ml-2">{item.name}</span>}
@@ -85,16 +86,14 @@ export default function Sidebar({
                                         </li>
                                    );
                               })}
-                              {/* Pemisah */}
                               <li>
                                    <hr className="my-4 border-gray-600" />
                               </li>
                               <li className='px-2'>
                                    <Link
                                         target='_blank'
-                                        href="https://hi.oktaa.my.id/portal" // Tetap gunakan /portal, pastikan rute ini ada
-                                        className={`flex items-center w-full p-3 rounded-lg transition-colors ${pathname === '/portal' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'
-                                             }`}
+                                        href="https://hi.oktaa.my.id/portal"
+                                        className={`flex items-center w-full p-3 rounded-lg transition-colors ${pathname === '/portal' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700'}`}
                                    >
                                         <CloudIcon className="h-6 w-6" />
                                         {isOpen && <span className="ml-2">Go to Portal</span>}
@@ -102,7 +101,7 @@ export default function Sidebar({
                               </li>
                          </ul>
                     </nav>
-               </div>
+               </aside>
           </>
      );
 }
