@@ -1,18 +1,22 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-     title: "Shorten Link Verification - Oktaa.",
+     metadataBase: new URL("https://oktaa.my.id"),
+     title: "Shorten Link Verification. | OKTAA~",
      description: "Verify your shorten link securely through Oktaa. Simplify and manage your links with ease.",
-     keywords: ["Shorten Link Verification", "Oktaa Dashboard", "Secure Access", "Link Management", "Short Links"],
-     robots: "index, follow",
+     keywords: ["Shorten Link Verification", "Firtiansyah Okta Website", "Firtiansyah Website", "Link Management", "Short Links", "Shorten OKTAA"],
+     robots: {
+          index: true,
+          follow: true
+     },
      openGraph: {
-          title: "Shorten Link Verification - Oktaa.",
-          description: "Easily verify and manage your shorten links securely through Oktaa.",
+          title: "Shorten Link Verification. | OKTAA~",
+          description: "Verify your shorten link securely through Oktaa. Simplify and manage your links with ease.",
           url: "https://oktaa.my.id",
           type: "website",
           images: [
                {
-                    url: "https://cdn.oktaa.my.id/banner.png",
+                    url: "https://cdn.oktaa.my.id/og-banner.png",
                     width: 1200,
                     height: 630,
                     alt: "Shorten Link Verification - Oktaa",
@@ -21,9 +25,9 @@ export const metadata: Metadata = {
      },
      twitter: {
           card: "summary_large_image",
-          title: "Shorten Link Verification - Oktaa",
-          description: "Easily verify and manage your shorten links securely through Oktaa.",
-          images: ["https://cdn.oktaa.my.id/banner.png"],
+          title: "Shorten Link Verification. | OKTAA~",
+          description: "Verify your shorten link securely through Oktaa. Simplify and manage your links with ease.",
+          images: ["https://cdn.oktaa.my.id/og-banner.png"],
      },
      icons: {
           icon: "https://cdn.oktaa.my.id/favicon.ico",
@@ -38,7 +42,7 @@ export const metadata: Metadata = {
 export default function ShortUrlLayout({ children }: { children: React.ReactNode }) {
      return (
           <div>
-               {children} 
+               {children}
           </div>
      )
 }
