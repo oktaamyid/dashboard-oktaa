@@ -9,7 +9,8 @@ import {
      BriefcaseIcon,
      XMarkIcon,
      GlobeAltIcon,
-     CloudIcon
+     CloudIcon,
+     HashtagIcon
 } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 
@@ -17,6 +18,7 @@ const sidebarItems = [
      { name: "Overview", icon: ChartPieIcon, href: "/" },
      { name: "Projects", icon: FolderIcon, href: "/projects" },
      { name: "Links", icon: LinkIcon, href: "/links" },
+     { name: "Categories", icon: HashtagIcon, href: "/categories" },
      { name: "Experiences", icon: BriefcaseIcon, href: "/experiences" },
      { name: "Subdomains", icon: GlobeAltIcon, href: "/subdomains" }
 ];
