@@ -21,9 +21,10 @@ interface Props {
      sortSettings: SortSettings;
      onSortChange: (categoryId: string, field: string, direction: "asc" | "desc") => void;
      setSortSettings: React.Dispatch<React.SetStateAction<SortSettings>>;
+     isLoading?: boolean;
 }
 
-export default function CategoryTable({ categories, sortSettings, onSortChange, setSortSettings }: Props) {
+export default function CategoryTable({ categories, sortSettings, onSortChange, setSortSettings, isLoading = false }: Props) {
      const columns = ["name", "count", "url", "sortField", "sortDirection", "actions"];
      const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error", message: string } | null>(null);
 
@@ -50,21 +51,21 @@ export default function CategoryTable({ categories, sortSettings, onSortChange, 
                     );
                case "sortField":
                     return (
-                         <Select
-                              value={currentSort.field || "createdAt"}
-                              onChange={(e) =>
-                                   setSortSettings({
-                                        ...sortSettings,
-                                        [categoryId]: { type: "field", field: e.target.value, direction: currentSort.direction || "desc" },
-                                   })
-                              }
-                              options={[
-                                   { value: "createdAt", label: "Tanggal Dibuat" },
-                                   { value: "nameUrl", label: "Nama (A-Z)" },
-                                   { value: "price", label: "Harga" },
-                                   { value: "clicks", label: "Jumlah Klik" },
-                              ]}
-                         />
+                          <Select
+                                value={currentSort.field || "createdAt"}
+                                onChange={(e) =>
+                                      setSortSettings({
+                                             ...sortSettings,
+                                             [categoryId]: { type: "field", field: e.target.value, direction: currentSort.direction || "desc" },
+                                      })
+                                }
+                                options={[
+                                      { value: "createdAt", label: "Created Date" },
+                                      { value: "nameUrl", label: "Name (A-Z)" },
+                                      { value: "price", label: "Price" },
+                                      { value: "clicks", label: "Click Count" },
+                                ]}
+                          />
                     );
                case "sortDirection":
                     return (
@@ -94,7 +95,7 @@ export default function CategoryTable({ categories, sortSettings, onSortChange, 
                                    });
                               }}
                          >
-                              Simpan
+                              Save
                          </Button>
                     );
                default:
@@ -104,22 +105,29 @@ export default function CategoryTable({ categories, sortSettings, onSortChange, 
 
      return (
           <div className="mt-6">
-               { alertMessage && (
+               {alertMessage && (
                     <div className="mb-4">
                          <Alert variant={alertMessage.type}>
                               {alertMessage.message}
                          </Alert>
                     </div>
                )}
-               {categories.length === 0 ? (
-                    <div className="text-center py-8 text-gray-300">Tidak ada kategori ditemukan.</div>
+               {isLoading ? (
+                    <Table
+                         columns={columns}
+                         data={[]}
+                         isLoading={true}
+                         renderCell={renderCell}
+                    />
+               ) : categories.length === 0 ? (
+                    <div className="text-center py-8 text-gray-300">No categories found.</div>
                ) : (
-               <Table
-                    columns={columns}
-                    data={categories}
-                    isLoading={false}
-                    renderCell={renderCell}
-               />
+                    <Table
+                         columns={columns}
+                         data={categories}
+                         isLoading={false}
+                         renderCell={renderCell}
+                    />
                )}
           </div>
      );

@@ -5,9 +5,9 @@ import { collection, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { Link } from "@/app/types";
 import { getProfile, updateProfile } from "@/lib/service";
-import Skeleton from "react-loading-skeleton";
 import CategoryTable from "@/components/features/categories/categoryTable";
 import CategoryMergeForm from "@/components/features/categories/categoryMergeForm";
+import Button from "@/components/ui/button";
 
 interface Category {
      id: string;
@@ -18,11 +18,13 @@ interface Category {
 export default function CategoriesPage() {
      const [categories, setCategories] = useState<Category[]>([]);
      const [loading, setLoading] = useState(true);
+     const [isFormVisible, setFormVisible] = useState(false);
      const [sortSettings, setSortSettings] = useState<{ [categoryId: string]: { type?: "field" | "manual"; field?: string; direction?: "asc" | "desc"; order?: string[] } }>({});
 
      useEffect(() => {
           const fetchCategories = async () => {
                try {
+                    setLoading(true);
                     const [linksResult, profileResult] = await Promise.allSettled([
                          getDocs(collection(db, "links")),
                          getProfile(),
@@ -104,27 +106,35 @@ export default function CategoriesPage() {
                console.error("Error merging categories:", error);
                throw error;
           }
+          setFormVisible(false);
      };
-
-     if (loading) {
-          return (
-               <div>
-                    <h1 className="text-2xl font-bold text-white mb-6">Kelola Kategori</h1>
-                    <Skeleton height={40} width="50%" className="mb-4" />
-                    <Skeleton count={5} height={60} className="mb-2" />
-               </div>
-          );
-     }
 
      return (
           <div>
-               <h1 className="text-2xl font-bold text-white mb-6">Kelola Kategori</h1>
-               <CategoryMergeForm categories={categories} onMerge={handleMergeCategories} />
+               <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold text-white mb-6">Categories</h1>
+                    <div className="flex space-x-2">
+                         {!isFormVisible && (
+                              <Button
+                                   onClick={() => setFormVisible(true)}
+                                   className="flex items-center"
+                                   variant="primary"
+                              >
+                                   Merge Category
+                              </Button>
+                         )}
+                    </div>
+               </div>
+               {isFormVisible && (
+                    <CategoryMergeForm categories={categories} onMerge={handleMergeCategories} onCancel={() => setFormVisible(false)} />
+               )}
+               
                <CategoryTable
                     categories={categories}
                     sortSettings={sortSettings}
                     onSortChange={handleSaveSort}
                     setSortSettings={setSortSettings}
+                    isLoading={loading}
                />
           </div>
      );
