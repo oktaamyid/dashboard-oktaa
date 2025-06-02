@@ -22,9 +22,9 @@ export interface Link {
      id: string;
      originalUrl: string;
      shortUrl?: string;
-     multipleUrls?: { 
-          url: string; name?: string 
-     }[]; 
+     multipleUrls?: {
+          url: string; name?: string
+     }[];
      useMultipleUrls?: boolean;
      createdAt?: string;
      updatedAt?: string;
@@ -33,7 +33,7 @@ export interface Link {
      nameUrl?: string;
      category?: string;
      description?: string;
-     price?: number; 
+     price?: number;
 
      // Statistik
      deviceStats?: {
@@ -73,6 +73,15 @@ export interface Profile {
      }
      bio?: string;
      website?: string;
+     sortSettings?: { field: string; direction: "asc" | "desc" };
+     categorySortSettings?: {
+          [categoryId: string]: {
+               type?: "field" | "manual";
+               field?: string; 
+               direction?: "asc" | "desc"; 
+               order?: string[]; 
+          };
+     };
 }
 
 export interface TableRenderData {
