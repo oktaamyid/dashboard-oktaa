@@ -22,7 +22,23 @@ const nextConfig: NextConfig = {
                     protocol: 'https',
                     hostname: 'cdn.oktaa.my.id',
                     pathname: '**'
-               }
+               },
+               {
+                    protocol: 'https',
+                    hostname: 'i.ibb.co',
+                    pathname: '**'
+               },
+               {
+                    protocol: 'https',
+                    hostname: 'i.imgur.com',
+                    pathname: '**'
+               },
+               {
+                    protocol: 'https',
+                    hostname: 'cdn2.oktaa.my.id',
+                    pathname: '**'
+               },
+               
           ],
           dangerouslyAllowSVG: true,
      },
