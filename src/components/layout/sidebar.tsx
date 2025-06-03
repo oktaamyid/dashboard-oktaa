@@ -47,7 +47,6 @@ const sidebarGroups: SidebarGroup[] = [
           label: 'Career',
           items: [
                { name: 'Projects', icon: FolderIcon, href: '/projects' },
-               { name: 'Profile', icon: UserIcon, href: '/profile' },
                { name: 'Experiences', icon: BriefcaseIcon, href: '/experiences' },
           ],
      },

@@ -47,7 +47,7 @@ export default function Header({
      };
 
      const profileEdit = async () => {
-          router.push("/dashboard/profile");
+          router.push("/profile");
      };
 
      return (
