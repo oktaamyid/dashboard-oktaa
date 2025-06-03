@@ -33,17 +33,17 @@ export default function ImageUploader({
                               <Image
                                    src={previewImage}
                                    alt="Preview"
-                                   width={64}
-                                   height={64}
-                                   className="w-16 h-16 rounded-full object-cover"
+                                   width={128}
+                                   height={128}
+                                   className="w-24 h-24 rounded-full object-cover"
                               />
-                              <Button
+                              <button
                                    type="button"
                                    onClick={onRemoveImage}
-                                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full px-2 py-0.5 hover:bg-red-600"
                               >
                                    ✕
-                              </Button>
+                              </button>
                          </div>
                     )}
                     <input
