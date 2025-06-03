@@ -14,6 +14,7 @@ import Card from "@/components/ui/card";
 import { onSnapshot, query, collection } from "firebase/firestore";
 import { db } from '@/lib/firebaseConfig';
 import Button from "@/components/ui/button";
+import Alert from "@/components/ui/alert";
 
 export default function LinksPage() {
      const [links, setLinks] = useState<Link[]>([]);
@@ -22,6 +23,7 @@ export default function LinksPage() {
      const [loading, setLoading] = useState(true);
      const [analyticsView, setAnalyticsView] = useState(true);
      const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null);
+     const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
      // Calculate analytics data
      const calculateAnalytics = (links: Link[]): AnalyticsSummary => {
@@ -129,8 +131,24 @@ export default function LinksPage() {
      };
 
      const handleDelete = async (id: string) => {
-          await deleteLink(id);
-          setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
+          try {
+               await deleteLink(id);
+               setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
+               setAlertMessage({ type: 'success', message: 'Link deleted successfully' });
+          } catch (error) {
+               setAlertMessage({ type: 'error', message: 'Failed to delete link' });
+               console.error(error);
+          }
+     };
+
+     const handleEdit = (link: Link) => {
+          setEditingLink(link);
+          setFormVisible(true);
+     }
+
+     const handleCancel = () => {
+          setEditingLink(null);    
+          setFormVisible(false);
      };
 
      // const handleResetAnalytics = async () => {
@@ -179,9 +197,13 @@ export default function LinksPage() {
                     <div className="flex space-x-2">
                          {!isFormVisible && (
                               <Button
-                                   onClick={() => setFormVisible(true)}
+                                   onClick={() => {
+                                        setFormVisible(true);
+                                        setAlertMessage(null);
+                                   }}
                                    className="flex items-center"
                                    variant="primary"
+                                   
                               >
                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -204,26 +226,28 @@ export default function LinksPage() {
                     </div>
                </div>
 
-               {isFormVisible ? (
+               {alertMessage && (
+                    <div className="mb-6">
+                         <Alert variant={alertMessage.type} onClose={() => setAlertMessage(null)}>{alertMessage.message}</Alert>
+                    </div>
+               )}
+
+               {isFormVisible && (
                     <LinkForm
                          onSubmit={(data) => handleCreateOrUpdate(data)}
                          initialData={editingLink || undefined}
-                         onCancel={() => {
-                              setEditingLink(null);
-                              setFormVisible(false);
-                         }}
-                    />
-               ) : (
-                    <LinkTable
-                         links={links}
-                         onEdit={(link) => {
-                              setEditingLink(link);
-                              setFormVisible(true);
-                         }}
-                         onDelete={handleDelete}
-                         isLoading={loading}
+                         onCancel={handleCancel}
+                         setAlertMessage={setAlertMessage}
                     />
                )}
+               
+               <LinkTable
+                    links={links}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    isLoading={loading}
+                    setAlertMessage={setAlertMessage}
+               />
 
                {analyticsView && analyticsData && (
                     <div className="my-6 space-y-6">

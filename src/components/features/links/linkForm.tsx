@@ -4,19 +4,21 @@ import { useState } from "react";
 import { Link } from "@/app/types";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
-import { FiPlus, FiTrash2, FiEdit } from "react-icons/fi";
+import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface LinkFormProps {
      initialData?: Link;
-     onSubmit: (data: Omit<Link, "id">) => void;
+     onSubmit: (data: Omit<Link, "id">) => Promise<void>;
      onCancel: () => void;
+     setAlertMessage: (alert: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
-export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormProps) {
+export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMessage }: LinkFormProps) {
      const [formData, setFormData] = useState<Omit<Link, "id">>({
-          originalUrl: initialData?.useMultipleUrls && initialData?.multipleUrls && initialData.multipleUrls.length > 0
-               ? initialData.multipleUrls[0].url
-               : initialData?.originalUrl || "",
+          originalUrl:
+               initialData?.useMultipleUrls && initialData?.multipleUrls && initialData.multipleUrls.length > 0
+                    ? initialData.multipleUrls[0].url
+                    : initialData?.originalUrl || "",
           shortUrl: initialData?.shortUrl || "",
           multipleUrls: initialData?.multipleUrls || [],
           useMultipleUrls: initialData?.useMultipleUrls || false,
@@ -30,10 +32,10 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                customMessage: initialData?.confirmationPageSettings?.customMessage || "",
           },
      });
-
      const [newUrl, setNewUrl] = useState<string>("");
      const [newUrlName, setNewUrlName] = useState<string>("");
      const [editingIndex, setEditingIndex] = useState<number | null>(null);
+     const [isSubmitting, setIsSubmitting] = useState(false);
 
      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           const { name, value, type, checked } = e.target;
@@ -51,9 +53,8 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
 
                if (name === "useMultipleUrls") {
                     const isChecked = checked;
-                    const newOriginalUrl = isChecked && prev.multipleUrls && prev.multipleUrls.length > 0
-                         ? prev.multipleUrls[0].url
-                         : "";
+                    const newOriginalUrl =
+                         isChecked && prev.multipleUrls && prev.multipleUrls.length > 0 ? prev.multipleUrls[0].url : "";
                     return {
                          ...prev,
                          useMultipleUrls: isChecked,
@@ -71,7 +72,10 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
      };
 
      const addOrUpdateUrl = () => {
-          if (!newUrl) return;
+          if (!newUrl) {
+               setAlertMessage({ type: "error", message: "Please enter a valid URL" });
+               return;
+          }
 
           setFormData((prev) => {
                const updatedUrls = [...(prev.multipleUrls || [])];
@@ -90,7 +94,14 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
           setNewUrl("");
           setNewUrlName("");
           setEditingIndex(null);
+          setAlertMessage({
+               type: "success",
+               message: editingIndex !== null
+                    ? `Link URL "${newUrl}" has been successfully updated`
+                    : `New link URL "${newUrl}" has been successfully added to the list`
+          });
      };
+
 
      const editUrl = (index: number) => {
           const urlObj = formData.multipleUrls?.[index];
@@ -116,22 +127,64 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                setNewUrlName("");
                setEditingIndex(null);
           }
+          setAlertMessage({ type: "success", message: "URL removed" });
      };
 
-     const handleSubmit = (e: React.FormEvent) => {
+     const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
-          if (formData.useMultipleUrls && (!formData.multipleUrls || formData.multipleUrls.length === 0)) {
-               alert("Please add at least one URL when using multiple URLs.");
+          setIsSubmitting(true);
+          setAlertMessage(null);
+
+          if (!formData.shortUrl) {
+               setAlertMessage({ type: "error", message: "Short URL is required" });
+               setIsSubmitting(false);
                return;
           }
-          onSubmit(formData);
+
+          if (!formData.useMultipleUrls && !formData.originalUrl) {
+               setAlertMessage({ type: "error", message: "Original URL is required when not using multiple URLs" });
+               setIsSubmitting(false);
+               return;
+          }
+
+          if (formData.useMultipleUrls && (!formData.multipleUrls || formData.multipleUrls.length === 0)) {
+               setAlertMessage({ type: "error", message: "Please add at least one URL when using multiple URLs" });
+               setIsSubmitting(false);
+               return;
+          }
+
+          try {
+               await onSubmit(formData);
+               setAlertMessage({ type: "success", message: initialData ? "Link updated successfully" : "Link created successfully" });
+               if (!initialData) {
+                    setFormData({
+                         originalUrl: "",
+                         shortUrl: "",
+                         multipleUrls: [],
+                         useMultipleUrls: false,
+                         showToPortal: false,
+                         category: "",
+                         nameUrl: "",
+                         description: "",
+                         price: 0,
+                         showConfirmationPage: false,
+                         confirmationPageSettings: { customMessage: "" },
+                    });
+                    setNewUrl("");
+                    setNewUrlName("");
+                    setEditingIndex(null);
+               }
+          } catch (error) {
+               setAlertMessage({ type: "error", message: "Failed to save link" });
+               console.error("Submit error:", error);
+          } finally {
+               setIsSubmitting(false);
+          }
      };
 
      return (
           <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-               <h2 className="text-xl font-semibold text-white mb-4">
-                    {initialData ? "Edit Link" : "Create New Link"}
-               </h2>
+               <h2 className="text-xl font-semibold text-white mb-4">{initialData ? "Edit Link" : "Create New Link"}</h2>
 
                <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
@@ -162,9 +215,10 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                               onChange={(e) => {
                                    const isChecked = e.target.checked;
                                    setFormData((prev) => {
-                                        const newOriginalUrl = isChecked && prev.useMultipleUrls && (prev.multipleUrls ?? []).length > 0
-                                             ? (prev.multipleUrls ?? [])[0]?.url
-                                             : prev.originalUrl;
+                                        const newOriginalUrl =
+                                             isChecked && prev.useMultipleUrls && (prev.multipleUrls ?? []).length > 0
+                                                  ? (prev.multipleUrls ?? [])[0]?.url
+                                                  : prev.originalUrl;
                                         return {
                                              ...prev,
                                              showToPortal: isChecked,
@@ -232,44 +286,49 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                                         {(!formData.multipleUrls || formData.multipleUrls.length === 0) && (
                                              <p className="text-yellow-400 text-sm">Please add at least one URL.</p>
                                         )}
-                                        <div className="flex space-x-2">
+                                        <div className="flex flex-col md:flex-row w-full md:gap-2 space-y-3 md:space-y-0">
                                              <Input
                                                   type="url"
                                                   value={newUrl}
                                                   onChange={(e) => setNewUrl(e.target.value)}
                                                   placeholder="Enter URL"
+                                                  className="w-full "
                                              />
                                              <Input
                                                   type="text"
                                                   value={newUrlName}
                                                   onChange={(e) => setNewUrlName(e.target.value)}
                                                   placeholder="Enter URL Name (optional)"
+                                                  className="w-full "
                                              />
-                                             <Button type="button" onClick={addOrUpdateUrl} disabled={!newUrl}>
-                                                  {editingIndex !== null ? <FiEdit className="w-4 h-4" /> : <FiPlus className="w-4 h-4" />}
+                                             <Button
+                                                  type="button"
+                                                  variant="primary"
+                                                  onClick={addOrUpdateUrl}
+                                                  disabled={!newUrl}
+                                             >
+                                                  {editingIndex !== null ? <PencilIcon className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
                                              </Button>
                                         </div>
                                         {formData.multipleUrls && formData.multipleUrls.length > 0 && (
                                              <div className="space-y-1">
                                                   {formData.multipleUrls.map((urlObj, index) => (
                                                        <div key={index} className="flex items-center justify-between text-gray-300 text-sm">
-                                                            <span className="truncate max-w-[70%]">
-                                                                 {urlObj.name || urlObj.url}
-                                                            </span>
+                                                            <span className="truncate max-w-[70%]">{urlObj.name || urlObj.url}</span>
                                                             <div className="flex space-x-2">
                                                                  <Button
                                                                       type="button"
                                                                       variant="secondary"
                                                                       onClick={() => editUrl(index)}
                                                                  >
-                                                                      <FiEdit className="w-4 h-4" />
+                                                                      <PencilIcon className="w-4 h-4" />
                                                                  </Button>
                                                                  <Button
                                                                       type="button"
                                                                       variant="danger"
                                                                       onClick={() => removeUrl(index)}
                                                                  >
-                                                                      <FiTrash2 className="w-4 h-4" />
+                                                                      <TrashIcon className="w-4 h-4" />
                                                                  </Button>
                                                             </div>
                                                        </div>
@@ -299,14 +358,26 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                               type="text"
                               value={formData.confirmationPageSettings?.customMessage || ""}
                               onChange={handleChange}
+                              className="bg-gray-700 text-gray-300 border-gray-600"
                          />
                     )}
 
                     <div className="flex space-x-4">
-                         <Button type="submit">
-                              {initialData ? "Update Link" : "Create Link"}
+                         <Button
+                              type="submit"
+                              disabled={isSubmitting}
+                              variant="primary"
+                              className="bg-blue-600 text-white hover:bg-blue-700"
+                         >
+                              {isSubmitting ? "Saving..." : initialData ? "Update Link" : "Create Link"}
                          </Button>
-                         <Button type="button" variant="danger" onClick={onCancel}>
+                         <Button
+                              type="button"
+                              variant="danger"
+                              onClick={onCancel}
+                              disabled={isSubmitting}
+                              className="bg-gray-600 text-white hover:bg-gray-500"
+                         >
                               Cancel
                          </Button>
                     </div>

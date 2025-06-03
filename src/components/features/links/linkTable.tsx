@@ -14,6 +14,7 @@ interface LinkTableProps {
      onEdit: (link: Link) => void;
      onDelete: (id: string) => void;
      isLoading?: boolean;
+     setAlertMessage: (alert: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
 interface LinkTableRow {
@@ -26,7 +27,7 @@ interface LinkTableRow {
      showConfirmationPage: boolean;
 }
 
-export default function LinkTable({ links, onEdit, onDelete, isLoading = false }: LinkTableProps) {
+export default function LinkTable({ links, onEdit, onDelete, isLoading = false, setAlertMessage }: LinkTableProps) {
      const [expandedLinkId, setExpandedLinkId] = useState<string | null>(null);
      const [searchTerm, setSearchTerm] = useState("");
 
@@ -113,9 +114,14 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false }
                               </Button>
                               <Button
                                    variant="danger"
-                                   onClick={() => {
+                                   onClick={async () => {
                                         if (confirm("Are you sure you want to delete this link?")) {
-                                             onDelete(link.id);
+                                             try {
+                                                  await onDelete(link.id);
+                                                  setAlertMessage({ type: 'success', message: 'Link deleted successfully' });
+                                             } catch (error) {
+                                                  console.error('Failed to delete link: ', error);
+                                             }
                                         }
                                    }}
                                    className="p-1"
