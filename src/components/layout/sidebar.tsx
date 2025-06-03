@@ -11,7 +11,6 @@ import {
      GlobeAltIcon,
      CloudIcon,
      HashtagIcon,
-     UserIcon,
      ChevronDownIcon,
      ChevronUpIcon,
 } from '@heroicons/react/24/solid';

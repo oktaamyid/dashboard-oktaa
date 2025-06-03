@@ -2,7 +2,6 @@
 
 import { ChangeEvent, useRef } from "react";
 import Image from "next/image";
-import Button from "@/components/ui/button";
 
 interface ImageUploaderProps {
      previewImage: string | null;
