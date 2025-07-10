@@ -3,8 +3,8 @@
 import Table from "@/components/ui/table";
 import Button from "@/components/ui/button";
 import Select from "@/components/ui/select";
-import Alert from "@/components/ui/alert";
 import { useState } from 'react';
+import { useToast } from "@/components/ui/toast";
 
 interface Category {
      id: string;
@@ -25,8 +25,8 @@ interface Props {
 }
 
 export default function CategoryTable({ categories, sortSettings, onSortChange, setSortSettings, isLoading = false }: Props) {
+     const { showSuccess, showError } = useToast();
      const columns = ["name", "count", "url", "sortField", "sortDirection", "actions"];
-     const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error", message: string } | null>(null);
 
      const renderCell = (column: string, row: Category) => {
           const categoryId = row.name.toLowerCase().replace(/\s+/g, "-");
@@ -89,10 +89,7 @@ export default function CategoryTable({ categories, sortSettings, onSortChange, 
                               variant="primary"
                               onClick={() => {
                                    onSortChange(categoryId, currentSort.field || "createdAt", currentSort.direction || "desc")
-                                   setAlertMessage({
-                                        type: "success",
-                                        message: "Sort settings saved successfully"
-                                   });
+                                   showSuccess("Sort settings saved successfully");
                               }}
                          >
                               Save
@@ -105,13 +102,6 @@ export default function CategoryTable({ categories, sortSettings, onSortChange, 
 
      return (
           <div className="mt-6">
-               {alertMessage && (
-                    <div className="mb-4">
-                         <Alert variant={alertMessage.type}>
-                              {alertMessage.message}
-                         </Alert>
-                    </div>
-               )}
                {isLoading ? (
                     <Table
                          columns={columns}

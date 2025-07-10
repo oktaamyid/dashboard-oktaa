@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
-import Alert from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toast";
 
 interface Category {
      id: string;
@@ -17,29 +17,28 @@ interface Props {
 }
 
 export default function CategoryMergeForm({ categories, onMerge, onCancel }: Props) {
+     const { showSuccess, showError } = useToast();
      const [mergeFrom, setMergeFrom] = useState("");
      const [mergeTo, setMergeTo] = useState("");
      const [isSubmitting, setIsSubmitting] = useState(false);
-     const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error", message: string } | null>(null);
 
      const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           setIsSubmitting(false);
-          setAlertMessage(null);
 
           if (!mergeFrom || !mergeTo) {
-               setAlertMessage({ type: "error", message: "Choose two categories to merge" });
+               showError("Choose two categories to merge");
                return;
           }
 
           try {
                setIsSubmitting(true);
                await onMerge(mergeFrom, mergeTo);
-               setAlertMessage({ type: "success", message: "Categories successfully merged" });
+               showSuccess("Categories successfully merged");
                setMergeFrom("");
                setMergeTo("");
           } catch (error) {
-               setAlertMessage({ type: "error", message: "Failed to merge categories" });
+               showError("Failed to merge categories");
                console.error("Merge error:", error);
           } finally {
                setIsSubmitting(false);
@@ -48,14 +47,6 @@ export default function CategoryMergeForm({ categories, onMerge, onCancel }: Pro
 
      return (
           <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-               {alertMessage && (
-                    <div className="mb-4">
-                         <Alert variant={alertMessage.type}>
-                              {alertMessage.message}
-                         </Alert>
-                    </div>
-               )}
-
                <h2 className="text-xl font-semibold text-white mb-6">Merge Categories</h2>
 
                <form onSubmit={handleSubmit} className="space-y-4">
