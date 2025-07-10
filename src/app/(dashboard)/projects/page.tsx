@@ -7,14 +7,14 @@ import ProjectTable from '@/components/features/project/projectTable';
 import { Project } from '@/app/types';
 import Button from '@/components/ui/button';
 import { getProjects, createProject, updateProject, deleteProject } from '@/lib/service';
-import Alert from '@/components/ui/alert';
+import { useToast } from '@/components/ui/toast';
 
 export default function ProjectsPage() {
+     const { showSuccess, showError } = useToast();
      const [projects, setProjects] = useState<Project[]>([]);
      const [loading, setLoading] = useState(true);
      const [editingProject, setEditingProject] = useState<Project | null>(null);
      const [showForm, setShowForm] = useState(false);
-     const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
      useEffect(() => {
           const fetchProjects = async () => {
@@ -56,8 +56,9 @@ export default function ProjectsPage() {
           try {
                await deleteProject(id);
                setProjects(projects.filter((p) => p.id !== id));
+               showSuccess("Project deleted successfully");
           } catch (error) {
-               setAlertMessage({ type: 'error', message: 'Failed to delete category' });
+               showError("Failed to delete project");
                console.error('Error deleting project:', error);
           }
      };
@@ -91,17 +92,11 @@ export default function ProjectsPage() {
                     </div>
                )}
 
-               {alertMessage && (
-                    <div className="mb-6">
-                         <Alert variant={alertMessage.type} onClose={() => setAlertMessage(null)}>{alertMessage.message}</Alert>
-                    </div>
-               )}
                {showForm && (
                     <ProjectForm
                          initialData={editingProject || undefined}
                          onSubmit={handleSubmit}
                          onCancel={handleCancel}
-                         setAlertMessage={setAlertMessage}
                     />
                )}
                <ProjectTable
@@ -109,7 +104,6 @@ export default function ProjectsPage() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     isLoading={loading}
-                    setAlertMessage={setAlertMessage}
                />
           </div>
      );

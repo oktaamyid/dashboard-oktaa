@@ -14,16 +14,16 @@ import Card from "@/components/ui/card";
 import { onSnapshot, query, collection } from "firebase/firestore";
 import { db } from '@/lib/firebaseConfig';
 import Button from "@/components/ui/button";
-import Alert from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toast";
 
 export default function LinksPage() {
+     const { showSuccess, showError } = useToast();
      const [links, setLinks] = useState<Link[]>([]);
      const [editingLink, setEditingLink] = useState<Link | null>(null);
      const [isFormVisible, setFormVisible] = useState(false);
      const [loading, setLoading] = useState(true);
      const [analyticsView, setAnalyticsView] = useState(true);
      const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null);
-     const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
      // Calculate analytics data
      const calculateAnalytics = (links: Link[]): AnalyticsSummary => {
@@ -134,9 +134,8 @@ export default function LinksPage() {
           try {
                await deleteLink(id);
                setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
-               setAlertMessage({ type: 'success', message: 'Link deleted successfully' });
           } catch (error) {
-               setAlertMessage({ type: 'error', message: 'Failed to delete link' });
+               showError('Failed to delete link');
                console.error(error);
           }
      };
@@ -199,7 +198,6 @@ export default function LinksPage() {
                               <Button
                                    onClick={() => {
                                         setFormVisible(true);
-                                        setAlertMessage(null);
                                    }}
                                    className="flex items-center"
                                    variant="primary"
@@ -226,18 +224,11 @@ export default function LinksPage() {
                     </div>
                </div>
 
-               {alertMessage && (
-                    <div className="mb-6">
-                         <Alert variant={alertMessage.type} onClose={() => setAlertMessage(null)}>{alertMessage.message}</Alert>
-                    </div>
-               )}
-
                {isFormVisible && (
                     <LinkForm
                          onSubmit={(data) => handleCreateOrUpdate(data)}
                          initialData={editingLink || undefined}
                          onCancel={handleCancel}
-                         setAlertMessage={setAlertMessage}
                     />
                )}
                
@@ -246,7 +237,6 @@ export default function LinksPage() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     isLoading={loading}
-                    setAlertMessage={setAlertMessage}
                />
 
                {analyticsView && analyticsData && (

@@ -1,6 +1,7 @@
 import { Raleway } from "next/font/google";
 import "./globals.css";
 import { Metadata } from 'next';
+import { ToastProvider } from "@/components/ui/toast";
 
 const raleway = Raleway({
      subsets: ['latin'],
@@ -59,7 +60,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
      return (
           <html lang="en">
                <body className={raleway.variable}>
-                    {children}
+                    <ToastProvider>
+                         {children}
+                    </ToastProvider>
                </body>
           </html>
      );
