@@ -35,6 +35,7 @@ const convertDoc = (doc: QueryDocumentSnapshot): Link => {
                : data.updatedAt,
           clicks: data.clicks || 0,
           showToPortal: data.showToPortal || false,
+          isPinned: data.isPinned || false,
           nameUrl: data.nameUrl || "",
           category: data.category || "",
           description: data.description || "",

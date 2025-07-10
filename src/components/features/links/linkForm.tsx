@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "@/app/types";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
+import Toggle from "@/components/ui/toggle";
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface LinkFormProps {
@@ -23,6 +24,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
           multipleUrls: initialData?.multipleUrls || [],
           useMultipleUrls: initialData?.useMultipleUrls || false,
           showToPortal: initialData?.showToPortal || false,
+          isPinned: initialData?.isPinned || false,
           category: initialData?.category || "",
           nameUrl: initialData?.nameUrl || "",
           description: initialData?.description || "",
@@ -207,13 +209,11 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
                          onChange={handleChange}
                     />
 
-                    <label className="flex items-center space-x-2 text-white">
-                         <input
-                              type="checkbox"
-                              name="showToPortal"
-                              checked={formData.showToPortal || formData.useMultipleUrls}
-                              onChange={(e) => {
-                                   const isChecked = e.target.checked;
+                    <div className="flex gap-2">
+
+                         <Toggle
+                              checked={formData.showToPortal || formData.useMultipleUrls || false}
+                              onChange={(isChecked) => {
                                    setFormData((prev) => {
                                         const newOriginalUrl =
                                              isChecked && prev.useMultipleUrls && (prev.multipleUrls ?? []).length > 0
@@ -228,21 +228,44 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
                                         };
                                    });
                               }}
-                              className="w-4 h-4"
+                              label="Show to Portal?"
+                              variant="success"
+                              size="md"
                          />
-                         <span>Show to Portal?</span>
-                    </label>
 
-                    <label className="flex items-center space-x-2 text-white">
-                         <input
-                              type="checkbox"
-                              name="useMultipleUrls"
-                              checked={formData.useMultipleUrls}
-                              onChange={handleChange}
-                              className="w-4 h-4"
+                         <Toggle
+                              checked={formData.useMultipleUrls || false}
+                              onChange={(isChecked) => {
+                                   setFormData((prev) => {
+                                        const newOriginalUrl =
+                                             isChecked && prev.multipleUrls && prev.multipleUrls.length > 0 ? prev.multipleUrls[0].url : "";
+                                        return {
+                                             ...prev,
+                                             useMultipleUrls: isChecked,
+                                             showToPortal: isChecked ? true : prev.showToPortal,
+                                             multipleUrls: isChecked ? prev.multipleUrls : [],
+                                             originalUrl: newOriginalUrl,
+                                        };
+                                   });
+                              }}
+                              label="Use Multiple URLs (disables Original URL)"
+                              variant="warning"
+                              size="md"
                          />
-                         <span>Use Multiple URLs (disables Original URL)</span>
-                    </label>
+
+                         <Toggle
+                              checked={formData.isPinned || false}
+                              onChange={(isChecked) => {
+                                   setFormData((prev) => ({
+                                        ...prev,
+                                        isPinned: isChecked
+                                   }));
+                              }}
+                              label="Pin this link"
+                              variant="default"
+                              size="md"
+                         />
+                    </div>
 
                     {formData.showToPortal && (
                          <>
@@ -340,16 +363,18 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
                          </>
                     )}
 
-                    <label className="flex items-center space-x-2 text-white">
-                         <input
-                              type="checkbox"
-                              name="showConfirmationPage"
-                              checked={formData.showConfirmationPage}
-                              onChange={handleChange}
-                              className="w-4 h-4"
-                         />
-                         <span>Show Confirmation Page</span>
-                    </label>
+                    <Toggle
+                         checked={formData.showConfirmationPage || false}
+                         onChange={(isChecked) => {
+                              setFormData((prev) => ({
+                                   ...prev,
+                                   showConfirmationPage: isChecked
+                              }));
+                         }}
+                         label="Show Confirmation Page"
+                         variant="default"
+                         size="md"
+                    />
 
                     {formData.showConfirmationPage && (
                          <Input

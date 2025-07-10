@@ -30,6 +30,7 @@ export interface Link {
      updatedAt?: string;
      clicks?: number;
      showToPortal?: boolean;
+     isPinned?: boolean;
      nameUrl?: string;
      category?: string;
      description?: string;
