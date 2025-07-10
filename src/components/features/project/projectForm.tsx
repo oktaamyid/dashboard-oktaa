@@ -6,15 +6,16 @@ import Button from '@/components/ui/button';
 import ImageUploader from '@/components/ui/imageUpload';
 import { Project } from '@/app/types';
 import { uploadImage, deleteImage } from '@/lib/service';
+import { useToast } from '@/components/ui/toast';
 
 interface ProjectFormProps {
      initialData?: Project;
      onSubmit: (data: Omit<Project, 'id'>) => Promise<void>;
      onCancel?: () => void;
-     setAlertMessage: (alert: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
-export default function ProjectForm({ initialData, onSubmit, onCancel, setAlertMessage }: ProjectFormProps) {
+export default function ProjectForm({ initialData, onSubmit, onCancel }: ProjectFormProps) {
+     const { showSuccess, showError } = useToast();
      const [formData, setFormData] = useState<Omit<Project, 'id'>>({
           title: initialData?.title || '',
           image: initialData?.image || '',
@@ -49,11 +50,11 @@ export default function ProjectForm({ initialData, onSubmit, onCancel, setAlertM
 
      const handleFileChange = (file: File) => {
           if (!file.type.startsWith('image/')) {
-               setAlertMessage({ type: 'error', message: 'Please upload an image file' });
+               showError('Please upload an image file');
                return;
           }
           if (file.size > 5 * 1024 * 1024) {
-               setAlertMessage({ type: 'error', message: 'File size is too large (maximum 5MB)' });
+               showError('File size is too large (maximum 5MB)');
                return;
           }
 
@@ -72,7 +73,7 @@ export default function ProjectForm({ initialData, onSubmit, onCancel, setAlertM
                     await deleteImage(formData.image);
                } catch (error) {
                     console.error('Failed to delete image from R2:', error);
-                    setAlertMessage({ type: 'error', message: 'Failed to delete image' });
+                    showError('Failed to delete image');
                }
           }
           setPreviewImage(null);
@@ -99,17 +100,16 @@ export default function ProjectForm({ initialData, onSubmit, onCancel, setAlertM
      const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           setIsSubmitting(true);
-          setAlertMessage(null);
           setUploadProgress(0);
 
           if (!formData.title || !formData.description) {
-               setAlertMessage({ type: 'error', message: 'Title and description are required' });
+               showError('Title and description are required');
                setIsSubmitting(false);
                return;
           }
 
           if (formData.technology.length === 0) {
-               setAlertMessage({ type: 'error', message: 'At least one technology is required' });
+               showError('At least one technology is required');
                setIsSubmitting(false);
                return;
           }
@@ -145,7 +145,7 @@ export default function ProjectForm({ initialData, onSubmit, onCancel, setAlertM
                     throw error;
                }
 
-               setAlertMessage({ type: 'success', message: 'Project saved successfully' });
+               showSuccess('Project saved successfully');
                if (!initialData) {
                     setFormData({ title: '', image: '', description: '', link: '', technology: [] });
                     setPreviewImage(null);
@@ -153,7 +153,7 @@ export default function ProjectForm({ initialData, onSubmit, onCancel, setAlertM
                     setTechnologyInput('');
                }
           } catch (error) {
-               setAlertMessage({ type: 'error', message: 'Failed to save project' });
+               showError('Failed to save project');
                console.error(error);
           } finally {
                setIsSubmitting(false);

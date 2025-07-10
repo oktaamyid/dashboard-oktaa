@@ -6,16 +6,17 @@ import Button from '@/components/ui/button';
 import Image from 'next/image';
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { deleteImage } from '@/lib/service';
+import { useToast } from '@/components/ui/toast';
 
 interface ProjectTableProps {
      projects: Project[];
      onEdit: (project: Project) => void;
      onDelete: (id: string) => void;
      isLoading?: boolean;
-     setAlertMessage: (alert: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
-export default function ProjectTable({ projects, onEdit, onDelete, isLoading = false, setAlertMessage }: ProjectTableProps) {
+export default function ProjectTable({ projects, onEdit, onDelete, isLoading = false }: ProjectTableProps) {
+     const { showSuccess, showError } = useToast();
      const columns = ['title', 'description', 'link', 'technology', 'actions'];
 
      const renderCell = (column: string, row: Project) => {
@@ -68,9 +69,9 @@ export default function ProjectTable({ projects, onEdit, onDelete, isLoading = f
                                                        await deleteImage(row.image);
                                                   }
                                                   await onDelete(row.id);
-                                                  setAlertMessage({ type: 'success', message: 'Project deleted successfully' });
                                              } catch (error) {
                                                   console.error('Failed to delete project or image:', error);
+                                                  showError('Failed to delete project');
                                              }
                                         }
                                    }}
