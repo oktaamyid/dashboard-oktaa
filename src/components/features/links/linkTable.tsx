@@ -8,13 +8,13 @@ import LinkAnalytics from "@/components/features/links/linkAnalytics";
 import { Link } from "@/app/types";
 import { PencilIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import Input from "@/components/ui/input";
+import { useToast } from "@/components/ui/toast";
 
 interface LinkTableProps {
      links: Link[];
      onEdit: (link: Link) => void;
      onDelete: (id: string) => void;
      isLoading?: boolean;
-     setAlertMessage: (alert: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
 interface LinkTableRow {
@@ -27,7 +27,8 @@ interface LinkTableRow {
      showConfirmationPage: boolean;
 }
 
-export default function LinkTable({ links, onEdit, onDelete, isLoading = false, setAlertMessage }: LinkTableProps) {
+export default function LinkTable({ links, onEdit, onDelete, isLoading = false }: LinkTableProps) {
+     const { showSuccess, showError } = useToast();
      const [expandedLinkId, setExpandedLinkId] = useState<string | null>(null);
      const [searchTerm, setSearchTerm] = useState("");
 
@@ -118,9 +119,9 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false, 
                                         if (confirm("Are you sure you want to delete this link?")) {
                                              try {
                                                   await onDelete(link.id);
-                                                  setAlertMessage({ type: 'success', message: 'Link deleted successfully' });
                                              } catch (error) {
                                                   console.error('Failed to delete link: ', error);
+                                                  showError('Failed to delete link');
                                              }
                                         }
                                    }}

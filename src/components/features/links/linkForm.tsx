@@ -5,16 +5,17 @@ import { Link } from "@/app/types";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import Toggle from "@/components/ui/toggle";
+import { useToast } from "@/components/ui/toast";
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface LinkFormProps {
      initialData?: Link;
      onSubmit: (data: Omit<Link, "id">) => Promise<void>;
      onCancel: () => void;
-     setAlertMessage: (alert: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
-export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMessage }: LinkFormProps) {
+export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormProps) {
+     const { showSuccess, showError } = useToast();
      const [formData, setFormData] = useState<Omit<Link, "id">>({
           originalUrl:
                initialData?.useMultipleUrls && initialData?.multipleUrls && initialData.multipleUrls.length > 0
@@ -75,7 +76,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
 
      const addOrUpdateUrl = () => {
           if (!newUrl) {
-               setAlertMessage({ type: "error", message: "Please enter a valid URL" });
+               showError("Please enter a valid URL");
                return;
           }
 
@@ -96,12 +97,11 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
           setNewUrl("");
           setNewUrlName("");
           setEditingIndex(null);
-          setAlertMessage({
-               type: "success",
-               message: editingIndex !== null
+          showSuccess(
+               editingIndex !== null
                     ? `Link URL "${newUrl}" has been successfully updated`
                     : `New link URL "${newUrl}" has been successfully added to the list`
-          });
+          );
      };
 
 
@@ -129,35 +129,34 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
                setNewUrlName("");
                setEditingIndex(null);
           }
-          setAlertMessage({ type: "success", message: "URL removed" });
+          showSuccess("URL removed");
      };
 
      const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           setIsSubmitting(true);
-          setAlertMessage(null);
 
           if (!formData.shortUrl) {
-               setAlertMessage({ type: "error", message: "Short URL is required" });
+               showError("Short URL is required");
                setIsSubmitting(false);
                return;
           }
 
           if (!formData.useMultipleUrls && !formData.originalUrl) {
-               setAlertMessage({ type: "error", message: "Original URL is required when not using multiple URLs" });
+               showError("Original URL is required when not using multiple URLs");
                setIsSubmitting(false);
                return;
           }
 
           if (formData.useMultipleUrls && (!formData.multipleUrls || formData.multipleUrls.length === 0)) {
-               setAlertMessage({ type: "error", message: "Please add at least one URL when using multiple URLs" });
+               showError("Please add at least one URL when using multiple URLs");
                setIsSubmitting(false);
                return;
           }
 
           try {
                await onSubmit(formData);
-               setAlertMessage({ type: "success", message: initialData ? "Link updated successfully" : "Link created successfully" });
+               showSuccess(initialData ? "Link updated successfully" : "Link created successfully");
                if (!initialData) {
                     setFormData({
                          originalUrl: "",
@@ -177,7 +176,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel, setAlertMess
                     setEditingIndex(null);
                }
           } catch (error) {
-               setAlertMessage({ type: "error", message: "Failed to save link" });
+               showError("Failed to save link");
                console.error("Submit error:", error);
           } finally {
                setIsSubmitting(false);
