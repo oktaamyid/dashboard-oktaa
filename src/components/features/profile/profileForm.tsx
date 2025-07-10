@@ -6,7 +6,7 @@ import { updateProfile } from "@/lib/service";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import ImageUploader from "@/components/ui/imageUpload";
-import Alert from '@/components/ui/alert';
+import { useToast } from "@/components/ui/toast";
 
 interface ProfileFormProps {
      initialData: Profile;
@@ -14,10 +14,10 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
+     const { showSuccess, showError } = useToast();
      const [formData, setFormData] = useState<Profile>(initialData);
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [previewImage, setPreviewImage] = useState<string | null>(null);
-     const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error", message: string } | null>(null);
      const [uploadProgress, setUploadProgress] = useState<number>(0);
 
      useEffect(() => {
@@ -49,18 +49,12 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
 
      const handleFileChange = (file: File) => {
           if (!file.type.startsWith("image/")) {
-               setAlertMessage({
-                    type: "error",
-                    message: "Please upload an image file"
-               });
+               showError("Please upload an image file");
                return;
           }
 
           if (file.size > 5 * 1024 * 1024) {
-               setAlertMessage({
-                    type: "error",
-                    message: "File size is too large (maximum 5MB)"
-               });
+               showError("File size is too large (maximum 5MB)");
                return;
           }
 
@@ -87,7 +81,6 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
      const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           setIsSubmitting(true);
-          setAlertMessage(null);
           setUploadProgress(0);
 
           try {
@@ -108,15 +101,9 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
                clearInterval(progressInterval);
                setUploadProgress(100);
 
-               setAlertMessage({
-                    type: "success",
-                    message: "Profile updated successfully"
-               });
+               showSuccess("Profile updated successfully");
           } catch (error) {
-               setAlertMessage({
-                    type: "error",
-                    message: "Failed to update profile"
-               });
+               showError("Failed to update profile");
                console.error(error);
           } finally {
                setIsSubmitting(false);
@@ -125,14 +112,6 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
 
      return (
           <div className="bg-gray-800 p-6 rounded-lg shadow-md mx-auto">
-               {alertMessage && (
-                    <div className="mb-4">
-                         <Alert variant={alertMessage.type}>
-                              {alertMessage.message}
-                         </Alert>
-                    </div>
-               )}
-
                <h2 className="text-xl font-semibold text-white mb-6">Edit Profile</h2>
 
                <form onSubmit={handleSubmit} className="space-y-4">
