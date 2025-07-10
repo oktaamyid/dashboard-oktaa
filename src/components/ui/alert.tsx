@@ -3,8 +3,7 @@ import {
      CheckCircleIcon,
      ExclamationCircleIcon,
      ExclamationTriangleIcon,
-     InformationCircleIcon,
-     XMarkIcon
+     InformationCircleIcon
 } from "@heroicons/react/24/solid";
 
 type AlertVariant = "success" | "error" | "warning" | "info" | "dark";
