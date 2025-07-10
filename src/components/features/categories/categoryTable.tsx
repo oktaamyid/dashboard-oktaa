@@ -3,7 +3,6 @@
 import Table from "@/components/ui/table";
 import Button from "@/components/ui/button";
 import Select from "@/components/ui/select";
-import { useState } from 'react';
 import { useToast } from "@/components/ui/toast";
 
 interface Category {
