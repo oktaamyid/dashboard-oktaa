@@ -5,6 +5,7 @@ import { Link } from "@/app/types";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import Toggle from "@/components/ui/toggle";
+import CategorySelect from "@/components/ui/categorySelect";
 import { useToast } from "@/components/ui/toast";
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
@@ -208,7 +209,7 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                          onChange={handleChange}
                     />
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
 
                          <Toggle
                               checked={formData.showToPortal || formData.useMultipleUrls || false}
@@ -276,12 +277,10 @@ export default function LinkForm({ initialData, onSubmit, onCancel }: LinkFormPr
                                    onChange={handleChange}
                               />
 
-                              <Input
+                              <CategorySelect
                                    label="Category"
-                                   name="category"
-                                   type="text"
                                    value={formData.category || ""}
-                                   onChange={handleChange}
+                                   onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                               />
 
                               <Input
