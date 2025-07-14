@@ -22,7 +22,7 @@ export default function CategorySelect({
      onChange,
      error,
      className = "",
-     placeholder = "Select or create category...",
+     placeholder = "Select or create category..",
      disabled = false
 }: CategorySelectProps) {
      const [categories, setCategories] = useState<string[]>([]);
