@@ -52,11 +52,19 @@ export default function Alert({
      useEffect(() => {
           if (autoClose && floating) {
                const timer = setTimeout(() => {
-                    handleClose();
+                    if (floating) {
+                         setIsAnimating(true);
+                         setTimeout(() => {
+                              setIsVisible(false);
+                              onClose?.();
+                         }, 300);
+                    } else {
+                         onClose?.();
+                    }
                }, autoCloseDuration);
                return () => clearTimeout(timer);
           }
-     }, [autoClose, autoCloseDuration, floating]);
+     }, [autoClose, autoCloseDuration, floating, onClose]);
 
      const handleClose = () => {
           if (floating) {
