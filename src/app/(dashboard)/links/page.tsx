@@ -11,13 +11,11 @@ import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, Ma
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { denormalizeReferer } from "@/lib/utils/normalizeReferer";
 import Card from "@/components/ui/card";
-import { onSnapshot, query, collection } from "firebase/firestore";
-import { db } from '@/lib/firebaseConfig';
 import Button from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
 export default function LinksPage() {
-     const { showSuccess, showError } = useToast();
+     const { showError } = useToast();
      const [links, setLinks] = useState<Link[]>([]);
      const [editingLink, setEditingLink] = useState<Link | null>(null);
      const [isFormVisible, setFormVisible] = useState(false);
@@ -114,26 +112,35 @@ export default function LinksPage() {
      };
 
      const handleCreateOrUpdate = async (linkData: Omit<Link, "id">) => {
-          if (editingLink) {
-               // Update jika sedang dalam mode edit
-               await updateLink(editingLink.id, linkData);
-               setLinks((prevLinks) =>
-                    prevLinks.map((link) => (link.id === editingLink.id ? { ...link, ...linkData } : link))
-               );
-          } else {
-               // Create jika tidak dalam mode edit
-               const newLink = await createLink(linkData);
-               setLinks((prevLinks) => [...prevLinks, { id: newLink.id, ...linkData }]);
-          }
+          try {
+               if (editingLink) {
+                    // Update jika sedang dalam mode edit
+                    await updateLink(editingLink.id, linkData);
+                    const updatedLinks = links.map((link) => (link.id === editingLink.id ? { ...link, ...linkData } : link));
+                    setLinks(updatedLinks);
+                    setAnalyticsData(calculateAnalytics(updatedLinks));
+               } else {
+                    // Create jika tidak dalam mode edit
+                    const newLink = await createLink(linkData);
+                    const updatedLinks = [...links, { id: newLink.id, ...linkData }];
+                    setLinks(updatedLinks);
+                    setAnalyticsData(calculateAnalytics(updatedLinks));
+               }
 
-          setEditingLink(null);
-          setFormVisible(false);
+               setEditingLink(null);
+               setFormVisible(false);
+          } catch (error) {
+               showError('Failed to save link');
+               console.error(error);
+          }
      };
 
      const handleDelete = async (id: string) => {
           try {
                await deleteLink(id);
-               setLinks((prevLinks) => prevLinks.filter((link) => link.id !== id));
+               const updatedLinks = links.filter((link) => link.id !== id);
+               setLinks(updatedLinks);
+               setAnalyticsData(calculateAnalytics(updatedLinks));
           } catch (error) {
                showError('Failed to delete link');
                console.error(error);
@@ -163,28 +170,21 @@ export default function LinksPage() {
      // };
 
      useEffect(() => {
-          const q = query(collection(db, "links"));
-          const unsubscribe = onSnapshot(q, (snapshot) => {
+          const fetchLinks = async () => {
                try {
                     setLoading(true);
-                    const linksData: Link[] = snapshot.docs.map(doc => ({
-                         id: doc.id,
-                         ...doc.data()
-                    })) as Link[];
+                    const { getLinks } = await import("@/lib/service");
+                    const linksData = await getLinks();
                     setLinks(linksData);
                     setAnalyticsData(calculateAnalytics(linksData));
                } catch (error) {
-                    console.error("Error fetching real-time data: ", error);
+                    console.error("Error fetching links: ", error);
                } finally {
                     setLoading(false);
                }
-          }, (error) => {
-               console.error("Firestore listener error: ", error);
-               setLoading(false);
-          });
+          };
 
-          // Clean up listener on unmount
-          return () => unsubscribe();
+          fetchLinks();
      }, []);
 
      const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
