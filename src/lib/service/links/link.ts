@@ -151,13 +151,21 @@ export const getLink = async (id: string): Promise<Link | null> => {
 
 // Get a link by short URL
 export const getLinkByShortUrl = async (shortUrl: string): Promise<Link | null> => {
+     // Ensure incoming short URL uses the same format stored in Firestore
+     const formattedShortUrl = formatShortUrl(shortUrl);
+
+     // If the short URL contains invalid characters, simply return null
+     if (!validateShortUrl(formattedShortUrl)) {
+          return null;
+     }
+
+     // Query Firestore for a document with matching shortUrl field
      const linksRef = collection(db, "links");
-     const querySnapshot = await getDocs(linksRef);
+     const q = query(linksRef, where("shortUrl", "==", formattedShortUrl));
+     const querySnapshot = await getDocs(q);
 
-     const match = querySnapshot.docs.find(doc => doc.data().shortUrl === shortUrl);
-
-     if (match) {
-          return convertDoc(match);
+     if (!querySnapshot.empty) {
+          return convertDoc(querySnapshot.docs[0]);
      }
 
      return null;
