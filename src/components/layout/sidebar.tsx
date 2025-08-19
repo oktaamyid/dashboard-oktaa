@@ -40,6 +40,7 @@ const sidebarGroups: SidebarGroup[] = [
           items: [
                { name: 'Links', icon: LinkIcon, href: '/links' },
                { name: 'Categories', icon: HashtagIcon, href: '/categories' },
+               { name: 'API Builder', icon: GlobeAltIcon, href: '/api-builder' },
           ],
      },
      {

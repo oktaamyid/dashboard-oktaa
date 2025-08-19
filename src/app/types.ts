@@ -1,4 +1,4 @@
-// types.ts
+// app/types.ts
 export interface Experience {
      id: string;
      company: string;
@@ -122,5 +122,18 @@ export interface CloudflareResponse {
      }[];
 }
 
+export interface ApiEndpoint {
+     id: string;
+     name: string;
+     slug: string;
+     method: string;
+     fields: {
+          fieldName: string;
+          type: "text" | "number" | "boolean" | "date";
+          required: boolean;
+          defaultValue: string | number | boolean | null;
+     }[];
+}
+
 // Union type utama yang sudah ada
-export type TableData = Experience | Project | Link | Profile | Subdomain;
+export type TableData = Experience | Project | Link | Profile | Subdomain | ApiEndpoint;
