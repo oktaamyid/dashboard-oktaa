@@ -28,7 +28,7 @@ interface LinkTableRow {
 }
 
 export default function LinkTable({ links, onEdit, onDelete, isLoading = false }: LinkTableProps) {
-     const { showSuccess, showError } = useToast();
+     const { showError } = useToast();
      const [expandedLinkId, setExpandedLinkId] = useState<string | null>(null);
      const [searchTerm, setSearchTerm] = useState("");
 
