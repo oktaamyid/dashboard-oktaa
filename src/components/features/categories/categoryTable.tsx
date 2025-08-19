@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function CategoryTable({ categories, sortSettings, onSortChange, setSortSettings, isLoading = false }: Props) {
-     const { showSuccess, showError } = useToast();
+     const { showSuccess } = useToast();
      const columns = ["name", "count", "url", "sortField", "sortDirection", "actions"];
 
      const renderCell = (column: string, row: Category) => {
