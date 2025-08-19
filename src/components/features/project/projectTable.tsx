@@ -16,7 +16,7 @@ interface ProjectTableProps {
 }
 
 export default function ProjectTable({ projects, onEdit, onDelete, isLoading = false }: ProjectTableProps) {
-     const { showSuccess, showError } = useToast();
+     const { showError } = useToast();
      const columns = ['title', 'description', 'link', 'technology', 'actions'];
 
      const renderCell = (column: string, row: Project) => {
