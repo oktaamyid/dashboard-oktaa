@@ -157,7 +157,7 @@ export default function Overview() {
                          isLoading={loading}
                     />
                     <AnimatedStatsCard
-                         title="Total Experiences"
+                         title="Total Experiences"     
                          finalValue={experiences.length}
                          icon={BriefcaseIcon}
                          isLoading={loading}
