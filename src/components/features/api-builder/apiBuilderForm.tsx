@@ -7,6 +7,7 @@ import Button from "@/components/ui/button";
 import Select from "@/components/ui/select";
 import Toggle from "@/components/ui/toggle";
 import { ApiEndpoint } from "@/app/types";
+import { toIsoWithLocalTZ, normalizeDateTimeForInput } from "@/lib/utils/parseDate";
 
 const FIELD_TYPES = [
      { label: "Text", value: "text" },
@@ -161,19 +162,44 @@ export default function ApiBuilderForm({
                                              label="Required"
                                              size="sm"
                                         />
-                                        <Input
-                                             placeholder="Default Value"
-                                             value={
-                                                  typeof field.defaultValue === "string" ||
+                                        {field.type === "boolean" ? (
+                                             <Toggle
+                                                  checked={Boolean(field.defaultValue)}
+                                                  onChange={(v) => handleFieldChange(idx, "defaultValue", v)}
+                                                  label="Default Value"
+                                                  size="sm"
+                                             />
+                                        ) : field.type === "number" ? (
+                                             <Input
+                                                  type="number"
+                                                  placeholder="Default Value"
+                                                  value={
                                                        typeof field.defaultValue === "number"
-                                                       ? field.defaultValue
-                                                       : ""
-                                             }
-                                             onChange={(e) =>
-                                                  handleFieldChange(idx, "defaultValue", e.target.value)
-                                             }
-                                             className="w-32"
-                                        />
+                                                            ? field.defaultValue
+                                                            : ""
+                                                  }
+                                                  onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value === "" ? "" : Number(e.target.value))}
+                                                  className="w-32"
+                                             />
+                                        ) : field.type === "date" ? (
+                                             <Input
+                                                  type="datetime-local"
+                                                  value={
+                                                       typeof field.defaultValue === "string"
+                                                            ? normalizeDateTimeForInput(field.defaultValue)  // helper baru
+                                                            : ""
+                                                  }
+                                                  onChange={(e) => handleFieldChange(idx, "defaultValue", toIsoWithLocalTZ(e.target.value))}
+                                             />
+                                        ) : (
+                                             <Input
+                                                  type="text"
+                                                  placeholder="Default Value"
+                                                  value={typeof field.defaultValue === "string" ? field.defaultValue : ""}
+                                                  onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
+                                                  className="w-32"
+                                             />
+                                        )}
                                         <Button
                                              type="button"
                                              variant="danger"

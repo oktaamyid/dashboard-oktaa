@@ -17,6 +17,7 @@
     "@vercel/blob": "^0.27.3",
     "cookies-next": "^5.1.0",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "detect-browser": "^5.3.0",
     "firebase": "^11.4.0",
     "firebase-functions": "^6.3.2",

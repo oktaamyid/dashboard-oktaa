@@ -19,18 +19,18 @@ export default function ApiBuilderPage() {
      const [showDocs, setShowDocs] = useState(false);
      const [docsEndpoint, setDocsEndpoint] = useState<ApiEndpoint | null>(null);
 
+     const fetchEndpoints = async () => {
+          setLoading(true);
+          try {
+               const data = await listEndpoints();
+               setEndpoints(data);
+          } catch (_err) {
+               showError("Failed to fetch endpoints");
+          } finally {
+               setLoading(false);
+          }
+     };
      useEffect(() => {
-          const fetchEndpoints = async () => {
-               setLoading(true);
-               try {
-                    const data = await listEndpoints();
-                    setEndpoints(data);
-               } catch (_err) {
-                    showError("Failed to fetch endpoints");
-               } finally {
-                    setLoading(false);
-               }
-          };
           fetchEndpoints();
      }, [showError]);
 
@@ -59,12 +59,11 @@ export default function ApiBuilderPage() {
           }
      };
 
-     const handleFormSubmit = (endpoint: ApiEndpoint, isEdit: boolean) => {
+     const handleFormSubmit = async (endpoint: ApiEndpoint, isEdit: boolean) => {
+          await fetchEndpoints();
           if (isEdit) {
-               setEndpoints(endpoints => endpoints.map(ep => ep.id === endpoint.id ? endpoint : ep));
                showSuccess("Endpoint updated!");
           } else {
-               setEndpoints(endpoints => [...endpoints, endpoint]);
                showSuccess("Endpoint created!");
                setDocsEndpoint(endpoint);
                setShowDocs(true);

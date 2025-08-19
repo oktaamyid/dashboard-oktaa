@@ -27,6 +27,6 @@ export async function updateEndpoint(id: string, data: Partial<ApiEndpoint>) {
      return updateDoc(doc(col, id), data);
 }
 
-export async function deleteEndpoint(id: string) {
+export async function deleteEndpoint(id: string): Promise<void> {
      return deleteDoc(doc(col, id));
 }

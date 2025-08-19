@@ -41,7 +41,7 @@ export default function ApiBuilderTable({ endpoints, onEdit, onDelete, isLoading
                               <Button variant="secondary" onClick={() => onEdit(row)} className="p-1">
                                    <PencilIcon className="w-5 h-5" />
                               </Button>
-                              <Button variant="danger" onClick={() => onDelete(row.id)} className="p-1">
+                              <Button variant="danger" onClick={() => onDelete(row.slug)} className="p-1">
                                    <TrashIcon className="w-5 h-5" />
                               </Button>
                               <Button variant="primary" onClick={() => onViewDocs(row)} className="p-1">
