@@ -18,7 +18,8 @@ export async function OPTIONS() {
 }
 
 // GET /api/[slug] => return sample data
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ slug: string }> }) {
+     const params = await props.params;
      const data = await findBySlug(params.slug);
      if (!data) {
           return NextResponse.json(
@@ -35,7 +36,8 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
 }
 
 // POST /api/[slug] => validate incoming body
-export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ slug: string }> }) {
+     const params = await props.params;
      const endpoint = await findBySlug(params.slug);
      if (!endpoint) {
           return NextResponse.json({ error: "Not found" }, { status: 404, headers: corsHeaders });
@@ -54,7 +56,8 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
 }
 
 // PUT /api/[slug]
-export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ slug: string }> }) {
+     const params = await props.params;
      const endpoint = await findBySlug(params.slug);
      if (!endpoint) {
           return NextResponse.json({ error: "Not found" }, { status: 404, headers: corsHeaders });
@@ -66,7 +69,8 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
 }
 
 // DELETE /api/[slug]
-export async function DELETE(req: Request, { params }: { params: { slug: string } }) {
+export async function DELETE(req: Request, props: { params: Promise<{ slug: string }> }) {
+     const params = await props.params;
      const endpoint = await findBySlug(params.slug);
      if (!endpoint) {
           return NextResponse.json({ error: "Not found" }, { status: 404, headers: corsHeaders });
