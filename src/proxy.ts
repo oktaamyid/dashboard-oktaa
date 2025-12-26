@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
-     console.log("⚡ Middleware berjalan di:", req.nextUrl.pathname);
+export function proxy(req: NextRequest) {
+     console.log("⚡ Proxy berjalan di:", req.nextUrl.pathname);
 
      const token = req.cookies.get("token")?.value;
      const pathname = req.nextUrl.pathname;

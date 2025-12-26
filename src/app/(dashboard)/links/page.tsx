@@ -153,7 +153,7 @@ export default function LinksPage() {
      }
 
      const handleCancel = () => {
-          setEditingLink(null);    
+          setEditingLink(null);
           setFormVisible(false);
      };
 
@@ -201,7 +201,7 @@ export default function LinksPage() {
                                    }}
                                    className="flex items-center"
                                    variant="primary"
-                                   
+
                               >
                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -231,7 +231,7 @@ export default function LinksPage() {
                          onCancel={handleCancel}
                     />
                )}
-               
+
                <LinkTable
                     links={links}
                     onEdit={handleEdit}
@@ -301,7 +301,7 @@ export default function LinksPage() {
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                                                   >
                                                        {analyticsData.deviceDistribution.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -334,7 +334,7 @@ export default function LinksPage() {
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                                                   >
                                                        {analyticsData.referrerDistribution.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -367,7 +367,7 @@ export default function LinksPage() {
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                                                   >
                                                        {analyticsData.geoDistribution.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -400,7 +400,7 @@ export default function LinksPage() {
                                                        fill="#8884d8"
                                                        dataKey="value"
                                                        nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                                                   >
                                                        {analyticsData.browserDistribution.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

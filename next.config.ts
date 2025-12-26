@@ -38,12 +38,12 @@ const nextConfig: NextConfig = {
                     hostname: 'cdn2.oktaa.my.id',
                     pathname: '**'
                },
-               
+
           ],
           dangerouslyAllowSVG: true,
      },
      experimental: {
-          middlewarePrefetch: "strict",
+          proxyPrefetch: "strict",
      },
 };
 
