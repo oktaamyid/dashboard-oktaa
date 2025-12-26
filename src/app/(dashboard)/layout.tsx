@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
      return (
           <>
                <Analytics />
-               <div className="antialiased bg-gradient-to-br from-gray-700 to-black/80 min-h-screen">
+               <div className="antialiased bg-linear-to-br from-gray-700 to-black/80 min-h-screen">
                     <div className="flex h-full">
                          <Sidebar
                               isOpen={isOpen}

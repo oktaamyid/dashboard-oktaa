@@ -78,9 +78,9 @@ export interface Profile {
      categorySortSettings?: {
           [categoryId: string]: {
                type?: "field" | "manual";
-               field?: string; 
-               direction?: "asc" | "desc"; 
-               order?: string[]; 
+               field?: string;
+               direction?: "asc" | "desc";
+               order?: string[];
           };
      };
 }
@@ -136,4 +136,14 @@ export interface ApiEndpoint {
 }
 
 // Union type utama yang sudah ada
-export type TableData = Experience | Project | Link | Profile | Subdomain | ApiEndpoint;
+export type TableData = Experience | Project | Link | Profile | Subdomain | ApiEndpoint | Image;
+
+export interface Image {
+     id: string;
+     url: string;
+     pathname: string;
+     size: number;
+     uploadedAt: string;
+     filename: string;
+     contentType?: string;
+}

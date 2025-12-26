@@ -5,6 +5,7 @@ import { useEffect, useState, use } from "react";
 import Image from 'next/image';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { ASSETS } from "@/lib/assets";
 
 export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: string }> }) {
      const params = use(props.params);
@@ -101,7 +102,7 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
                          </div>
                     </div>
 
-                    
+
                </div>
           );
      }
@@ -117,20 +118,19 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
      return (
           <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 px-4">
                {/* Brand Icon & Header */}
-               <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 text-center sm:text-left">
+               <div className="flex">
                     <Image
-                         src="https://cdn.oktaa.my.id/logo-dark-theme.svg"
+                         src={ASSETS.LOGO_TEXT_LIGHT}
                          alt="Brand Logo"
-                         width={75}
-                         height={75}
+                         width={150}
+                         height={150}
                     />
-                    <h1 className="text-gray-100 text-lg sm:text-xl font-semibold">Confirm Link Access</h1>
                </div>
 
                {/* URL Box */}
                <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-[90%] sm:max-w-md text-center">
                     <p className="text-gray-500 text-sm">Short URL accessed:</p>
-                    <p className="text-blue-600 font-medium text-lg break-words">{window.location.origin}/{params.shortUrl}</p>
+                    <p className="text-blue-600 font-medium text-lg wrap-break-word">{window.location.origin}/{params.shortUrl}</p>
 
                     {/* Custom Message Display */}
                     {customMessage && (

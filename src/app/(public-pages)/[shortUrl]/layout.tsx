@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { ASSETS } from "@/lib/assets";
 
 export const metadata: Metadata = {
      metadataBase: new URL("https://oktaa.my.id"),
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
           type: "website",
           images: [
                {
-                    url: "https://cdn.oktaa.my.id/og-banner.png",
+                    url: ASSETS.OG_BANNER,
                     width: 1200,
                     height: 630,
                     alt: "Shorten Link Verification - Oktaa",
@@ -27,11 +28,11 @@ export const metadata: Metadata = {
           card: "summary_large_image",
           title: "Shorten Link Verification. | OKTAA~",
           description: "Verify your shorten link securely through Oktaa. Simplify and manage your links with ease.",
-          images: ["https://cdn.oktaa.my.id/og-banner.png"],
+          images: [ASSETS.OG_BANNER],
      },
      icons: {
-          icon: "https://cdn.oktaa.my.id/favicon.ico",
-          apple: "https://cdn.oktaa.my.id/apple-touch-icon.png",
+          icon: ASSETS.ICON,
+          apple: ASSETS.APPLE,
      },
      other: {
           "google-adsense-account": "ca-pub-8320640493505504",

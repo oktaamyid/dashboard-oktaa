@@ -7,6 +7,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebaseConfig";
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import Button from '@/components/ui/button';
+import { ASSETS } from "@/lib/assets";
 
 export default function Header({
      isOpen,
@@ -65,7 +66,7 @@ export default function Header({
                <div className="relative" ref={dropdownRef}>
                     <div className="flex gap-2">
                          <Image
-                              src="https://cdn.oktaa.my.id/apple-touch-icon.png"
+                              src={ASSETS.APPLE}
                               alt="Profile"
                               width={25}
                               height={25}
@@ -74,29 +75,29 @@ export default function Header({
                          />
                     </div>
                     <div
-                          className={`absolute right-0 mt-2 w-48 bg-gray-700 text-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isDropdownOpen
-                                ? 'opacity-100 translate-y-0 z-50'
-                                : 'opacity-0 translate-y-2 pointer-events-none'
-                                }`}
+                         className={`absolute right-0 mt-2 w-48 bg-gray-700 text-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isDropdownOpen
+                              ? 'opacity-100 translate-y-0 z-50'
+                              : 'opacity-0 translate-y-2 pointer-events-none'
+                              }`}
                     >
-                          <span
-                                className="block w-full px-4 py-2 text-xs text-left text-gray-300"
-                                title={auth.currentUser?.email || "Guest"}
-                          >
-                                {auth.currentUser?.email || "Guest"}
-                          </span>
-                          <button
-                                onClick={profileEdit}
-                                className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
-                          >
-                                Profile
-                          </button>
-                          <button
-                                onClick={handleLogout}
-                                className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
-                          >
-                                Logout
-                          </button>
+                         <span
+                              className="block w-full px-4 py-2 text-xs text-left text-gray-300"
+                              title={auth.currentUser?.email || "Guest"}
+                         >
+                              {auth.currentUser?.email || "Guest"}
+                         </span>
+                         <button
+                              onClick={profileEdit}
+                              className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
+                         >
+                              Profile
+                         </button>
+                         <button
+                              onClick={handleLogout}
+                              className="block w-full px-4 py-2 text-left hover:bg-gray-600 transition-colors duration-200"
+                         >
+                              Logout
+                         </button>
                     </div>
                </div>
           </header>
