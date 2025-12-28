@@ -10,7 +10,6 @@ import DivContainer from '@/components/ui/container';
 import { CursorArrowRippleIcon, ChartBarIcon, DeviceTabletIcon, GlobeAltIcon, MapIcon, LinkIcon } from '@heroicons/react/24/solid';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { denormalizeReferer } from "@/lib/utils/normalizeReferer";
-import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 
@@ -157,18 +156,6 @@ export default function LinksPage() {
           setFormVisible(false);
      };
 
-     // const handleResetAnalytics = async () => {
-     //      if (confirm("Are you sure you want to reset all link analytics? This cannot be undone.")) {
-     //          try {
-     //              await resetLinkAnalytics();
-     //              alert("Analytics reset successfully.");
-     //          } catch (error) {
-     //              console.error("Error resetting analytics: ", error);
-     //              alert("Failed to reset analytics.");
-     //          }
-     //      }
-     // };
-
      useEffect(() => {
           const fetchLinks = async () => {
                try {
@@ -187,240 +174,217 @@ export default function LinksPage() {
           fetchLinks();
      }, []);
 
-     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+     const COLORS = ['#FFFFFF', '#A1A1AA', '#52525B', '#27272A', '#000000'];
 
      return (
-          <div>
-               <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">Links</h1>
-                    <div className="flex space-x-2">
+          <div className="space-y-6">
+               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-white/10 pb-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Links Manager</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Create, Track & Analyze Shortlinks</p>
+                    </div>
+                    <div className="flex gap-2">
                          {!isFormVisible && (
                               <Button
-                                   onClick={() => {
-                                        setFormVisible(true);
-                                   }}
-                                   className="flex items-center"
+                                   onClick={() => setFormVisible(true)}
                                    variant="primary"
-
+                                   size="sm"
                               >
-                                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                   </svg>
-                                   Add Link
+                                   ADD NEW LINK
                               </Button>
                          )}
 
                          <Button
                               onClick={() => setAnalyticsView(!analyticsView)}
-                              className="flex items-center"
                               variant="secondary"
+                              size="sm"
                          >
-                              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                              </svg>
-                              {analyticsView ? "Hide Analytics" : "Show Analytics"}
+                              {analyticsView ? "HIDE METRICS" : "SHOW METRICS"}
                          </Button>
 
                     </div>
                </div>
 
                {isFormVisible && (
-                    <LinkForm
-                         onSubmit={(data) => handleCreateOrUpdate(data)}
-                         initialData={editingLink || undefined}
-                         onCancel={handleCancel}
-                    />
-               )}
-
-               <LinkTable
-                    links={links}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    isLoading={loading}
-               />
-
-               {analyticsView && analyticsData && (
-                    <div className="my-6 space-y-6">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {/* Summary Cards */}
-                              <AnimatedStatsCard
-                                   title="Total Click"
-                                   finalValue={analyticsData.totalClicks}
-                                   icon={CursorArrowRippleIcon}
-                              />
-
-                              <Card
-                                   title="Average Clicks per Link"
-                                   value={analyticsData.averageClicks.toFixed(1)}
-                                   icon={ChartBarIcon}
-                              />
-
-                         </div>
-
-                         {/* Top Links Chart */}
-                         <DivContainer className="p-4" hoverEffect={false}>
-                              <h3 className="font-medium text-gray-300 mb-4">Top Performing Links</h3>
-                              <div className="h-64">
-                                   <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={analyticsData.topLinks}>
-                                             <XAxis dataKey="name" stroke="#d1d5db" />
-                                             <YAxis stroke="#d1d5db" />
-                                             <Tooltip
-                                                  contentStyle={{
-                                                       backgroundColor: '#374151',
-                                                       borderColor: '#4b5563',
-                                                       borderRadius: '0.5rem'
-                                                  }}
-                                             />
-                                             <Legend />
-                                             <Bar
-                                                  dataKey="clicks"
-                                                  fill="#8884d8"
-                                                  name="Clicks"
-                                                  radius={[4, 4, 0, 0]}
-                                             />
-                                        </BarChart>
-                                   </ResponsiveContainer>
-                              </div>
-                         </DivContainer>
-
-                         {/* Distribution Charts */}
-                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              {/* Device Distribution */}
-                              <DivContainer className="p-4" hoverEffect={false} icon={DeviceTabletIcon}>
-                                   <h3 className="font-medium text-gray-300 mb-4">Device Distribution</h3>
-                                   <div className="h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                             <PieChart>
-                                                  <Pie
-                                                       data={analyticsData.deviceDistribution}
-                                                       cx="50%"
-                                                       cy="50%"
-                                                       labelLine={false}
-                                                       outerRadius={70}
-                                                       fill="#8884d8"
-                                                       dataKey="value"
-                                                       nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                                                  >
-                                                       {analyticsData.deviceDistribution.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                       ))}
-                                                  </Pie>
-                                                  <Tooltip
-                                                       contentStyle={{
-                                                            backgroundColor: '#374151',
-                                                            borderColor: '#4b5563',
-                                                            borderRadius: '0.5rem'
-                                                       }}
-                                                  />
-                                             </PieChart>
-                                        </ResponsiveContainer>
-                                   </div>
-                              </DivContainer>
-
-                              {/* Referrer Distribution */}
-                              <DivContainer className="p-4" hoverEffect={false} icon={LinkIcon}>
-                                   <h3 className="font-medium text-gray-300 mb-4">Top Referrers</h3>
-                                   <div className="h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                             <PieChart>
-                                                  <Pie
-                                                       data={analyticsData.referrerDistribution}
-                                                       cx="50%"
-                                                       cy="50%"
-                                                       labelLine={false}
-                                                       outerRadius={70}
-                                                       fill="#8884d8"
-                                                       dataKey="value"
-                                                       nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                                                  >
-                                                       {analyticsData.referrerDistribution.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                       ))}
-                                                  </Pie>
-                                                  <Tooltip
-                                                       contentStyle={{
-                                                            backgroundColor: '#374151',
-                                                            borderColor: '#4b5563',
-                                                            borderRadius: '0.5rem'
-                                                       }}
-                                                  />
-                                             </PieChart>
-                                        </ResponsiveContainer>
-                                   </div>
-                              </DivContainer>
-
-                              {/* Geo Distribution */}
-                              <DivContainer className="p-4" hoverEffect={false} icon={MapIcon}>
-                                   <h3 className="font-medium text-gray-300 mb-4">Top Locations</h3>
-                                   <div className="h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                             <PieChart>
-                                                  <Pie
-                                                       data={analyticsData.geoDistribution}
-                                                       cx="50%"
-                                                       cy="50%"
-                                                       labelLine={false}
-                                                       outerRadius={70}
-                                                       fill="#8884d8"
-                                                       dataKey="value"
-                                                       nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                                                  >
-                                                       {analyticsData.geoDistribution.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                       ))}
-                                                  </Pie>
-                                                  <Tooltip
-                                                       contentStyle={{
-                                                            backgroundColor: '#374151',
-                                                            borderColor: '#4b5563',
-                                                            borderRadius: '0.5rem'
-                                                       }}
-                                                  />
-                                             </PieChart>
-                                        </ResponsiveContainer>
-                                   </div>
-                              </DivContainer>
-
-                              {/* Browser Distribution */}
-                              <DivContainer className="p-4" hoverEffect={false} icon={GlobeAltIcon}>
-                                   <h3 className="font-medium text-gray-300 mb-4">Top Browsers</h3>
-                                   <div className="h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                             <PieChart>
-                                                  <Pie
-                                                       data={analyticsData.browserDistribution}
-                                                       cx="50%"
-                                                       cy="50%"
-                                                       labelLine={false}
-                                                       outerRadius={70}
-                                                       fill="#8884d8"
-                                                       dataKey="value"
-                                                       nameKey="name"
-                                                       label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                                                  >
-                                                       {analyticsData.browserDistribution.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                       ))}
-                                                  </Pie>
-                                                  <Tooltip
-                                                       contentStyle={{
-                                                            backgroundColor: '#374151',
-                                                            borderColor: '#4b5563',
-                                                            borderRadius: '0.5rem'
-                                                       }}
-                                                  />
-                                             </PieChart>
-                                        </ResponsiveContainer>
-                                   </div>
-                              </DivContainer>
-                         </div>
+                    <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
+                         <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">{editingLink ? 'Edit Link' : 'Create New Link'}</h3>
+                         <LinkForm
+                              onSubmit={(data) => handleCreateOrUpdate(data)}
+                              initialData={editingLink || undefined}
+                              onCancel={handleCancel}
+                         />
                     </div>
                )}
 
+               <div className="grid grid-cols-1 gap-8">
+                    <div className="border border-white/10 rounded-none overflow-hidden">
+                         <LinkTable
+                              links={links}
+                              onEdit={handleEdit}
+                              onDelete={handleDelete}
+                              isLoading={loading}
+                         />
+                    </div>
+
+                    {analyticsView && analyticsData && (
+                         <div className="space-y-6 animate-in fade-in">
+                              <div className="flex items-center gap-2 mb-2">
+                                   <div className="h-px bg-white/20 flex-1"></div>
+                                   <span className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Analytics Overview</span>
+                                   <div className="h-px bg-white/20 flex-1"></div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                   <AnimatedStatsCard
+                                        title="Total Clicks"
+                                        finalValue={analyticsData.totalClicks}
+                                        icon={CursorArrowRippleIcon}
+                                   />
+
+                                   <AnimatedStatsCard
+                                        title="Avg. Click / Link"
+                                        finalValue={Number(analyticsData.averageClicks.toFixed(1))}
+                                        icon={ChartBarIcon}
+                                   />
+                              </div>
+
+                              {/* Top Links Chart */}
+                              <DivContainer className="p-6">
+                                   <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Top Performing Links</h3>
+                                   <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                             <BarChart data={analyticsData.topLinks}>
+                                                  <XAxis dataKey="name" stroke="#52525B" fontSize={10} tickLine={false} axisLine={false} />
+                                                  <YAxis stroke="#52525B" fontSize={10} tickLine={false} axisLine={false} />
+                                                  <Tooltip
+                                                       cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                                       contentStyle={{ backgroundColor: '#000', borderColor: '#333', color: '#fff', borderRadius: 0 }}
+                                                       itemStyle={{ color: '#fff' }}
+                                                  />
+                                                  <Bar
+                                                       dataKey="clicks"
+                                                       fill="#fff"
+                                                       radius={[0, 0, 0, 0]}
+                                                       barSize={40}
+                                                  />
+                                             </BarChart>
+                                        </ResponsiveContainer>
+                                   </div>
+                              </DivContainer>
+
+                              {/* Distribution Charts */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                   {/* Device Distribution */}
+                                   <DivContainer className="p-4" hoverEffect={false}>
+                                        <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Device Split</h3>
+                                        <div className="h-40">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                  <PieChart>
+                                                       <Pie
+                                                            data={analyticsData.deviceDistribution}
+                                                            cx="50%"
+                                                            cy="50%"
+                                                            innerRadius={40}
+                                                            outerRadius={60}
+                                                            fill="#8884d8"
+                                                            dataKey="value"
+                                                            nameKey="name"
+                                                            stroke="black"
+                                                       >
+                                                            {analyticsData.deviceDistribution.map((entry, index) => (
+                                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                            ))}
+                                                       </Pie>
+                                                       <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #333', color: '#fff' }} />
+                                                  </PieChart>
+                                             </ResponsiveContainer>
+                                        </div>
+                                   </DivContainer>
+
+                                   {/* Referrer Distribution */}
+                                   <DivContainer className="p-4" hoverEffect={false}>
+                                        <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Top Referrers</h3>
+                                        <div className="h-40">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                  <PieChart>
+                                                       <Pie
+                                                            data={analyticsData.referrerDistribution}
+                                                            cx="50%"
+                                                            cy="50%"
+                                                            innerRadius={40}
+                                                            outerRadius={60}
+                                                            fill="#8884d8"
+                                                            dataKey="value"
+                                                            nameKey="name"
+                                                            stroke="black"
+                                                       >
+                                                            {analyticsData.referrerDistribution.map((entry, index) => (
+                                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                            ))}
+                                                       </Pie>
+                                                       <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #333', color: '#fff' }} />
+                                                  </PieChart>
+                                             </ResponsiveContainer>
+                                        </div>
+                                   </DivContainer>
+
+                                   {/* Geo Distribution */}
+                                   <DivContainer className="p-4" hoverEffect={false}>
+                                        <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Locations</h3>
+                                        <div className="h-40">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                  <PieChart>
+                                                       <Pie
+                                                            data={analyticsData.geoDistribution}
+                                                            cx="50%"
+                                                            cy="50%"
+                                                            innerRadius={40}
+                                                            outerRadius={60}
+                                                            fill="#8884d8"
+                                                            dataKey="value"
+                                                            nameKey="name"
+                                                            stroke="black"
+                                                       >
+                                                            {analyticsData.geoDistribution.map((entry, index) => (
+                                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                            ))}
+                                                       </Pie>
+                                                       <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #333', color: '#fff' }} />
+                                                  </PieChart>
+                                             </ResponsiveContainer>
+                                        </div>
+                                   </DivContainer>
+
+                                   {/* Browser Distribution */}
+                                   <DivContainer className="p-4" hoverEffect={false}>
+                                        <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Browsers</h3>
+                                        <div className="h-40">
+                                             <ResponsiveContainer width="100%" height="100%">
+                                                  <PieChart>
+                                                       <Pie
+                                                            data={analyticsData.browserDistribution}
+                                                            cx="50%"
+                                                            cy="50%"
+                                                            innerRadius={40}
+                                                            outerRadius={60}
+                                                            fill="#8884d8"
+                                                            dataKey="value"
+                                                            nameKey="name"
+                                                            stroke="black"
+                                                       >
+                                                            {analyticsData.browserDistribution.map((entry, index) => (
+                                                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                            ))}
+                                                       </Pie>
+                                                       <Tooltip contentStyle={{ backgroundColor: '#000', border: '1px solid #333', color: '#fff' }} />
+                                                  </PieChart>
+                                             </ResponsiveContainer>
+                                        </div>
+                                   </DivContainer>
+                              </div>
+                         </div>
+                    )}
+               </div>
           </div>
      );
 }

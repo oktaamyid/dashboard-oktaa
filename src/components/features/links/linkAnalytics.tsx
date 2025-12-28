@@ -9,9 +9,9 @@ interface LinkAnalyticsProps {
 export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
      // Prepare data for device stats
      const deviceData = [
-          { name: "Desktop", value: link.deviceStats?.desktop || 0, color: "bg-blue-500" },
-          { name: "Mobile", value: link.deviceStats?.mobile || 0, color: "bg-green-500" },
-          { name: "Tablet", value: link.deviceStats?.tablet || 0, color: "bg-purple-500" }
+          { name: "Desktop", value: link.deviceStats?.desktop || 0, color: "bg-white" },
+          { name: "Mobile", value: link.deviceStats?.mobile || 0, color: "bg-zinc-400" },
+          { name: "Tablet", value: link.deviceStats?.tablet || 0, color: "bg-zinc-600" }
      ].filter(item => item.value > 0);
 
      // Prepare data for browser stats (top 5 browser)
@@ -37,40 +37,41 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
 
      if (!link.clicks) {
           return (
-               <div className="text-gray-400 italic text-center py-6">
+               <div className="text-zinc-500 text-xs uppercase tracking-widest text-center py-12 border border-white/10 bg-black">
                     No analytics data available yet
                </div>
           );
      }
 
      return (
-          <div className="space-y-6 p-4">
-               <h3 className="text-lg font-semibold text-gray-200">
+          <div className="space-y-6">
+               <h3 className="text-lg font-black text-white uppercase tracking-tighter my-4 mx-5">
                     Analytics for {link.nameUrl || link.shortUrl}
                </h3>
 
-               <div className="text-center mb-6 p-4 bg-gray-800 rounded-lg">
-                    <div className="text-3xl font-bold text-white">{link.clicks || 0}</div>
-                    <div className="text-sm text-gray-400">Total Clicks</div>
+               {/* Total Clicks Card */}
+               <div className="text-center p-8 bg-black border border-white/10">
+                    <div className="text-5xl font-black text-white font-outfit mb-2">{link.clicks || 0}</div>
+                    <div className="text-xs text-zinc-500 uppercase tracking-widest">Total Clicks</div>
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                     {/* Device Stats */}
-                    <div className="bg-gray-800 rounded-lg p-4 shadow">
-                         <h4 className="font-medium text-gray-300 mb-3">Device Types</h4>
+                    <div className="bg-black border border-white/10 p-6">
+                         <h4 className="font-bold text-white text-xs uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Device Types</h4>
                          {deviceData.length > 0 ? (
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                    {deviceData.map((device) => (
-                                        <div key={device.name} className="space-y-1">
-                                             <div className="flex justify-between text-sm">
-                                                  <span className="text-gray-400">{device.name}</span>
-                                                  <span className="text-gray-200 font-medium">
-                                                       {device.value} ({Math.round((device.value / (link.clicks || 1)) * 100)}%)
+                                        <div key={device.name} className="space-y-2">
+                                             <div className="flex justify-between text-xs uppercase tracking-wide">
+                                                  <span className="text-zinc-400">{device.name}</span>
+                                                  <span className="text-white font-bold">
+                                                       {device.value} <span className="text-zinc-600">({Math.round((device.value / (link.clicks || 1)) * 100)}%)</span>
                                                   </span>
                                              </div>
-                                             <div className="w-full bg-gray-700 rounded-full h-2">
+                                             <div className="w-full bg-zinc-900 h-1">
                                                   <div
-                                                       className={`${device.color} h-2 rounded-full`}
+                                                       className={`${device.color} h-1`}
                                                        style={{
                                                             width: `${Math.min(100, (device.value / (link.clicks || 1)) * 100)}%`
                                                        }}
@@ -80,28 +81,28 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
                                    ))}
                               </div>
                          ) : (
-                              <div className="text-gray-500 italic text-sm">
-                                   No device data available
+                              <div className="text-zinc-600 text-[10px] uppercase tracking-widest">
+                                   No data
                               </div>
                          )}
                     </div>
 
                     {/* Browser Stats */}
-                    <div className="bg-gray-800 rounded-lg p-4 shadow">
-                         <h4 className="font-medium text-gray-300 mb-3">Top Browsers</h4>
+                    <div className="bg-black border border-white/10 p-6">
+                         <h4 className="font-bold text-white text-xs uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Top Browsers</h4>
                          {browserData.length > 0 ? (
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                    {browserData.map((item) => (
-                                        <div key={item.browser} className="space-y-1">
-                                             <div className="flex justify-between text-sm">
-                                                  <span className="text-gray-400">{item.browser}</span>
-                                                  <span className="text-gray-200 font-medium">
-                                                       {item.count} ({Math.round((item.count / (link.clicks || 1)) * 100)}%)
+                                        <div key={item.browser} className="space-y-2">
+                                             <div className="flex justify-between text-xs uppercase tracking-wide">
+                                                  <span className="text-zinc-400">{item.browser}</span>
+                                                  <span className="text-white font-bold">
+                                                       {item.count} <span className="text-zinc-600">({Math.round((item.count / (link.clicks || 1)) * 100)}%)</span>
                                                   </span>
                                              </div>
-                                             <div className="w-full bg-gray-700 rounded-full h-2">
+                                             <div className="w-full bg-zinc-900 h-1">
                                                   <div
-                                                       className="bg-cyan-500 h-2 rounded-full"
+                                                       className="bg-zinc-200 h-1"
                                                        style={{
                                                             width: `${Math.min(100, (item.count / (link.clicks || 1)) * 100)}%`
                                                        }}
@@ -111,28 +112,28 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
                                    ))}
                               </div>
                          ) : (
-                              <div className="text-gray-500 italic text-sm">
-                                   No browser data available
+                              <div className="text-zinc-600 text-[10px] uppercase tracking-widest">
+                                   No data
                               </div>
                          )}
                     </div>
 
                     {/* Geo Stats */}
-                    <div className="bg-gray-800 rounded-lg p-4 shadow">
-                         <h4 className="font-medium text-gray-300 mb-3">Top Locations</h4>
+                    <div className="bg-black border border-white/10 p-6">
+                         <h4 className="font-bold text-white text-xs uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Top Locations</h4>
                          {geoData.length > 0 ? (
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                    {geoData.map((item) => (
-                                        <div key={item.country} className="space-y-1">
-                                             <div className="flex justify-between text-sm">
-                                                  <span className="text-gray-400">{item.country}</span>
-                                                  <span className="text-gray-200 font-medium">
-                                                       {item.count} ({Math.round((item.count / (link.clicks || 1)) * 100)}%)
+                                        <div key={item.country} className="space-y-2">
+                                             <div className="flex justify-between text-xs uppercase tracking-wide">
+                                                  <span className="text-zinc-400">{item.country}</span>
+                                                  <span className="text-white font-bold">
+                                                       {item.count} <span className="text-zinc-600">({Math.round((item.count / (link.clicks || 1)) * 100)}%)</span>
                                                   </span>
                                              </div>
-                                             <div className="w-full bg-gray-700 rounded-full h-2">
+                                             <div className="w-full bg-zinc-900 h-1">
                                                   <div
-                                                       className="bg-cyan-500 h-2 rounded-full"
+                                                       className="bg-zinc-200 h-1"
                                                        style={{
                                                             width: `${Math.min(100, (item.count / (link.clicks || 1)) * 100)}%`
                                                        }}
@@ -142,30 +143,30 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
                                    ))}
                               </div>
                          ) : (
-                              <div className="text-gray-500 italic text-sm">
-                                   No location data available
+                              <div className="text-zinc-600 text-[10px] uppercase tracking-widest">
+                                   No data
                               </div>
                          )}
                     </div>
 
                     {/* Referer Stats */}
-                    <div className="bg-gray-800 rounded-lg p-4 shadow">
-                         <h4 className="font-medium text-gray-300 mb-3">Top Referrers</h4>
+                    <div className="bg-black border border-white/10 p-6">
+                         <h4 className="font-bold text-white text-xs uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Top Referrers</h4>
                          {refererData.length > 0 ? (
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                    {refererData.map((item) => (
-                                        <div key={item.referer} className="space-y-1">
-                                             <div className="flex justify-between text-sm">
-                                                  <span className="text-gray-400 truncate max-w-[120px]" title={item.referer}>
+                                        <div key={item.referer} className="space-y-2">
+                                             <div className="flex justify-between text-xs uppercase tracking-wide">
+                                                  <span className="text-zinc-400 truncate max-w-40" title={item.referer}>
                                                        {item.referer || "Direct"}
                                                   </span>
-                                                  <span className="text-gray-200 font-medium">
-                                                       {item.count} ({Math.round((item.count / (link.clicks || 1)) * 100)}%)
+                                                  <span className="text-white font-bold">
+                                                       {item.count} <span className="text-zinc-600">({Math.round((item.count / (link.clicks || 1)) * 100)}%)</span>
                                                   </span>
                                              </div>
-                                             <div className="w-full bg-gray-700 rounded-full h-2">
+                                             <div className="w-full bg-zinc-900 h-1">
                                                   <div
-                                                       className="bg-pink-500 h-2 rounded-full"
+                                                       className="bg-zinc-200 h-1"
                                                        style={{
                                                             width: `${Math.min(100, (item.count / (link.clicks || 1)) * 100)}%`
                                                        }}
@@ -175,8 +176,8 @@ export default function LinkAnalytics({ link }: LinkAnalyticsProps) {
                                    ))}
                               </div>
                          ) : (
-                              <div className="text-gray-500 italic text-sm">
-                                   No referrer data available
+                              <div className="text-zinc-600 text-[10px] uppercase tracking-widest">
+                                   No data
                               </div>
                          )}
                     </div>

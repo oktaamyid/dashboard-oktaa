@@ -1,250 +1,193 @@
-// src/components/features/api-builder/apiBuilderForm.tsx
-
 "use client";
-import { useState } from "react";
-import Input from "@/components/ui/input";
-import Button from "@/components/ui/button";
-import Select from "@/components/ui/select";
-import Toggle from "@/components/ui/toggle";
-import { ApiEndpoint } from "@/app/types";
-import { toIsoWithLocalTZ, normalizeDateTimeForInput } from "@/lib/utils/parseDate";
 
-const FIELD_TYPES = [
-     { label: "Text", value: "text" },
-     { label: "Number", value: "number" },
-     { label: "Boolean", value: "boolean" },
-     { label: "Date", value: "date" },
-];
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
+import Button from "@/components/ui/button";
+import FormWrapper from "@/components/ui/form-wrapper";
+import { useToast } from "@/components/ui/toast";
+import { apiEndpointSchema, ApiEndpointFormData } from "@/lib/schemas";
+import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ApiEndpoint } from "@/app/types";
 
 interface ApiBuilderFormProps {
      initialData?: ApiEndpoint;
-     onSubmit: (endpoint: ApiEndpoint, isEdit: boolean) => void;
+     onSubmit: (data: ApiEndpoint, isEdit: boolean) => Promise<void>;
      onCancel: () => void;
 }
 
-export default function ApiBuilderForm({
-     initialData,
-     onSubmit,
-     onCancel,
-}: ApiBuilderFormProps) {
-     const [name, setName] = useState(initialData?.name || "");
-     const [slug, setSlug] = useState(initialData?.slug || "");
-     const [method, setMethod] = useState(initialData?.method || "GET");
-     const [fields, setFields] = useState<ApiEndpoint["fields"]>(
-          initialData?.fields || [
-               { fieldName: "", type: "text", required: false, defaultValue: "" },
-          ]
-     );
-     const [isSubmitting, setIsSubmitting] = useState(false);
+export default function ApiBuilderForm({ initialData, onSubmit, onCancel }: ApiBuilderFormProps) {
+     const { showSuccess, showError } = useToast();
 
-     const handleFieldChange = (
-          idx: number,
-          key: string,
-          value: string | number | boolean
-     ) => {
-          setFields((fields) =>
-               fields.map((f, i) => (i === idx ? { ...f, [key]: value } : f))
-          );
-     };
-     const addField = () =>
-          setFields([
-               ...fields,
-               { fieldName: "", type: "text", required: false, defaultValue: "" },
-          ]);
-     const removeField = (idx: number) =>
-          setFields((fields) => fields.filter((_, i) => i !== idx));
+     const {
+          register,
+          control,
+          handleSubmit,
+          formState: { errors, isSubmitting },
+     } = useForm<ApiEndpointFormData>({
+          resolver: zodResolver(apiEndpointSchema),
+          defaultValues: {
+               name: initialData?.name || "",
+               slug: initialData?.slug || "",
+               method: (initialData?.method as "GET" | "POST") || "GET",
+               fields: initialData?.fields?.map(f => ({
+                    fieldName: f.fieldName,
+                    type: f.type as "text" | "number" | "boolean" | "date",
+                    required: f.required,
+                    defaultValue: f.defaultValue
+               })) || []
+          } as any,
+     });
 
-     const handleSubmit = async (e: React.FormEvent) => {
-          e.preventDefault();
-          setIsSubmitting(true);
+     const { fields, append, remove } = useFieldArray({
+          control,
+          name: "fields",
+     });
+
+     const onFormSubmit = async (data: ApiEndpointFormData) => {
           try {
-               let endpointSlug = initialData?.slug;
-               if (initialData) {
-                    // Update
-                    const res = await fetch(`/api/${initialData.slug}`, {
-                         method: "PUT",
-                         headers: { "Content-Type": "application/json" },
-                         body: JSON.stringify({ name, slug, method, fields }),
-                    });
-                    if (!res.ok) throw new Error("Failed to update endpoint");
-               } else {
-                    // Create
-                    const res = await fetch("/api/endpoints", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json" },
-                         body: JSON.stringify({ name, slug, method, fields }),
-                    });
-                    if (!res.ok) throw new Error("Failed to create endpoint");
-                    const { slug: newSlug } = await res.json();
-                    endpointSlug = newSlug;
-               }
-               onSubmit(
-                    {
-                         id: initialData?.id || "", // Add id to satisfy ApiEndpoint type
-                         slug: endpointSlug!,
-                         name,
-                         method,
-                         fields,
-                    },
-                    !!initialData
-               );
-          } catch (_err) {
-               // Error handled in parent
-          } finally {
-               setIsSubmitting(false);
+               // Map form data to ApiEndpoint structure
+               // We need to preserve ID if it exists (for edits) or let backend handle it
+               // The parent handles the ID logic typically, but here we construct the object
+               const apiData: ApiEndpoint = {
+                    id: initialData?.id || "", // ID is required by type, preserve if exists
+                    slug: data.slug,
+                    method: data.method,
+                    name: data.name,
+                    fields: data.fields.map(f => ({
+                         fieldName: f.fieldName,
+                         type: f.type,
+                         required: f.required,
+                         defaultValue: f.defaultValue ?? null // Convert undefined to null if needed
+                    }))
+               };
+
+               await onSubmit(apiData, !!initialData);
+               // Success message handled by parent based on promise, but we can show one here too or removing it to avoid double toast
+               // Parent checks isEdit to show "Updated" vs "Created"
+          } catch (error) {
+               console.error(error);
+               showError("Failed to save endpoint");
           }
      };
 
      return (
-          <div className="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-6 mb-8">
-               <h2 className="text-lg font-semibold text-white mb-4">
-                    {initialData ? "Edit Endpoint" : "Create New Endpoint"}
-               </h2>
-               <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <Input
-                              label="API Name"
-                              value={name}
-                              onChange={(e) => setName(e.target.value)}
-                              required
-                         />
-                         <Input
-                              label="Slug (endpoint)"
-                              value={slug}
-                              onChange={(e) =>
-                                   setSlug(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))
-                              }
-                              required
-                         />
-                         <Select
-                              label="Method"
-                              value={method}
-                              onChange={(e) => setMethod(e.target.value)}
-                              options={[
-                                   { label: "GET", value: "GET" },
-                                   { label: "POST", value: "POST" },
-                              ]}
-                              className="md:col-span-2"
-                         />
-                    </div>
-                    <div>
-                         <label className="text-gray-300 text-sm font-semibold mb-2 block">
-                              Fields
-                         </label>
-                         <div className="space-y-3">
-                              {fields.map((field, idx) => (
-                                   <div
-                                        key={idx}
-                                        className="flex flex-col md:flex-row gap-2 items-center bg-gray-700 p-3 rounded-lg border border-gray-600"
-                                   >
-                                        <Input
-                                             placeholder="Field Name"
-                                             value={field.fieldName}
-                                             onChange={(e) =>
-                                                  handleFieldChange(idx, "fieldName", e.target.value)
-                                             }
-                                             className="flex-1"
-                                             required
-                                        />
-                                        <Select
-                                             value={field.type}
-                                             onChange={(e) =>
-                                                  handleFieldChange(idx, "type", e.target.value)
-                                             }
-                                             options={FIELD_TYPES}
-                                             className="w-32"
-                                        />
-                                        <Toggle
-                                             checked={field.required}
-                                             onChange={(v) =>
-                                                  handleFieldChange(idx, "required", v)
-                                             }
-                                             label="Required"
-                                             size="sm"
-                                        />
-                                        {field.type === "boolean" ? (
-                                             <Toggle
-                                                  checked={Boolean(field.defaultValue)}
-                                                  onChange={(v) => handleFieldChange(idx, "defaultValue", v)}
-                                                  label="Default Value"
-                                                  size="sm"
-                                             />
-                                        ) : field.type === "number" ? (
-                                             <Input
-                                                  type="number"
-                                                  placeholder="Default Value"
-                                                  value={
-                                                       typeof field.defaultValue === "number"
-                                                            ? field.defaultValue
-                                                            : ""
-                                                  }
-                                                  onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value === "" ? "" : Number(e.target.value))}
-                                                  className="w-32"
-                                             />
-                                        ) : field.type === "date" ? (
-                                             <Input
-                                                  type="datetime-local"
-                                                  value={
-                                                       typeof field.defaultValue === "string"
-                                                            ? normalizeDateTimeForInput(field.defaultValue)  // helper baru
-                                                            : ""
-                                                  }
-                                                  onChange={(e) => handleFieldChange(idx, "defaultValue", toIsoWithLocalTZ(e.target.value))}
-                                             />
-                                        ) : (
-                                             <Input
-                                                  type="text"
-                                                  placeholder="Default Value"
-                                                  value={typeof field.defaultValue === "string" ? field.defaultValue : ""}
-                                                  onChange={(e) => handleFieldChange(idx, "defaultValue", e.target.value)}
-                                                  className="w-32"
-                                             />
-                                        )}
-                                        <Button
-                                             type="button"
-                                             variant="danger"
-                                             onClick={() => removeField(idx)}
-                                             className="px-2"
-                                        >
-                                             Remove
-                                        </Button>
-                                   </div>
-                              ))}
-                              <Button
-                                   type="button"
-                                   variant="secondary"
-                                   onClick={addField}
-                                   className="w-full md:w-auto"
-                              >
-                                   + Add Field
-                              </Button>
+          <FormWrapper
+               title={initialData ? "Edit Endpoint" : "Create Endpoint"}
+               description="Define your visual API schema"
+          >
+               <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                         <div className="md:col-span-1">
+                              <Select
+                                   label="HTTP Method"
+                                   {...register("method")}
+                                   options={[
+                                        { value: "GET", label: "GET (Fetch Data)" },
+                                        { value: "POST", label: "POST (Submit Data)" }
+                                   ]}
+                              />
+                              {errors.method && <p className="text-red-500 text-xs mt-1">{errors.method.message}</p>}
+                         </div>
+                         <div className="md:col-span-2">
+                              <Input
+                                   label="Endpoint Slug"
+                                   {...register("slug")}
+                                   error={errors.slug?.message}
+                                   placeholder="e.g. users"
+                              />
                          </div>
                     </div>
-                    <div className="flex space-x-4 justify-end">
-                         <Button
-                              type="submit"
-                              variant="primary"
-                              disabled={isSubmitting}
-                              className="px-8"
-                         >
-                              {isSubmitting
-                                   ? initialData
-                                        ? "Updating..."
-                                        : "Creating..."
-                                   : initialData
-                                        ? "Update Endpoint"
-                                        : "Create Endpoint"}
-                         </Button>
-                         <Button
-                              type="button"
-                              variant="secondary"
-                              onClick={onCancel}
-                              disabled={isSubmitting}
-                         >
+
+                    <Input
+                         label="Description / Name"
+                         {...register("name")}
+                         error={errors.name?.message}
+                         placeholder="e.g. Get All Active Users"
+                    />
+
+                    {/* Fields Builder */}
+                    <div className="pt-6 border-t border-white/10">
+                         <div className="flex justify-between items-center mb-6">
+                              <h3 className="text-sm font-bold text-white uppercase tracking-widest">Schema Fields</h3>
+                              <Button
+                                   type="button"
+                                   variant="primary"
+                                   size="sm"
+                                   onClick={() => append({ fieldName: "", type: "text", required: false })}
+                              >
+                                   <PlusIcon className="w-4 h-4 mr-2" /> Add Field
+                              </Button>
+                         </div>
+
+                         {fields.length === 0 && (
+                              <div className="text-center py-8 border border-dashed border-white/10 bg-white/5">
+                                   <p className="text-zinc-500 text-sm">No fields defined. This endpoint will return/accept raw data.</p>
+                              </div>
+                         )}
+
+                         <div className="space-y-3">
+                              {fields.map((field, index) => (
+                                   <div key={field.id} className="grid grid-cols-12 gap-4 items-start bg-black border border-white/10 p-4 animate-in fade-in slide-in-from-left-2">
+                                        <div className="col-span-4">
+                                             <Input
+                                                  label={index === 0 ? "Field Name" : undefined}
+                                                  {...register(`fields.${index}.fieldName`)}
+                                                  error={errors.fields?.[index]?.fieldName?.message}
+                                                  placeholder="key_name"
+                                                  className="h-9"
+                                             />
+                                        </div>
+                                        <div className="col-span-3">
+                                             <Select
+                                                  label={index === 0 ? "Data Type" : undefined}
+                                                  {...register(`fields.${index}.type`)}
+                                                  options={[
+                                                       { value: "text", label: "Text String" },
+                                                       { value: "number", label: "Number" },
+                                                       { value: "boolean", label: "Boolean" },
+                                                       { value: "date", label: "Date/Time" },
+                                                  ]}
+                                                  className="h-9"
+                                             />
+                                        </div>
+                                        <div className="col-span-4 pt-1">
+                                             {index === 0 && <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Options</label>}
+                                             <div className="flex items-center space-x-4 h-9">
+                                                  <label className="flex items-center gap-2 cursor-pointer">
+                                                       <input
+                                                            type="checkbox"
+                                                            {...register(`fields.${index}.required`)}
+                                                            className="w-4 h-4 rounded border-white/20 bg-black text-white focus:ring-0 checked:bg-white"
+                                                       />
+                                                       <span className="text-xs text-zinc-300 uppercase font-bold tracking-wider">Req</span>
+                                                  </label>
+                                             </div>
+                                        </div>
+                                        <div className="col-span-1 flex justify-end">
+                                             <button
+                                                  type="button"
+                                                  onClick={() => remove(index)}
+                                                  className={`text-zinc-500 hover:text-red-500 transition-colors ${index === 0 ? 'mt-7' : 'mt-2'}`}
+                                             >
+                                                  <TrashIcon className="w-5 h-5" />
+                                             </button>
+                                        </div>
+                                   </div>
+                              ))}
+                         </div>
+                    </div>
+
+                    <div className="flex justify-end gap-4 pt-8 border-t border-white/10">
+                         <Button type="button" variant="secondary" onClick={onCancel}>
                               Cancel
+                         </Button>
+                         <Button type="submit" disabled={isSubmitting} variant="primary">
+                              {isSubmitting ? "Saving Endpoint..." : initialData ? "Update Endpoint" : "Create Endpoint"}
                          </Button>
                     </div>
                </form>
-          </div>
+          </FormWrapper>
      );
 }

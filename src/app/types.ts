@@ -1,9 +1,10 @@
-// app/types.ts
 export interface Experience {
      id: string;
      company: string;
      role: string;
      year: string;
+     description: string;
+     description_id?: string;
      logo: string;
      link: string;
      techStack: string[];
@@ -12,8 +13,11 @@ export interface Experience {
 export interface Project {
      id: string;
      title: string;
+     type: 'Website' | 'Mobile' | 'Other';
+     year: string;
      image: string;
      description: string;
+     description_id?: string;
      link: string;
      technology: string[];
 }
@@ -108,6 +112,7 @@ export interface Subdomain {
 }
 
 export interface DnsRecord {
+     id: string;
      name: string;
      type: "A" | "CNAME";
      content: string;
@@ -116,6 +121,7 @@ export interface DnsRecord {
 export interface CloudflareResponse {
      success: boolean;
      result: {
+          id: string;
           name: string;
           type: string;
           content: string;

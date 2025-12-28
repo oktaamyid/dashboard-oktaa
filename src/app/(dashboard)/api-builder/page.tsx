@@ -1,5 +1,4 @@
 // src/app/(dashboard)/api-builder/page.tsx
-
 "use client";
 
 import Button from "@/components/ui/button";
@@ -77,49 +76,73 @@ export default function ApiBuilderPage() {
           setEditingEndpoint(null);
      };
 
-     // handleViewDocs removed (was unused)
-
      return (
-          <div className="">
-               <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-white">Dynamic API Builder</h1>
+          <div className="space-y-6">
+               <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">API Builder</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Construct Dynamic Endpoints</p>
+                    </div>
                     {!showForm && (
-                         <Button onClick={handleAdd} variant="primary">+ Add Endpoint</Button>
+                         <Button onClick={handleAdd} variant="primary" size="sm">+ Add Endpoint</Button>
                     )}
                </div>
+
                {showForm && (
-                    <ApiBuilderForm
-                         initialData={editingEndpoint || undefined}
-                         onSubmit={handleFormSubmit}
-                         onCancel={handleFormCancel}
-                    />
+                    <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
+                         <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">{editingEndpoint ? 'Edit Endpoint' : 'Create New Endpoint'}</h3>
+                         <ApiBuilderForm
+                              initialData={editingEndpoint || undefined}
+                              onSubmit={handleFormSubmit}
+                              onCancel={handleFormCancel}
+                         />
+                    </div>
                )}
-               <ApiBuilderTable
-                    endpoints={endpoints}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    isLoading={loading}
-                    onViewDocs={(endpoint) => {
-                         setDocsEndpoint(endpoint);
-                         setShowDocs(true);
-                    }}
-               />
+
+               <div className="border border-white/10 rounded-none overflow-hidden">
+                    <ApiBuilderTable
+                         endpoints={endpoints}
+                         onEdit={handleEdit}
+                         onDelete={handleDelete}
+                         isLoading={loading}
+                         onViewDocs={(endpoint) => {
+                              setDocsEndpoint(endpoint);
+                              setShowDocs(true);
+                         }}
+                    />
+               </div>
+
+               {/* Sharp Modal for Docs */}
                {showDocs && docsEndpoint && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                         <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
-                              <h2 className="text-xl font-bold mb-4 text-white">API Documentation</h2>
-                              <p><strong className="text-gray-300">Endpoint:</strong> <span className="text-blue-400">/api/{docsEndpoint.slug}</span></p>
-                              <p><strong className="text-gray-300">Method:</strong> <span className="text-green-400">{docsEndpoint.method}</span></p>
-                              <p><strong className="text-gray-300">Fields:</strong></p>
-                              <ul className="list-disc pl-6 text-gray-300">
-                                   {docsEndpoint.fields.map(field => (
-                                        <li key={field.fieldName}>
-                                             <strong>{field.fieldName}</strong> ({field.type}) {field.required ? "(required)" : "(optional)"}
-                                        </li>
-                                   ))}
-                              </ul>
-                              <div className="mt-4 flex justify-end">
-                                   <Button onClick={() => setShowDocs(false)} variant="secondary">Close</Button>
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                         <div className="bg-black border border-white/20 shadow-2xl max-w-lg w-full rounded-none">
+                              <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                                   <h2 className="text-xl font-bold text-white uppercase tracking-tight">API Documentation</h2>
+                                   <div className="badge badge-accent rounded-none uppercase text-xs font-bold">{docsEndpoint.method}</div>
+                              </div>
+
+                              <div className="p-6 space-y-4 font-mono text-sm">
+                                   <div>
+                                        <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">Endpoint URL</p>
+                                        <div className="bg-zinc-900 p-3 border border-zinc-800 text-blue-400">/api/{docsEndpoint.slug}</div>
+                                   </div>
+
+                                   <div>
+                                        <p className="text-zinc-500 text-xs uppercase tracking-widest mb-1">Expected Fields</p>
+                                        <ul className="space-y-2">
+                                             {docsEndpoint.fields.map(field => (
+                                                  <li key={field.fieldName} className="flex items-center gap-2 border-b border-zinc-800 pb-2 last:border-0 last:pb-0">
+                                                       <span className="text-white font-bold">{field.fieldName}</span>
+                                                       <span className="text-zinc-500">({field.type})</span>
+                                                       {field.required && <span className="text-red-500 text-[10px] uppercase border border-red-500/50 px-1">Required</span>}
+                                                  </li>
+                                             ))}
+                                        </ul>
+                                   </div>
+                              </div>
+
+                              <div className="p-4 bg-zinc-900 border-t border-white/10 flex justify-end">
+                                   <Button onClick={() => setShowDocs(false)} variant="primary" size="sm">Close Documentation</Button>
                               </div>
                          </div>
                     </div>

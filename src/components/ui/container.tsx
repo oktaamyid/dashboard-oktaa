@@ -11,7 +11,7 @@ interface DivContainerProps {
 export default function DivContainer({
      children,
      className = "",
-     hoverEffect = true,
+     hoverEffect = false, // Default false for sharp look
      icon: Icon,
      iconPosition = "bottom-right"
 }: DivContainerProps) {
@@ -19,39 +19,40 @@ export default function DivContainer({
      const getIconPositionClasses = () => {
           switch (iconPosition) {
                case "top-left":
-                    return "left-2 top-2 origin-top-left";
+                    return "left-0 top-0 origin-top-left";
                case "top-right":
-                    return "right-2 top-2 origin-top-right";
+                    return "right-0 top-0 origin-top-right";
                case "bottom-left":
-                    return "left-2 bottom-2 origin-bottom-left";
+                    return "left-0 bottom-0 origin-bottom-left";
                default: // bottom-right
-                    return "right-2 bottom-2 origin-bottom-right";
+                    return "right-0 bottom-0 origin-bottom-right";
           }
      };
 
      return (
           <div
                className={`
-        bg-gray-700 
-        rounded-lg 
-        shadow-lg 
-        ${hoverEffect ? "hover:bg-gray-600 transition-all duration-300" : ""}
-        relative 
-        overflow-hidden 
-        ${className}
-      `}
+               bg-black 
+               border border-white/10 
+               rounded-none
+               relative 
+               overflow-hidden 
+               ${hoverEffect ? "hover:border-white transition-colors duration-300" : ""}
+               ${className}
+          `}
           >
                {/* Background Icon (if provided) */}
                {Icon && (
                     <div
                          className={`
-            absolute 
-            ${getIconPositionClasses()} 
-            opacity-10 
-            ${hoverEffect ? "group-hover:opacity-20 transition-all duration-500 group-hover:scale-125" : ""}
-          `}
+                    absolute 
+                    ${getIconPositionClasses()} 
+                    opacity-[0.03] 
+                    pointer-events-none
+                    ${hoverEffect ? "group-hover:opacity-[0.05] transition-opacity duration-500" : ""}
+               `}
                     >
-                         <Icon className="h-16 w-16 text-white" />
+                         <Icon className="h-32 w-32 text-white" />
                     </div>
                )}
 

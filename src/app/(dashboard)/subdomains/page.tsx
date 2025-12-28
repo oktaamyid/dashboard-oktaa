@@ -16,7 +16,7 @@ export default function SubdomainsPage() {
                     setLoading(true);
                     const subdomains = await getSubdomains();
                     setData(subdomains);
-                    
+
                } catch (error) {
                     console.error("Error fetching subdomains:", error);
                } finally {
@@ -28,14 +28,22 @@ export default function SubdomainsPage() {
      }, []);
 
      return (
-          <div>
-               <h1 className="text-2xl font-bold mb-6">Subdomains</h1>
-               <Table
-                    data={data}
-                    columns={["name", "type", "content"]}
-                    isLoading={loading}
-                    renderCell={(column, row) => row[column as keyof Subdomain]}
-               />
+          <div className="space-y-6">
+               <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Subdomains</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Manage Domain Routing</p>
+                    </div>
+               </div>
+
+               <div className="border border-white/10 rounded-none overflow-hidden">
+                    <Table
+                         data={data}
+                         columns={["name", "type", "content"]}
+                         isLoading={loading}
+                         renderCell={(column, row) => row[column as keyof Subdomain]}
+                    />
+               </div>
           </div>
      );
 }

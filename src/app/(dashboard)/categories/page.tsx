@@ -110,32 +110,39 @@ export default function CategoriesPage() {
      };
 
      return (
-          <div>
-               <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-white mb-6">Categories</h1>
-                    <div className="flex space-x-2">
-                         {!isFormVisible && (
-                              <Button
-                                   onClick={() => setFormVisible(true)}
-                                   className="flex items-center"
-                                   variant="primary"
-                              >
-                                   Merge Category
-                              </Button>
-                         )}
+          <div className="space-y-6">
+               <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Categories</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Organize Content</p>
                     </div>
+                    {!isFormVisible && (
+                         <Button
+                              onClick={() => setFormVisible(true)}
+                              className="flex items-center"
+                              variant="primary"
+                              size="sm"
+                         >
+                              Merge Category
+                         </Button>
+                    )}
                </div>
+
                {isFormVisible && (
-                    <CategoryMergeForm categories={categories} onMerge={handleMergeCategories} onCancel={() => setFormVisible(false)} />
+                    <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
+                         <CategoryMergeForm categories={categories} onMerge={handleMergeCategories} onCancel={() => setFormVisible(false)} />
+                    </div>
                )}
-               
-               <CategoryTable
-                    categories={categories}
-                    sortSettings={sortSettings}
-                    onSortChange={handleSaveSort}
-                    setSortSettings={setSortSettings}
-                    isLoading={loading}
-               />
+
+               <div className="border border-white/10 rounded-none overflow-hidden">
+                    <CategoryTable
+                         categories={categories}
+                         sortSettings={sortSettings}
+                         onSortChange={handleSaveSort}
+                         setSortSettings={setSortSettings}
+                         isLoading={loading}
+                    />
+               </div>
           </div>
      );
 }

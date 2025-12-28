@@ -59,10 +59,6 @@ export async function POST(request: Request) {
      }
 }
 
-export const config = {
-     api: {
-          bodyParser: {
-               sizeLimit: '10mb',
-          },
-     },
-};
+// Config removed as it is deprecated in App Router and not applicable for Route Handlers in the same way.
+// The runtime setting is default 'nodejs', and body parser config is not supported here.
+;

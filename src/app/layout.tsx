@@ -4,16 +4,18 @@ import { Metadata } from 'next';
 import { ToastProvider } from "@/components/ui/toast";
 import { ASSETS } from "@/lib/assets";
 
-const raleway = Raleway({
+const raleway =  ({
      subsets: ['latin'],
      weight: ['400', '700'],
      variable: '--font-raleway',
 });
 
+const description = "oktaamyid dashboard";
+
 export const metadata: Metadata = {
      title: "oktaamyid~ | Dashboard",
      metadataBase: new URL("https://oktaa.my.id"),
-     description: "oktaamyid~ lets you unleash your digital identity with a sleek platform to manage content, projects, and more. Crafted by Firtiansyah Okta Resama for creators and innovators.",
+     description: description,
      icons: {
           icon: ASSETS.ICON,
           apple: ASSETS.APPLE
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
           type: "website",
           url: "https://oktaa.my.id",
           title: "oktaamyid~ | Dashboard",
-          description: "oktaamyid~ lets you unleash your digital identity with a sleek platform to manage content, projects, and more. Crafted by Firtiansyah Okta Resama for creators and innovators.",
+          description: description,
           images: [
                {
                     url: ASSETS.OG_BANNER,
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
           card: "summary_large_image",
           site: "@oktaa",
           title: "oktaamyid~ | Dashboard",
-          description: "oktaamyid~ lets you unleash your digital identity with a sleek platform to manage content, projects, and more. Crafted by Firtiansyah Okta Resama for creators and innovators.",
+          description: description,
           images: [ASSETS.OG_BANNER],
      },
      other: {

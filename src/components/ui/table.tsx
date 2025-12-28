@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from '@/components/ui/select';
 import Button from '@/components/ui/button';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 interface TableProps<T> {
      data: T[];
@@ -26,12 +27,12 @@ export default function Table<T extends { id: string }>({
      const [currentPage, setCurrentPage] = useState(1);
      const [itemsPerPage, setItemsPerPage] = useState(10);
 
-     // Reset currentPage to 1 when data changes (e.g., after filtering)
+     // Reset currentPage when data changes
      useEffect(() => {
           setCurrentPage(1);
      }, [data]);
 
-     // Adjust currentPage when itemsPerPage or totalItems changes
+     // Adjust logic
      useEffect(() => {
           const totalItems = data.length;
           const newTotalPages = Math.ceil(totalItems / itemsPerPage);
@@ -40,75 +41,71 @@ export default function Table<T extends { id: string }>({
           }
      }, [itemsPerPage, data.length, currentPage]);
 
-     // Calculate pagination
      const totalItems = data.length;
-     const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage)); // Ensure at least 1 page
+     const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
      const startIndex = (currentPage - 1) * itemsPerPage;
      const endIndex = startIndex + itemsPerPage;
      const paginatedData = data.slice(startIndex, endIndex);
 
-     // Handle page change
      const handlePageChange = (page: number) => {
           if (page >= 1 && page <= totalPages) {
                setCurrentPage(page);
           }
      };
 
-     // Handle items per page change
      const handleItemsPerPageChange = (value: string) => {
-          const newItemsPerPage = parseInt(value);
-          setItemsPerPage(newItemsPerPage);
-          setCurrentPage(1); // Reset to first page for consistent UX
+          setItemsPerPage(parseInt(value));
+          setCurrentPage(1);
      };
 
      return (
-          <div className="mt-6">
-               <div className="min-h-full overflow-y-auto overflow-x-auto border border-gray-600 rounded-lg">
-                    <table className="min-w-full w-full bg-gray-700 rounded-lg shadow-lg">
-                         <thead className="sticky top-0 z-10 bg-gray-600">
-                              <tr>
+          <div className="mt-6 flex flex-col gap-4">
+               {/* Wrapper Table */}
+               <div className="overflow-x-auto border border-white/10 bg-black shadow-2xl">
+                    <table className="table w-full rounded-none">
+                         {/* Header */}
+                         <thead>
+                              <tr className="border-b border-white/20">
                                    {columns.map((column) => (
                                         <th
                                              key={column}
-                                             className="px-4 py-3 border-b-2 border-gray-500 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider whitespace-nowrap"
+                                             className="rounded-none bg-black text-white text-[10px] uppercase font-bold tracking-[0.15em] px-6 py-4 h-12"
                                         >
                                              {columnLabels?.[column] || column}
                                         </th>
                                    ))}
                               </tr>
                          </thead>
+
+                         {/* Body */}
                          <tbody>
                               {isLoading ? (
+                                   // Loading Skeleton
                                    Array.from({ length: 5 }).map((_, index) => (
-                                        <React.Fragment key={index}>
-                                             <tr className="animate-pulse">
-                                                  {columns.map((column) => (
-                                                       <td key={column} className="px-4 py-4 border-b border-gray-500">
-                                                            <div className="h-4 bg-gray-500 rounded w-full"></div>
-                                                       </td>
-                                                  ))}
-                                             </tr>
-                                             <tr>
-                                                  <td colSpan={columns.length} className="px-4 py-4 border-b border-gray-500">
-                                                       <div className="h-16 bg-gray-500 rounded animate-pulse"></div>
+                                        <tr key={index} className="border-b border-white/5 animate-pulse">
+                                             {columns.map((column) => (
+                                                  <td key={column} className="px-6 py-4">
+                                                       <div className="h-4 bg-white/10 w-3/4 mx-auto rounded-none"></div>
                                                   </td>
-                                             </tr>
-                                        </React.Fragment>
+                                             ))}
+                                        </tr>
                                    ))
                               ) : paginatedData.length === 0 ? (
+                                   // Empty State
                                    <tr>
-                                        <td colSpan={columns.length} className="px-4 py-4 text-center text-gray-300">
-                                             No data available
+                                        <td colSpan={columns.length} className="text-center py-12 text-zinc-500 uppercase tracking-widest text-xs">
+                                             No data found
                                         </td>
                                    </tr>
                               ) : (
+                                   // Data Rows
                                    paginatedData.map((row) => (
                                         <React.Fragment key={row.id}>
-                                             <tr className="border-b border-gray-500 hover:bg-gray-600 transition-all duration-300">
+                                             <tr className="border-b border-white/5 hover:bg-white/5 transition-colors duration-200 group">
                                                   {columns.map((column) => (
                                                        <td
                                                             key={column}
-                                                            className="px-4 py-4 text-sm text-gray-300 whitespace-nowrap overflow-hidden text-ellipsis max-w-xs"
+                                                            className="text-zinc-400 group-hover:text-zinc-200 text-xs px-6 py-4 font-mono tracking-wide max-w-xs truncate"
                                                        >
                                                             {renderCell
                                                                  ? renderCell(column, row)
@@ -116,9 +113,10 @@ export default function Table<T extends { id: string }>({
                                                        </td>
                                                   ))}
                                              </tr>
+                                             {/* Expanded Row */}
                                              {expandedRowId === row.id && renderExpandedRow && (
                                                   <tr>
-                                                       <td colSpan={columns.length} className="px-4 py-2 bg-gray-600">
+                                                       <td colSpan={columns.length} className="bg-zinc-900 border-b border-white/10 p-0">
                                                             {renderExpandedRow(row)}
                                                        </td>
                                                   </tr>
@@ -132,58 +130,45 @@ export default function Table<T extends { id: string }>({
 
                {/* Pagination Controls */}
                {!isLoading && totalItems > 0 && (
-                    <div className="mt-4 flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 rounded-lg border border-gray-600">
-                         <div className="flex items-center mb-2 sm:mb-0">
-                              <span className="text-sm text-gray-300 mr-2">Items per page:</span>
-                              <Select
+                    <div className="flex flex-col sm:flex-row items-center justify-between p-4 border border-white/10 bg-black gap-4">
+
+                         {/* Items Per Page */}
+                         <div className="flex items-center gap-3">
+                              <span className="text-[10px] uppercase tracking-widest text-zinc-500">Rows per page:</span>
+                              <select
+                                   className="select select-sm select-bordered w-20 rounded-none bg-black text-white text-xs border-white/20 focus:border-white focus:outline-none"
                                    value={itemsPerPage.toString()}
                                    onChange={(e) => handleItemsPerPageChange(e.target.value)}
-                                   options={[
-                                        { value: '5', label: '5' },
-                                        { value: '10', label: '10' },
-                                        { value: '25', label: '25' },
-                                        { value: '50', label: '50' },
-                                   ]}
-                                   className="bg-gray-700 text-gray-300 border border-gray-600 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
+                              >
+                                   <option value="5">5</option>
+                                   <option value="10">10</option>
+                                   <option value="25">25</option>
+                                   <option value="50">50</option>
+                              </select>
                          </div>
 
-                         <div className="flex items-center space-x-2">
-                              <Button
+                         {/* Actions */}
+                         <div className="join rounded-none border border-white/10">
+                              <button
+                                   className="join-item btn btn-sm btn-ghost rounded-none text-white disabled:bg-transparent disabled:text-zinc-700"
                                    onClick={() => handlePageChange(currentPage - 1)}
                                    disabled={currentPage === 1}
-                                   className={`px-3 py-1 text-sm ${currentPage === 1
-                                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                        }`}
                               >
-                                   Previous
-                              </Button>
+                                   <ChevronLeftIcon className="h-4 w-4" />
+                              </button>
 
-                              {/* Page Numbers */}
-                              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                                   <Button
-                                        key={page}
-                                        onClick={() => handlePageChange(page)}
-                                        className={`px-3 py-1 text-sm ${currentPage === page
-                                             ? 'bg-blue-600 text-white'
-                                             : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                             }`}
-                                   >
-                                        {page}
-                                   </Button>
-                              ))}
+                              {/* Page Info */}
+                              <button className="join-item btn btn-sm btn-ghost rounded-none text-xs font-mono no-animation cursor-default hover:bg-transparent text-zinc-400">
+                                   Page <span className="text-white mx-1">{currentPage}</span> of {totalPages}
+                              </button>
 
-                              <Button
+                              <button
+                                   className="join-item btn btn-sm btn-ghost rounded-none text-white disabled:bg-transparent disabled:text-zinc-700"
                                    onClick={() => handlePageChange(currentPage + 1)}
                                    disabled={currentPage === totalPages}
-                                   className={`px-3 py-1 text-sm ${currentPage === totalPages
-                                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                        }`}
                               >
-                                   Next
-                              </Button>
+                                   <ChevronRightIcon className="h-4 w-4" />
+                              </button>
                          </div>
                     </div>
                )}

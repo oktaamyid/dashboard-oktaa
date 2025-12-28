@@ -10,24 +10,19 @@ export default function Card({
      className?: string
 }) {
      return (
-          <div className={`group bg-gray-700 p-4 sm:p-6 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300 flex items-center space-x-4 relative overflow-hidden ${className}`}>
-               {/* Background Icon with hover effect */}
-               {Icon && (
-                    <div className="absolute -right-2 -bottom-2 opacity-10 group-hover:opacity-20 transition-all duration-500 group-hover:scale-125 transform origin-bottom-right">
-                         <Icon className="h-16 w-16 text-white" />
+          <div className={`stats shadow bg-black border border-white/10 rounded-none overflow-hidden ${className}`}>
+               <div className="stat px-6 py-6 group hover:bg-white/5 transition-colors duration-300">
+                    <div className="stat-figure text-secondary">
+                         {Icon && (
+                              <div className="w-12 h-12 flex items-center justify-center border border-white/10 bg-black text-white group-hover:bg-white group-hover:text-black transition-all duration-300">
+                                   <Icon className="h-6 w-6" />
+                              </div>
+                         )}
                     </div>
-               )}
-
-               {/* Icon in Foreground */}
-               {Icon && (
-                    <div className="bg-gray-600 p-3 rounded-full z-10">
-                         <Icon className="h-6 w-6 text-white" />
-                    </div>
-               )}
-
-               <div className="z-10">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-300">{title}</h3>
-                    <p className="text-xl sm:text-2xl font-bold mt-1 text-white">{value}</p>
+                    <div className="stat-title text-zinc-500 font-bold uppercase tracking-widest text-xs mb-1">{title}</div>
+                    <div className="stat-value text-white font-black text-4xl tracking-tight font-outfit">{value}</div>
+                    {/* Optional: Add minimal desc or trend if needed later */}
+                    {/* <div className="stat-desc text-zinc-600 text-xs mt-2">↗ 20% more than last month</div> */}
                </div>
           </div>
      );

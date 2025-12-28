@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
+import FormWrapper from "@/components/ui/form-wrapper";
 import { useToast } from "@/components/ui/toast";
 
 interface Category {
@@ -31,6 +32,11 @@ export default function CategoryMergeForm({ categories, onMerge, onCancel }: Pro
                return;
           }
 
+          if (mergeFrom === mergeTo) {
+               showError("Source and Target categories cannot be the same");
+               return;
+          }
+
           try {
                setIsSubmitting(true);
                await onMerge(mergeFrom, mergeTo);
@@ -46,11 +52,12 @@ export default function CategoryMergeForm({ categories, onMerge, onCancel }: Pro
      };
 
      return (
-          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-               <h2 className="text-xl font-semibold text-white mb-6">Merge Categories</h2>
-
-               <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormWrapper
+               title="Merge Categories"
+               description="Consolidate duplicate categories into a single entity"
+          >
+               <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                          <Select
                               label="Source Category"
                               value={mergeFrom}
@@ -65,15 +72,15 @@ export default function CategoryMergeForm({ categories, onMerge, onCancel }: Pro
                          />
                     </div>
 
-                    <div className="flex space-x-4">
-                         <Button type="submit" disabled={isSubmitting || !mergeFrom || !mergeTo}>
-                              {isSubmitting ? "Merging..." : "Merge"}
-                         </Button>
-                         <Button type="button" variant="danger" onClick={onCancel}>
+                    <div className="flex justify-end gap-4 pt-4 border-t border-white/10">
+                         <Button type="button" variant="secondary" onClick={onCancel}>
                               Cancel
+                         </Button>
+                         <Button type="submit" disabled={isSubmitting || !mergeFrom || !mergeTo} variant="primary">
+                              {isSubmitting ? "Merging..." : "Merge"}
                          </Button>
                     </div>
                </form>
-          </div>
+          </FormWrapper>
      );
 }

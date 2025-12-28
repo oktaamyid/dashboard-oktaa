@@ -66,120 +66,112 @@ export default function ShortUrlPage(props: { params: Promise<{ shortUrl?: strin
 
      if (loading) {
           return (
-               <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 px-4">
-                    {/* Brand Icon & Header Skeleton */}
-                    <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 text-center sm:text-left">
-                         <Skeleton circle width={75} height={75} />
-                         <Skeleton width={200} height={24} />
+               <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4 relative overflow-hidden">
+                    {/* Background Decoration */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] pointer-events-none" />
+
+                    <div className="flex flex-col sm:flex-row items-center mb-10 gap-6 relative z-10">
+                         <Skeleton circle width={80} height={80} baseColor="#27272a" highlightColor="#3f3f46" />
                     </div>
 
-                    {/* URL Box Skeleton */}
-                    <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-[90%] sm:max-w-md">
-                         <div className="text-center">
-                              <Skeleton width={100} height={16} containerClassName="mx-auto" />
-                              <Skeleton width="80%" height={24} containerClassName="mx-auto mt-2" />
+                    <div className="bg-black border border-white/10 p-8 w-full max-w-[90%] sm:max-w-md relative z-10">
+                         <div className="text-center space-y-4">
+                              <Skeleton width={120} height={16} baseColor="#27272a" highlightColor="#3f3f46" containerClassName="mx-auto" />
+                              <Skeleton width="90%" height={24} baseColor="#27272a" highlightColor="#3f3f46" containerClassName="mx-auto" />
                          </div>
-
-                         {/* Custom Message Skeleton */}
-                         <div className="mt-4 bg-gray-200 p-3 rounded-lg">
-                              <Skeleton width={160} height={16} />
-                              <Skeleton width="100%" height={16} containerClassName="mt-2" />
-                         </div>
-
-                         <div className="mt-4">
-                              <Skeleton width={140} height={16} containerClassName="mx-auto" />
-                              <Skeleton width="100%" height={40} containerClassName="mt-1" />
-                         </div>
-
-                         <div className="mt-4">
-                              <Skeleton width="90%" height={32} containerClassName="mx-auto" />
-                         </div>
-
-                         {/* Buttons Skeleton */}
-                         <div className="flex flex-col sm:flex-row justify-between mt-4 gap-2 sm:gap-4">
-                              <Skeleton width={120} height={40} containerClassName="w-full sm:w-auto" />
-                              <Skeleton width={120} height={40} containerClassName="w-full sm:w-auto" />
+                         <div className="mt-8">
+                              <Skeleton width="100%" height={48} baseColor="#27272a" highlightColor="#3f3f46" />
                          </div>
                     </div>
-
-
                </div>
           );
      }
 
      if (error) {
-          return console.log(error);
-     }
-
-     if (showConfirmationPage) {
-          console.log("success");
+          return null; // or redirecting...
      }
 
      return (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 px-4">
-               {/* Brand Icon & Header */}
-               <div className="flex">
-                    <Image
-                         src={ASSETS.LOGO_TEXT_LIGHT}
-                         alt="Brand Logo"
-                         width={150}
-                         height={150}
-                    />
-               </div>
+          <div className="flex flex-col items-center justify-center min-h-screen bg-black px-4 relative overflow-hidden font-sans">
+               {/* Background Decoration */}
+               <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] pointer-events-none" />
 
-               {/* URL Box */}
-               <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-[90%] sm:max-w-md text-center">
-                    <p className="text-gray-500 text-sm">Short URL accessed:</p>
-                    <p className="text-blue-600 font-medium text-lg wrap-break-word">{window.location.origin}/{params.shortUrl}</p>
-
-                    {/* Custom Message Display */}
-                    {customMessage && (
-                         <div className="mt-4 bg-gray-200 p-3 rounded-lg text-gray-700 text-sm sm:text-base">
-                              <p className="font-medium">Message from the creator:</p>
-                              <p className="italic">{customMessage}</p>
-                         </div>
-                    )}
-
-                    <div className="mt-4">
-                         <label className="block text-sm font-medium text-gray-700">You will be redirected to:</label>
-                         <input
-                              type="text"
-                              value={originalUrl || ""}
-                              readOnly
-                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 text-gray-700 text-center text-sm sm:text-base"
+               <div className="w-full max-w-md z-10 flex flex-col items-center">
+                    {/* Brand Icon */}
+                    <div className="mb-10 w-24 h-24 bg-black flex items-center justify-center">
+                         <Image
+                              src={ASSETS.LOGO_LIGHT}
+                              alt="Brand Logo"
+                              width={40}
+                              height={40}
+                              className="object-contain"
                          />
                     </div>
-                    <div className="mt-4">
-                         <p className="text-sm text-gray-500">By clicking &apos;Continue&apos;, you acknowledge that you&apos;ll be redirected to an external website. Please ensure you trust this destination.</p>
+
+                    {/* Content Card */}
+                    <div className="bg-black border border-white/10 p-8 w-full backdrop-blur-sm">
+                         <div className="text-center space-y-2 mb-8">
+                              <p className="text-zinc-500 text-xs uppercase tracking-[0.2em] font-bold">Secure Link Verification</p>
+                              <p className="text-white font-black text-2xl tracking-tight break-all">
+                                   oktaa.my.id/<span className="text-zinc-400">{params.shortUrl}</span>
+                              </p>
+                         </div>
+
+                         {/* Custom Message */}
+                         {customMessage && (
+                              <div className="mb-8 p-6 bg-zinc-900/50 border border-white/5 text-center">
+                                   <p className="text-zinc-500 text-xs uppercase tracking-widest mb-3 font-bold">Message from creator</p>
+                                   <p className="text-zinc-300 text-base italic font-serif">"{customMessage}"</p>
+                              </div>
+                         )}
+
+                         <div className="space-y-6">
+                              <div>
+                                   <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Destination URL</label>
+                                   <div className="relative group">
+                                        <input
+                                             type="text"
+                                             value={originalUrl || ""}
+                                             readOnly
+                                             className="block w-full bg-black border border-white/20 text-white text-base p-4 focus:outline-none focus:border-white transition-colors text-center font-mono placeholder-zinc-700"
+                                        />
+                                   </div>
+                              </div>
+
+                              <div className="pt-2">
+                                   <p className="text-xs text-zinc-600 text-center leading-relaxed">
+                                        By clicking 'Continue', you acknowledge that you will be redirected to an external website.
+                                   </p>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4 mt-8">
+                                   <button
+                                        onClick={handleBack}
+                                        className="w-full py-4 text-xs font-bold uppercase tracking-[0.2em] bg-transparent border border-white/20 text-white hover:bg-white/5 transition-all duration-300"
+                                   >
+                                        Cancel
+                                   </button>
+                                   <button
+                                        onClick={handleContinue}
+                                        className="w-full py-4 text-xs font-bold uppercase tracking-[0.2em] bg-white text-black border border-white hover:bg-zinc-200 transition-all duration-300"
+                                   >
+                                        Continue
+                                   </button>
+                              </div>
+                         </div>
                     </div>
 
-                    {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row justify-between mt-4 gap-2 sm:gap-4">
-                         <button
-                              onClick={handleBack}
-                              className="w-full sm:w-auto px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-                         >
-                              Back
-                         </button>
-                         <button
-                              onClick={handleContinue}
-                              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                         >
-                              Continue
-                         </button>
-                    </div>
-               </div>
-
-               {/* Ads Section */}
-               <div className="mt-6 w-full max-w-[90%] sm:max-w-md">
-                    <p className="text-sm text-gray-500 text-center">Advertisement</p>
-                    <div className="w-full h-24 flex items-center justify-center">
-                         <ins className="adsbygoogle"
-                              style={{ display: "block" }}
-                              data-ad-client="ca-pub-8320640493505504"
-                              data-ad-slot="9039091075"
-                              data-ad-format="auto"
-                              data-full-width-responsive="true"></ins>
+                    {/* Ads Section */}
+                    <div className="mt-8 w-full">
+                         <p className="text-xs text-zinc-700 text-center uppercase tracking-widest mb-4">Sponsored</p>
+                         <div className="w-full flex items-center justify-center min-h-25 border border-white/5 bg-zinc-900/20">
+                              <ins className="adsbygoogle"
+                                   style={{ display: "block" }}
+                                   data-ad-client="ca-pub-8320640493505504"
+                                   data-ad-slot="9039091075"
+                                   data-ad-format="auto"
+                                   data-full-width-responsive="true"></ins>
+                         </div>
                     </div>
                </div>
           </div>

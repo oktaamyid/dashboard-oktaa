@@ -147,28 +147,28 @@ export default function CategorySelect({
                )}
                <div className="relative">
                     <select
-                         className={`bg-gray-700 text-gray-300 p-2 pr-8 rounded-lg border ${error ? "border-red-500" : "border-gray-500"
-                              } shadow-md focus:ring-2 focus:ring-gray-400 focus:outline-none transition-all duration-300 w-full ${disabled ? "opacity-50 cursor-not-allowed" : ""
-                              } ${className}`}
+                         className={`bg-black text-white px-4 py-3 pr-8 rounded-none border ${error ? "border-red-500" : "border-white/20"
+                              } shadow-sm focus:border-white focus:ring-0 focus:outline-none transition-all duration-300 w-full ${disabled ? "opacity-50 cursor-not-allowed" : ""
+                              } ${className} appearance-none`}
                          value={value}
                          onChange={handleSelectChange}
                          disabled={loading || disabled}
                     >
-                         <option value="" className="bg-gray-800">
+                         <option value="" className="bg-black text-zinc-500">
                               {loading ? "Loading categories..." : placeholder}
                          </option>
                          {categories.map((category) => (
                               <option
                                    key={category}
                                    value={category}
-                                   className="bg-gray-800 hover:bg-gray-600"
+                                   className="bg-black text-white hover:bg-zinc-900"
                               >
                                    {category}
                               </option>
                          ))}
                          <option
                               value="__ADD_NEW__"
-                              className="bg-gray-800 border-t border-gray-600 font-semibold text-blue-400"
+                              className="bg-zinc-900 border-t border-white/10 font-bold text-blue-400"
                          >
                               + Add New Category
                          </option>

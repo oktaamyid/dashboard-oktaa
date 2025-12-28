@@ -1,220 +1,204 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile } from "@/app/types";
-import { updateProfile } from "@/lib/service";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import ImageUploader from "@/components/ui/imageUpload";
+import FormWrapper from "@/components/ui/form-wrapper";
 import { useToast } from "@/components/ui/toast";
+import { uploadImage, deleteImage } from "@/lib/service";
+import { profileSchema, ProfileFormData } from "@/lib/schemas";
+import { useState } from "react";
 
 interface ProfileFormProps {
-     initialData: Profile;
-     onCancel?: () => void;
+     initialData?: Profile;
+     onSubmit: (data: Profile) => Promise<void>;
+     onCancel: () => void;
 }
 
-export default function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
+export default function ProfileForm({ initialData, onSubmit, onCancel }: ProfileFormProps) {
      const { showSuccess, showError } = useToast();
-     const [formData, setFormData] = useState<Profile>(initialData);
-     const [isSubmitting, setIsSubmitting] = useState(false);
-     const [previewImage, setPreviewImage] = useState<string | null>(null);
-     const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-     useEffect(() => {
-          setFormData(initialData);
-          if (initialData.profilePicture) {
-               setPreviewImage(initialData.profilePicture);
-          }
-     }, [initialData]);
+     const {
+          register,
+          handleSubmit,
+          setValue,
+          watch,
+          formState: { errors, isSubmitting },
+     } = useForm<ProfileFormData>({
+          resolver: zodResolver(profileSchema),
+          defaultValues: {
+               fullName: initialData?.name || "",
+               username: initialData?.username || "",
+               email: initialData?.socialMedia?.mail || "",
+               bio: initialData?.bio || "",
+               avatarUrl: initialData?.profilePicture || "",
+               website: initialData?.website || "",
+               instagram: initialData?.socialMedia?.instagram || "",
+               linkedin: initialData?.socialMedia?.linkedin || "",
+               spotify: initialData?.socialMedia?.spotify || "",
+               github: initialData?.socialMedia?.github || "",
+               tiktok: initialData?.socialMedia?.tiktok || "",
+          },
+     });
 
-     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-          const { name, value } = e.target;
+     const avatarUrl = watch("avatarUrl");
 
-          if (name.startsWith("socialMedia.")) {
-               const field = name.split(".")[1];
-               setFormData((prev) => ({
-                    ...prev,
-                    socialMedia: {
-                         ...prev.socialMedia,
-                         [field]: value,
-                    },
-               }));
-          } else {
-               setFormData((prev) => ({
-                    ...prev,
-                    [name]: value,
-               }));
-          }
-     };
-
-     const handleFileChange = (file: File) => {
-          if (!file.type.startsWith("image/")) {
-               showError("Please upload an image file");
-               return;
-          }
-
-          if (file.size > 5 * 1024 * 1024) {
-               showError("File size is too large (maximum 5MB)");
-               return;
-          }
-
-          const reader = new FileReader();
-          reader.onload = () => {
-               const base64 = reader.result as string;
-               setPreviewImage(base64);
-               setFormData((prev) => ({
-                    ...prev,
-                    profilePicture: base64,
-               }));
-          };
-          reader.readAsDataURL(file);
-     };
-
-     const handleRemoveImage = () => {
-          setPreviewImage(null);
-          setFormData((prev) => ({
-               ...prev,
-               profilePicture: "",
-          }));
-     };
-
-     const handleSubmit = async (e: React.FormEvent) => {
-          e.preventDefault();
-          setIsSubmitting(true);
-          setUploadProgress(0);
-
+     const onFormSubmit = async (data: ProfileFormData) => {
           try {
-               // Start upload progress animation
-               const progressInterval = setInterval(() => {
-                    setUploadProgress((prev) => {
-                         if (prev >= 95) {
-                              clearInterval(progressInterval);
-                              return 95;
-                         }
-                         return prev + 5;
-                    });
-               }, 100);
+               // Map form data back to Profile structure
+               const profileData: Profile = {
+                    ...initialData,
+                    // Preserve existing fields
+                    id: initialData?.id || "",
+                    // Update modified fields
+                    name: data.fullName,
+                    username: data.username,
+                    bio: data.bio,
+                    profilePicture: data.avatarUrl,
+                    website: data.website,
+                    socialMedia: {
+                         ...initialData?.socialMedia,
+                         mail: data.email,
+                         instagram: data.instagram,
+                         linkedin: data.linkedin,
+                         spotify: data.spotify,
+                         github: data.github,
+                         tiktok: data.tiktok,
+                    }
+               };
 
-               await updateProfile(formData);
-
-               // Complete progress
-               clearInterval(progressInterval);
-               setUploadProgress(100);
-
+               await onSubmit(profileData);
                showSuccess("Profile updated successfully");
           } catch (error) {
-               showError("Failed to update profile");
                console.error(error);
-          } finally {
-               setIsSubmitting(false);
+               showError("Failed to save profile");
+          }
+     };
+
+     const handleImageUpload = async (file: File) => {
+          try {
+               const { url } = await uploadImage(file);
+               setValue("avatarUrl", url, { shouldValidate: true });
+               showSuccess("Avatar uploaded");
+          } catch (e) {
+               showError("Failed to upload avatar");
+          }
+     };
+
+     const handleImageRemove = async () => {
+          const currentUrl = avatarUrl;
+          if (currentUrl) {
+               // Optimistically update UI
+               setValue("avatarUrl", "", { shouldValidate: true });
+               try {
+                    await deleteImage(currentUrl);
+                    showSuccess("Avatar removed");
+               } catch (error) {
+                    console.error(error);
+                    // Optionally revert if delete fails
+               }
           }
      };
 
      return (
-          <div className="bg-gray-800 p-6 rounded-lg shadow-md mx-auto">
-               <h2 className="text-xl font-semibold text-white mb-6">Edit Profile</h2>
-
-               <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <div>
-                              <Input
-                                   label="Nama Lengkap"
-                                   name="name"
-                                   required
-                                   value={formData.name}
-                                   onChange={handleChange}
-                              />
-
-                              <Input
-                                   label="Username"
-                                   name="username"
-                                   required
-                                   value={formData.username}
-                                   onChange={handleChange}
-                              />
-                         </div>
-
-                         <div>
+          <FormWrapper
+               title="Edit Configuration"
+               description="Update your personal profile information"
+          >
+               <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+                    <div className="flex flex-col md:flex-row gap-8">
+                         <div className="w-full md:w-1/3 flex flex-col items-center">
                               <ImageUploader
-                                   previewImage={previewImage}
-                                   onFileChange={handleFileChange}
-                                   onRemoveImage={handleRemoveImage}
+                                   previewImage={avatarUrl || null}
+                                   onFileChange={handleImageUpload}
+                                   onRemoveImage={handleImageRemove}
                               />
-                              {isSubmitting && previewImage && previewImage !== initialData.profilePicture && (
-                                   <div className="mt-2">
-                                        <div className="w-full bg-gray-700 rounded-full h-2.5">
-                                             <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
-                                        </div>
-                                        <p className="text-xs text-gray-400 mt-1">Uploading image: {uploadProgress}%</p>
+                         </div>
+
+                         <div className="w-full md:w-2/3 space-y-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                   <Input
+                                        label="Full Name"
+                                        {...register("fullName")}
+                                        error={errors.fullName?.message}
+                                        placeholder="Enter full name"
+                                   />
+                                   <Input
+                                        label="Username"
+                                        {...register("username")}
+                                        error={errors.username?.message}
+                                        placeholder="Enter username"
+                                   />
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                   <Input
+                                        label="Email Address"
+                                        {...register("email")}
+                                        error={errors.email?.message}
+                                        type="email"
+                                        placeholder="name@example.com"
+                                   />
+                                   <Input
+                                        label="Website"
+                                        {...register("website")}
+                                        error={errors.website?.message}
+                                        placeholder="https://yourwebsite.com"
+                                   />
+                              </div>
+
+                              <div className="space-y-2">
+                                   <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Bio</label>
+                                   <textarea
+                                        {...register("bio")}
+                                        className="w-full bg-black border border-white/10 rounded-none p-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/30 transition-colors min-h-30 text-sm resize-y"
+                                        placeholder="Tell us about yourself..."
+                                   />
+                                   {errors.bio && <p className="text-red-500 text-xs">{errors.bio.message}</p>}
+                              </div>
+
+                              <div className="border-t border-white/10 pt-6 space-y-6">
+                                   <h3 className="text-sm font-bold text-white uppercase tracking-wider">Social Media</h3>
+                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <Input
+                                             label="Instagram"
+                                             {...register("instagram")}
+                                             error={errors.instagram?.message}
+                                             placeholder="@username"
+                                        />
+                                        <Input
+                                             label="LinkedIn"
+                                             {...register("linkedin")}
+                                             error={errors.linkedin?.message}
+                                             placeholder="LinkedIn Profile URL"
+                                        />
+                                        <Input
+                                             label="Spotify"
+                                             {...register("spotify")}
+                                             error={errors.spotify?.message}
+                                             placeholder="Spotify Profile URL"
+                                        />
+                                        <Input
+                                             label="GitHub"
+                                             {...register("github")}
+                                             error={errors.github?.message}
+                                             placeholder="GitHub Profile URL"
+                                        />
+                                        <Input
+                                             label="TikTok"
+                                             {...register("tiktok")}
+                                             error={errors.tiktok?.message}
+                                             placeholder="@username"
+                                        />
                                    </div>
-                              )}
+                              </div>
                          </div>
                     </div>
 
-                    <Input
-                         label="Bio"
-                         name="bio"
-                         value={formData.bio || ""}
-                         onChange={handleChange}
-                    />
-
-                    <Input
-                         label="Website"
-                         name="website"
-                         type="url"
-                         value={formData.website || ""}
-                         onChange={handleChange}
-                    />
-
-                    <div className="border-t border-gray-600 pt-4">
-                         <h3 className="text-lg font-medium text-gray-300 mb-3">Social Media</h3>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <Input
-                                   label="GitHub"
-                                   name="socialMedia.github"
-                                   type="url"
-                                   value={formData.socialMedia?.github || ""}
-                                   onChange={handleChange}
-                              />
-                              <Input
-                                   label="LinkedIn"
-                                   name="socialMedia.linkedin"
-                                   type="url"
-                                   value={formData.socialMedia?.linkedin || ""}
-                                   onChange={handleChange}
-                              />
-                              <Input
-                                   label="Instagram"
-                                   name="socialMedia.instagram"
-                                   type="url"
-                                   value={formData.socialMedia?.instagram || ""}
-                                   onChange={handleChange}
-                              />
-                              <Input
-                                   label="Spotify"
-                                   name="socialMedia.spotify"
-                                   type="url"
-                                   value={formData.socialMedia?.spotify || ""}
-                                   onChange={handleChange}
-                              />
-                              <Input
-                                   label="TikTok"
-                                   name="socialMedia.tiktok"
-                                   type="url"
-                                   value={formData.socialMedia?.tiktok || ""}
-                                   onChange={handleChange}
-                              />
-                              <Input
-                                   label="Email"
-                                   name="socialMedia.mail"
-                                   type="email"
-                                   value={formData.socialMedia?.mail || ""}
-                                   onChange={handleChange}
-                              />
-                         </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-4 pt-6">
+                    <div className="flex justify-end gap-4 pt-8 border-t border-white/10">
                          <Button
                               type="button"
                               variant="secondary"
@@ -223,11 +207,11 @@ export default function ProfileForm({ initialData, onCancel }: ProfileFormProps)
                          >
                               Cancel
                          </Button>
-                         <Button type="submit" disabled={isSubmitting}>
-                              {isSubmitting ? "Saving..." : "Save Changes"}
+                         <Button type="submit" disabled={isSubmitting} variant="primary">
+                              {isSubmitting ? "Saving..." : "Save Profile"}
                          </Button>
                     </div>
                </form>
-          </div>
+          </FormWrapper>
      );
 }

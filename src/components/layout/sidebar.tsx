@@ -13,8 +13,11 @@ import {
      HashtagIcon,
      ChevronDownIcon,
      ChevronUpIcon,
+     Cog6ToothIcon
 } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
+import { ASSETS } from '@/lib/assets';
+import Image from 'next/image';
 
 interface SidebarItem {
      name: string;
@@ -29,14 +32,9 @@ interface SidebarGroup {
 }
 
 const sidebarGroups: SidebarGroup[] = [
+
      {
-          label: 'Analytics',
-          items: [
-               { name: 'Overview', icon: ChartPieIcon, href: '/' },
-          ],
-     },
-     {
-          label: 'Content Management',
+          label: 'Content',
           items: [
                { name: 'Links', icon: LinkIcon, href: '/links' },
                { name: 'Categories', icon: HashtagIcon, href: '/categories' },
@@ -44,22 +42,23 @@ const sidebarGroups: SidebarGroup[] = [
           ],
      },
      {
-          label: 'Career',
+          label: 'Portfolio',
           items: [
                { name: 'Projects', icon: FolderIcon, href: '/projects' },
                { name: 'Experiences', icon: BriefcaseIcon, href: '/experiences' },
           ],
      },
      {
-          label: 'Configuration',
+          label: 'System',
           items: [
                { name: 'Subdomains', icon: GlobeAltIcon, href: '/subdomains' },
+               { name: 'Portal Config', icon: Cog6ToothIcon, href: '/profile' },
           ],
      },
 ];
 
 const externalItems: SidebarItem[] = [
-     { name: 'Go to Portal', icon: CloudIcon, href: 'https://hi.oktaa.my.id/portal', target: '_blank' },
+     { name: 'Open Portal', icon: CloudIcon, href: 'https://hi.oktaa.my.id/portal', target: '_blank' },
 ];
 
 export default function Sidebar({
@@ -86,98 +85,180 @@ export default function Sidebar({
      return (
           <>
                {/* Mobile Overlay */}
-               {isOpen && (
-                    <div
-                         className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                         onClick={onCloseSidebar}
-                    />
-               )}
+               <div
+                    className={`fixed inset-0 bg-black/80 backdrop-blur-sm z-40 transition-opacity duration-300 md:hidden ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                    onClick={onCloseSidebar}
+               />
 
-               {/* Sidebar */}
+               {/* Sidebar Container */}
                <aside
-                    className={`fixed top-0 left-0 bottom-0 z-50 bg-gray-800 text-white transition-all duration-300 md:relative min-h-screen overflow-y-auto ${isOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-16'}`}
+                    className={`
+                    fixed md:relative top-0 left-0 bottom-0 z-50 
+                    h-screen
+                    bg-black border-r border-white/10 
+                    transition-all duration-300 ease-in-out
+                    flex flex-col
+                    ${isOpen ? 'w-72 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-20'}
+               `}
                >
-                    <nav>
-                         <div className="flex items-center justify-between py-6 px-4">
-                              <Link
-                                   href="/"
-                                   className={`text-2xl font-bold ${isOpen ? '' : 'hidden md:block'}`}
-                              >
-                                   {isOpen ? 'Oktaa' : ''}
-                              </Link>
-                              {/* Close button for mobile */}
-                              {isOpen && (
-                                   <button onClick={onCloseSidebar} className="md:hidden">
-                                        <XMarkIcon className="h-6 w-6" />
-                                   </button>
-                              )}
+                    {/* Header Logo */}
+                    <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+                         <div className="flex items-center gap-3 overflow-hidden">
+                              <div className="w-8 h-8 flex items-center justify-center bg-black shrink-0">
+                                   <Image
+                                        src={ASSETS.LOGO_LIGHT}
+                                        alt="Logo"
+                                        width={30}
+                                        height={30}
+                                        className="object-contain"
+                                   />
+                              </div>
+                              <span className={`font-black text-xl tracking-tighter uppercase text-white whitespace-nowrap transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                                   OKTAA.
+                              </span>
                          </div>
 
-                         <ul className="space-y-4">
-                              {sidebarGroups.map((group, groupIndex) => {
+                         {/* Mobile Close */}
+                         <button
+                              onClick={onCloseSidebar}
+                              className="md:hidden text-zinc-500 hover:text-white transition-colors"
+                         >
+                              <XMarkIcon className="h-6 w-6" />
+                         </button>
+                    </div>
+
+                    {/* Scrollable Content */}
+                    <nav className="flex-1 overflow-y-auto overflow-x-hidden py-6 custom-scrollbar">
+                         <div className="flex flex-col gap-6">
+                              {/* Dashboard / Main - Top Level */}
+                              <div>
+                                   <Link
+                                        href="/"
+                                        className={`
+                                             relative flex items-center gap-4 px-6 py-3
+                                             text-sm transition-all duration-200
+                                             group
+                                             ${pathname === '/'
+                                                  ? 'text-white bg-white/5'
+                                                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/2'
+                                             }
+                                        `}
+                                   >
+                                        {pathname === '/' && (
+                                             <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                                        )}
+                                        <ChartPieIcon className={`h-5 w-5 shrink-0 transition-colors ${pathname === '/' ? 'text-white' : 'text-zinc-600 group-hover:text-zinc-400'}`} />
+                                        <span className={`
+                                             uppercase tracking-wider text-[11px] whitespace-nowrap transition-all duration-300
+                                             ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 absolute left-16 pointer-events-none'}
+                                             ${pathname === '/' ? 'font-bold' : 'font-medium'}
+                                        `}>
+                                             Dashboard
+                                        </span>
+
+                                        {!isOpen && (
+                                             <div className="absolute left-14 bg-zinc-900 border border-white/10 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                                  <span className="text-[10px] uppercase tracking-widest text-white whitespace-nowrap">Dashboard</span>
+                                             </div>
+                                        )}
+                                   </Link>
+                              </div>
+
+                              {sidebarGroups.map((group) => {
                                    const isGroupExpanded = isOpen ? expandedGroups[group.label] : true;
 
                                    return (
-                                        <li key={group.label}>
+                                        <div key={group.label} className="px-0">
                                              {isOpen && (
                                                   <button
                                                        onClick={() => toggleGroup(group.label)}
-                                                       className="flex items-center w-full px-4 py-2 text-xs font-semibold text-gray-400 uppercase hover:text-gray-200"
+                                                       className="w-full px-6 mb-2 flex items-center justify-between group"
                                                   >
-                                                       {group.label}
+                                                       <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600 group-hover:text-zinc-400 transition-colors">
+                                                            {group.label}
+                                                       </span>
                                                        {isGroupExpanded ? (
-                                                            <ChevronUpIcon className="ml-auto h-4 w-4" />
+                                                            <ChevronUpIcon className="h-3 w-3 text-zinc-700 group-hover:text-zinc-500" />
                                                        ) : (
-                                                            <ChevronDownIcon className="ml-auto h-4 w-4" />
+                                                            <ChevronDownIcon className="h-3 w-3 text-zinc-700 group-hover:text-zinc-500" />
                                                        )}
                                                   </button>
                                              )}
-                                             <ul className="space-y-1">
+
+                                             <div className={`flex flex-col gap-0.5 transition-all duration-300 ${isGroupExpanded ? 'opacity-100 max-h-125' : 'opacity-0 max-h-0 overflow-hidden'}`}>
                                                   {group.items.map((item) => {
                                                        const isActive = pathname === item.href;
-                                                       // Show item jika grup terbuka atau item aktif
-                                                       if (!isGroupExpanded && !isActive) {
-                                                            return null;
-                                                       }
                                                        return (
-                                                            <li key={item.name} className="px-2">
-                                                                 <Link
-                                                                      href={item.href}
-                                                                      className={`flex items-center w-full p-2 rounded-lg transition-colors ${isActive ? 'bg-gray-600 text-white' : 'hover:bg-gray-700'} ${isOpen ? 'pl-6' : ''}`}
-                                                                 >
-                                                                      <item.icon className="h-6 w-6" />
-                                                                      {isOpen && <span className="ml-3">{item.name}</span>}
-                                                                 </Link>
-                                                            </li>
+                                                            <Link
+                                                                 key={item.href}
+                                                                 href={item.href}
+                                                                 className={`
+                                                                       relative flex items-center gap-4 px-6 py-3
+                                                                       text-sm transition-all duration-200
+                                                                       group
+                                                                       ${isActive
+                                                                           ? 'text-white bg-white/5'
+                                                                           : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/2'
+                                                                      }
+                                                                  `}
+                                                            >
+                                                                 {/* Active Indicator Line */}
+                                                                 {isActive && (
+                                                                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                                                                 )}
+
+                                                                 <item.icon className={`h-5 w-5 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-zinc-600 group-hover:text-zinc-400'}`} />
+
+                                                                 <span className={`
+                                                                       uppercase tracking-wider text-[11px] whitespace-nowrap transition-all duration-300
+                                                                       ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 absolute left-16 pointer-events-none'}
+                                                                       ${isActive ? 'font-bold' : 'font-medium'}
+                                                                  `}>
+                                                                      {item.name}
+                                                                 </span>
+
+                                                                 {/* Tooltip for collapsed state */}
+                                                                 {!isOpen && (
+                                                                      <div className="absolute left-14 bg-zinc-900 border border-white/10 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                                                           <span className="text-[10px] uppercase tracking-widest text-white whitespace-nowrap">{item.name}</span>
+                                                                      </div>
+                                                                 )}
+                                                            </Link>
                                                        );
                                                   })}
-                                             </ul>
-                                             {groupIndex < sidebarGroups.length - 1 && isOpen && (
-                                                  <hr className="my-4 mx-4 border-gray-600" />
-                                             )}
-                                        </li>
+                                             </div>
+                                        </div>
                                    );
                               })}
-                              <li>
-                                   <hr className="my-7 border-gray-600" />
-                              </li>
-                              {externalItems.map((item) => {
-                                   const isActive = pathname === item.href;
-                                   return (
-                                        <li key={item.name} className="px-2">
-                                             <Link
-                                                  href={item.href}
-                                                  target={item.target}
-                                                  className={`flex items-center w-full p-2 rounded-lg transition-colors ${isActive ? 'bg-gray-600 text-white' : 'hover:bg-gray-700'}`}
-                                             >
-                                                  <item.icon className="h-6 w-6" />
-                                                  {isOpen && <span className="ml-3">{item.name}</span>}
-                                             </Link>
-                                        </li>
-                                   );
-                              })}
-                         </ul>
+                         </div>
                     </nav>
+
+                    {/* Footer / External */}
+                    <div className="p-4 border-t border-white/10 bg-black shrink-0">
+                         {externalItems.map((item) => (
+                              <Link
+                                   key={item.href}
+                                   href={item.href}
+                                   target={item.target}
+                                   className="flex items-center gap-4 px-6 py-3 text-zinc-500 hover:text-white transition-colors group relative border border-white/5 hover:border-white/20 bg-zinc-900/50"
+                              >
+                                   <item.icon className="h-4 w-4 shrink-0" />
+                                   <span className={`
+                                        uppercase tracking-wider text-[10px] font-bold whitespace-nowrap transition-all duration-300
+                                        ${isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}
+                                   `}>
+                                        {item.name}
+                                   </span>
+                                   {isOpen && <span className="text-[10px] ml-auto opacity-50">↗</span>}
+
+                                   {!isOpen && (
+                                        <div className="absolute left-14 bg-zinc-900 border border-white/10 px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                             <span className="text-[10px] uppercase tracking-widest text-white whitespace-nowrap">{item.name}</span>
+                                        </div>
+                                   )}
+                              </Link>
+                         ))}
+                    </div>
                </aside>
           </>
      );

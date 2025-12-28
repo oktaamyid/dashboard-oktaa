@@ -143,7 +143,7 @@ export default function LinkTable({ links, onEdit, onDelete, isLoading = false }
      };
 
      return (
-          <div className="mt-6">
+          <div className="my-6 mx-4">
                <Input
                     type="text"
                     placeholder="Type to search..."

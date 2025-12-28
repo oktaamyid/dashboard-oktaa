@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ProfileForm from "@/components/features/profile/profileForm";
-import { getProfile } from "@/lib/service";
+import { getProfile, updateProfile } from "@/lib/service";
 import { Profile } from '@/app/types';
 
 export default function EditProfilePage() {
@@ -15,7 +15,7 @@ export default function EditProfilePage() {
                     const profileData = await getProfile();
                     setProfile(profileData);
                } catch (error) {
-                    console.error("Failed to fetch profile:", error);
+                    console.error("Failed to fetch portal config:", error);
                } finally {
                     setLoading(false);
                }
@@ -24,27 +24,49 @@ export default function EditProfilePage() {
           fetchProfile();
      }, []);
 
+     const handleSubmit = async (updatedProfile: Profile) => {
+          await updateProfile(updatedProfile);
+          setProfile(updatedProfile);
+     };
+
      if (loading) {
           return (
-               <div className="flex items-center justify-center h-64">
+               <div className="space-y-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Portal Configuration</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Loading Settings...</p>
+                    </div>
                </div>
           );
      }
 
      if (!profile) {
           return (
-               <div className="text-center py-10">
-                    <p>Profile data not found</p>
+               <div className="space-y-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Portal Configuration</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Error Loading Data</p>
+                    </div>
                </div>
           );
      }
 
      return (
-          <div className="mx-auto">
-               <ProfileForm
-                    initialData={profile}
-                    onCancel={() => window.history.back()}
-               />
+          <div className="space-y-6">
+               <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Portal Configuration</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">System-wide Settings & Preferences</p>
+                    </div>
+               </div>
+
+               <div className="bg-black border border-white/10 p-6">
+                    <ProfileForm
+                         initialData={profile}
+                         onSubmit={handleSubmit}
+                         onCancel={() => window.history.back()}
+                    />
+               </div>
           </div>
      );
 }

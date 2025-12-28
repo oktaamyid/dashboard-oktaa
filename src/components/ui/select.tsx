@@ -15,31 +15,30 @@ export default function Select({
      ...props
 }: SelectProps) {
      return (
-          <div className="flex flex-col space-y-1">
+          <div className="form-control w-full">
                {label && (
-                    <label className="text-gray-300 text-sm font-semibold mb-1">
-                         {label}
-                    </label>
+                    <div className="label pb-1">
+                         <span className="label-text text-zinc-500 font-bold uppercase tracking-widest text-[10px]">{label}</span>
+                    </div>
                )}
                <select
-                    className={`bg-gray-700 text-gray-300 p-2 rounded-lg border ${error ? "border-red-500" : "border-gray-500"
-                         } shadow-md focus:ring-2 focus:ring-gray-400 focus:outline-none transition-all duration-300 ${className
-                         }`}
+                    className={`select select-bordered rounded-none bg-black text-white border-white/20 focus:border-white focus:outline-none transition-all duration-300 w-full ${className} ${error ? "select-error" : ""}`}
                     {...props}
                >
                     {options.map((option) => (
                          <option
                               key={option.value}
                               value={option.value}
-                              className="bg-gray-800 hover:bg-gray-600" 
+                              className="bg-black text-white"
                          >
                               {option.label}
                          </option>
                     ))}
                </select>
-               {/* Error Output */}
                {error && (
-                    <p className="text-red-400 text-xs mt-1">{error}</p>
+                    <div className="label pt-1">
+                         <span className="label-text-alt text-error">{error}</span>
+                    </div>
                )}
           </div>
      );

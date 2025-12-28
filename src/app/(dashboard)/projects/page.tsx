@@ -70,41 +70,54 @@ export default function ProjectsPage() {
 
      if (loading) {
           return (
-               <div className="p-6 min-h-screen">
-                    <h1 className="text-2xl font-bold text-white mb-6">Manage Projects</h1>
-                    <Skeleton height={40} width="50%" className="mb-4" />
+               <div className="space-y-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Projects</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Loading data...</p>
+                    </div>
+                    <Skeleton height={40} className="mb-4" />
                     <Skeleton count={5} height={60} className="mb-2" />
                </div>
           );
      }
 
      return (
-          <div>
-               <h1 className="text-2xl font-bold text-white mb-6">Manage Projects</h1>
-               {!showForm && (
-                    <div className="mb-6">
+          <div className="space-y-6">
+               <div className="flex justify-between items-end border-b border-white/10 pb-6">
+                    <div className="space-y-1">
+                         <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Projects</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">Manage Portfolio Items</p>
+                    </div>
+                    {!showForm && (
                          <Button
                               onClick={() => setShowForm(true)}
-                              className="bg-blue-600 text-white hover:bg-blue-700"
+                              variant="primary"
+                              size="sm"
                          >
-                              Add New Project
+                              New Project
                          </Button>
+                    )}
+               </div>
+
+               {showForm && (
+                    <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
+                         <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">{editingProject ? 'Edit Project' : 'Add New Project'}</h3>
+                         <ProjectForm
+                              initialData={editingProject || undefined}
+                              onSubmit={handleSubmit}
+                              onCancel={handleCancel}
+                         />
                     </div>
                )}
 
-               {showForm && (
-                    <ProjectForm
-                         initialData={editingProject || undefined}
-                         onSubmit={handleSubmit}
-                         onCancel={handleCancel}
+               <div className="border border-white/10 rounded-none overflow-hidden">
+                    <ProjectTable
+                         projects={projects}
+                         onEdit={handleEdit}
+                         onDelete={handleDelete}
+                         isLoading={loading}
                     />
-               )}
-               <ProjectTable
-                    projects={projects}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    isLoading={loading}
-               />
+               </div>
           </div>
      );
 }

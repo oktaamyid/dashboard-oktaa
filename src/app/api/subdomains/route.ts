@@ -1,4 +1,3 @@
-// app/api/subdomains/route.ts
 import { NextResponse } from "next/server";
 import { CloudflareResponse, DnsRecord } from '@/app/types';
 
@@ -17,9 +16,10 @@ export async function GET() {
       }
 
       const filtered = json.result
-            .filter((r): r is (typeof json.result[0] & { type: "A" | "CNAME" }) => 
+            .filter((r): r is (typeof json.result[0] & { type: "A" | "CNAME" }) =>
                   r.type === "A" || r.type === "CNAME")
             .map((r): DnsRecord => ({
+                  id: r.id,
                   name: r.name,
                   type: r.type,
                   content: r.content,

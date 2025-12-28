@@ -1,7 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import Alert from './alert';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import {
+     CheckCircleIcon,
+     ExclamationCircleIcon,
+     ExclamationTriangleIcon,
+     InformationCircleIcon,
+     XMarkIcon
+} from "@heroicons/react/24/solid";
 
 interface Toast {
      id: string;
@@ -89,24 +95,57 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 const ToastContainer: React.FC<{ toasts: Toast[]; removeToast: (id: string) => void }> = ({ toasts, removeToast }) => {
      return (
-          <>
-               {toasts.map((toast, index) => (
-                    <Alert
-                         key={toast.id}
-                         variant={toast.variant}
-                         floating
-                         position="top-right"
-                         autoClose={toast.autoClose}
-                         autoCloseDuration={toast.duration}
-                         onClose={() => removeToast(toast.id)}
-                         showCloseButton
-                         className={`mb-2`}
-                         style={{ top: `${1 + index * 5.5}rem` }}
-                    >
-                         {toast.message}
-                    </Alert>
+          <div className="toast toast-top toast-end z-50 p-4 gap-2">
+               {toasts.map((toast) => (
+                    <ToastItem key={toast.id} toast={toast} removeToast={removeToast} />
                ))}
-          </>
+          </div>
+     );
+};
+
+const ToastItem: React.FC<{ toast: Toast; removeToast: (id: string) => void }> = ({ toast, removeToast }) => {
+     useEffect(() => {
+          if (toast.autoClose) {
+               const timer = setTimeout(() => {
+                    removeToast(toast.id);
+               }, toast.duration || 5000);
+
+               return () => clearTimeout(timer);
+          }
+     }, [toast, removeToast]);
+
+     const variantClasses = {
+          success: "alert-success bg-black border border-green-500 text-green-500",
+          error: "alert-error bg-black border border-red-500 text-red-500",
+          warning: "alert-warning bg-black border border-yellow-500 text-yellow-500",
+          info: "alert-info bg-black border border-blue-500 text-blue-500",
+          dark: "alert-neutral bg-black border border-white/20 text-white"
+     };
+
+     const defaultIcons = {
+          success: CheckCircleIcon,
+          error: ExclamationCircleIcon,
+          warning: ExclamationTriangleIcon,
+          info: InformationCircleIcon,
+          dark: InformationCircleIcon
+     };
+
+     const Icon = defaultIcons[toast.variant];
+
+     return (
+          <div
+               role="alert"
+               className={`alert rounded-none shadow-lg ${variantClasses[toast.variant]} w-full max-w-xs animate-in slide-in-from-right fade-in`}
+          >
+               <Icon className="h-6 w-6 stroke-current shrink-0" />
+               <span className="text-xs uppercase font-bold tracking-wider">{toast.message}</span>
+               <button
+                    onClick={() => removeToast(toast.id)}
+                    className="btn btn-sm btn-ghost btn-square rounded-none hover:bg-white/10"
+               >
+                    <XMarkIcon className="h-4 w-4" />
+               </button>
+          </div>
      );
 };
 
