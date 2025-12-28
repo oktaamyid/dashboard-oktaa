@@ -1,17 +1,23 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: black --default;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Sharp Editorial Aesthetic - Remove Rounded Corners */
+  --rounded-box: 0rem;
+  --rounded-btn: 0rem;
+  --rounded-badge: 0rem;
+  --animation-btn: 0s;
+  --animation-input: 0s;
+
+  /* Map standard Next.js vars to DaisyUI colors for safety */
+  --background: var(--color-base-100);
+  --foreground: var(--color-base-content);
 }
 
 body {
   color: var(--foreground);
+  background: var(--background);
 }
