@@ -15,25 +15,18 @@ export async function POST(request: Request) {
      try {
           const { url } = await request.json();
           if (!url) {
-               console.error('No URL provided for deletion');
                return NextResponse.json({ error: 'No URL provided' }, { status: 400 });
           }
 
           const key = url.split('/').pop();
           if (!key) {
-               console.error('Invalid URL format:', url);
                return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
           }
 
-          console.log(`Deleting file: ${key}`);
-
-          const command = new DeleteObjectCommand({
+          await r2Client.send(new DeleteObjectCommand({
                Bucket: process.env.CLOUDFLARE_BUCKET_NAME,
                Key: key,
-          });
-
-          await r2Client.send(command);
-          console.log(`Successfully deleted file: ${key}`);
+          }));
 
           return NextResponse.json({ message: 'Image deleted successfully' }, { status: 200 });
      } catch (error) {

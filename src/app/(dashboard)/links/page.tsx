@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import LinkTable from "@/components/features/links/linkTable";
 import LinkForm from "@/components/features/links/linkForm";
 import { createLink, updateLink, deleteLink } from "@/lib/service";
@@ -20,10 +20,11 @@ export default function LinksPage() {
      const [isFormVisible, setFormVisible] = useState(false);
      const [loading, setLoading] = useState(true);
      const [analyticsView, setAnalyticsView] = useState(true);
-     const [analyticsData, setAnalyticsData] = useState<AnalyticsSummary | null>(null);
 
-     // Calculate analytics data
-     const calculateAnalytics = (links: Link[]): AnalyticsSummary => {
+     // Calculate analytics data derived from links
+     const analyticsData = useMemo<AnalyticsSummary | null>(() => {
+          if (links.length === 0 && !loading) return null;
+
           const totalClicks = links.reduce((sum, link) => sum + (link.clicks || 0), 0);
           const averageClicks = links.length > 0 ? totalClicks / links.length : 0;
 
@@ -108,7 +109,7 @@ export default function LinksPage() {
                geoDistribution,
                browserDistribution
           };
-     };
+     }, [links, loading]);
 
      const handleCreateOrUpdate = async (linkData: Omit<Link, "id">) => {
           try {
@@ -117,13 +118,11 @@ export default function LinksPage() {
                     await updateLink(editingLink.id, linkData);
                     const updatedLinks = links.map((link) => (link.id === editingLink.id ? { ...link, ...linkData } : link));
                     setLinks(updatedLinks);
-                    setAnalyticsData(calculateAnalytics(updatedLinks));
                } else {
                     // Create jika tidak dalam mode edit
                     const newLink = await createLink(linkData);
                     const updatedLinks = [...links, { id: newLink.id, ...linkData }];
                     setLinks(updatedLinks);
-                    setAnalyticsData(calculateAnalytics(updatedLinks));
                }
 
                setEditingLink(null);
@@ -139,7 +138,6 @@ export default function LinksPage() {
                await deleteLink(id);
                const updatedLinks = links.filter((link) => link.id !== id);
                setLinks(updatedLinks);
-               setAnalyticsData(calculateAnalytics(updatedLinks));
           } catch (error) {
                showError('Failed to delete link');
                console.error(error);
@@ -163,7 +161,6 @@ export default function LinksPage() {
                     const { getLinks } = await import("@/lib/service");
                     const linksData = await getLinks();
                     setLinks(linksData);
-                    setAnalyticsData(calculateAnalytics(linksData));
                } catch (error) {
                     console.error("Error fetching links: ", error);
                } finally {

@@ -6,7 +6,7 @@ export async function GET() {
             headers: {
                   Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
             },
-            cache: "no-store",
+            next: { revalidate: 60 }, // Cache for 1 minute to avoid hitting rate limits
       });
 
       const json = await res.json() as CloudflareResponse;

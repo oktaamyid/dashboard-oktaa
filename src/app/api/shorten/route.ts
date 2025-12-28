@@ -8,10 +8,7 @@ export async function POST(req: Request) {
                return NextResponse.json({ error: "Missing originalUrl or shortUrl" }, { status: 400 });
           }
 
-          const isExists = await checkShortUrlExists(shortUrl);
-          if (isExists) {
-               return NextResponse.json({ error: "Short URL is already taken" }, { status: 400 });
-          }
+
 
           const newLink = await createLink({ originalUrl, shortUrl, showConfirmationPage, confirmationPageSettings });
 

@@ -175,21 +175,30 @@ export const resetLinkAnalytics = async (): Promise<void> => {
      try {
           const linksCollection = collection(db, "links");
           const querySnapshot = await getDocs(linksCollection);
-          const batch = writeBatch(db);
 
-          querySnapshot.docs.forEach((docSnapshot) => {
-               const linkRef = doc(db, "links", docSnapshot.id);
-               batch.update(linkRef, {
-                    clicks: 0,
-                    deviceStats: { desktop: 0, mobile: 0, tablet: 0 },
-                    browserStats: {},
-                    geoStats: {},
-                    refererStats: {}
+          const BATCH_SIZE = 500;
+          const chunks = [];
+
+          for (let i = 0; i < querySnapshot.docs.length; i += BATCH_SIZE) {
+               chunks.push(querySnapshot.docs.slice(i, i + BATCH_SIZE));
+          }
+
+          for (const chunk of chunks) {
+               const batch = writeBatch(db);
+               chunk.forEach((docSnapshot) => {
+                    const linkRef = doc(db, "links", docSnapshot.id);
+                    batch.update(linkRef, {
+                         clicks: 0,
+                         deviceStats: { desktop: 0, mobile: 0, tablet: 0 },
+                         browserStats: {},
+                         geoStats: {},
+                         refererStats: {}
+                    });
                });
-          });
+               await batch.commit();
+          }
 
-          await batch.commit();
-          console.log("Successfully reset analytics for all links.");
+          console.log(`Successfully reset analytics for ${querySnapshot.size} links.`);
      } catch (error) {
           console.error("Error resetting link analytics: ", error);
           throw new Error("Failed to reset link analytics");

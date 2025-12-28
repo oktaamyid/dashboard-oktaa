@@ -23,7 +23,6 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
           }
 
           const data = await res.json();
-          console.log('Uploaded image URL:', data.url);
           return data;
      } catch (error) {
           console.error('Upload service error:', error);
@@ -49,8 +48,6 @@ export async function deleteImage(url: string): Promise<void> {
                console.error('Delete API error:', error);
                throw new Error('Failed to delete image from Cloudflare R2');
           }
-
-          console.log('Deleted image:', url);
      } catch (error) {
           console.error('Delete service error:', error);
           throw error;
