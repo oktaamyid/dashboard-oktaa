@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Experience } from "@/app/types";
@@ -8,6 +9,7 @@ import Button from "@/components/ui/button";
 import FormWrapper from "@/components/ui/form-wrapper";
 import { useToast } from "@/components/ui/toast";
 import { experienceSchema, ExperienceFormData } from "@/lib/schemas";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface ExperienceFormProps {
      initialData?: Experience;
@@ -17,10 +19,13 @@ interface ExperienceFormProps {
 
 export default function ExperienceForm({ initialData, onSubmit, onCancel }: ExperienceFormProps) {
      const { showSuccess, showError } = useToast();
+     const [techInput, setTechInput] = useState("");
 
      const {
           register,
           handleSubmit,
+          setValue,
+          watch,
           formState: { errors, isSubmitting },
      } = useForm<ExperienceFormData>({
           resolver: zodResolver(experienceSchema),
@@ -35,6 +40,23 @@ export default function ExperienceForm({ initialData, onSubmit, onCancel }: Expe
                techStack: initialData?.techStack || [],
           },
      });
+
+     const techStack = watch("techStack") || [];
+
+     const addTechStack = (e: React.KeyboardEvent) => {
+          if (e.key === "Enter" || e.key === ",") {
+               e.preventDefault();
+               const newTech = techInput.trim();
+               if (newTech && !techStack.includes(newTech)) {
+                    setValue("techStack", [...techStack, newTech], { shouldValidate: true });
+                    setTechInput("");
+               }
+          }
+     };
+
+     const removeTechStack = (tech: string) => {
+          setValue("techStack", techStack.filter((t) => t !== tech), { shouldValidate: true });
+     };
 
      const onFormSubmit = async (data: ExperienceFormData) => {
           try {
@@ -102,6 +124,34 @@ export default function ExperienceForm({ initialData, onSubmit, onCancel }: Expe
                                    error={errors.description_id?.message}
                                    placeholder="Deskripsikan dampak dan tanggung jawab anda..."
                               />
+
+                              <div>
+                                   <Input
+                                        label="Tech Stack (Press Enter)"
+                                        value={techInput}
+                                        onChange={(e) => setTechInput(e.target.value)}
+                                        onKeyDown={addTechStack}
+                                        placeholder="Type and press Enter..."
+                                        error={errors.techStack?.message}
+                                   />
+                                   <div className="mt-3 flex flex-wrap gap-2">
+                                        {techStack.map((tech) => (
+                                             <span
+                                                  key={tech}
+                                                  className="inline-flex items-center px-3 py-1 bg-white/5 border border-white/10 text-white text-[10px] uppercase font-bold tracking-wider group"
+                                             >
+                                                  {tech}
+                                                  <button
+                                                       type="button"
+                                                       onClick={() => removeTechStack(tech)}
+                                                       className="ml-2 text-zinc-500 group-hover:text-red-500 transition-colors"
+                                                  >
+                                                       <XMarkIcon className="w-3 h-3" />
+                                                  </button>
+                                             </span>
+                                        ))}
+                                   </div>
+                              </div>
                          </div>
                     </div>
 

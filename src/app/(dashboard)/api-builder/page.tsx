@@ -90,7 +90,6 @@ export default function ApiBuilderPage() {
 
                {showForm && (
                     <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
-                         <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">{editingEndpoint ? 'Edit Endpoint' : 'Create New Endpoint'}</h3>
                          <ApiBuilderForm
                               initialData={editingEndpoint || undefined}
                               onSubmit={handleFormSubmit}

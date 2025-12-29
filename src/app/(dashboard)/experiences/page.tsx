@@ -104,7 +104,6 @@ export default function Experiences() {
 
                {showForm && (
                     <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
-                         <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">{editingExperience ? 'Edit Experience' : 'Add New Experience'}</h3>
                          <ExperienceForm
                               initialData={editingExperience || undefined}
                               onSubmit={handleSubmit}

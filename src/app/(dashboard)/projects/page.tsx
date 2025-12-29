@@ -101,7 +101,6 @@ export default function ProjectsPage() {
 
                {showForm && (
                     <div className="bg-black border border-white/10 p-6 animate-in fade-in slide-in-from-top-4">
-                         <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">{editingProject ? 'Edit Project' : 'Add New Project'}</h3>
                          <ProjectForm
                               initialData={editingProject || undefined}
                               onSubmit={handleSubmit}
