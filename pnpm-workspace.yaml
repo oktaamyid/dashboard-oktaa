@@ -1,5 +1,20 @@
+allowBuilds:
+  '@firebase/util': false
+  protobufjs: false
+  sharp: false
+  unrs-resolver: false
 ignoredBuiltDependencies:
   - '@firebase/util'
   - protobufjs
   - sharp
   - unrs-resolver
+overrides:
+  'brace-expansion@>=5.0.0': '>=5.0.9'
+  'browserslist': '>=4.28.7'
+  'ip-address': '>=10.3.1'
+  'fast-xml-parser@>=4.0.0-beta.0 <4.5.4': '>=4.5.4'
+  '@grpc/grpc-js@>=1.14.0 <1.14.4': '>=1.14.4'
+  'form-data@<2.5.6': '>=2.5.6'
+  '@tootallnate/once@<2.0.1': '>=2.0.1'
+  'node-forge': '>=1.4.0'
+  'uuid': '>=11.1.1'

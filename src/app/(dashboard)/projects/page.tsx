@@ -8,6 +8,7 @@ import { Project } from '@/app/types';
 import Button from '@/components/ui/button';
 import { getProjects, createProject, updateProject, deleteProject } from '@/lib/service';
 import { useToast } from '@/components/ui/toast';
+import DownloadPortfolioButton from '@/components/pdf/DownloadPortfolioButton';
 
 export default function ProjectsPage() {
      const { showSuccess, showError } = useToast();
@@ -88,15 +89,18 @@ export default function ProjectsPage() {
                          <h1 className="text-3xl font-black text-white uppercase tracking-tighter">Projects</h1>
                          <p className="text-zinc-500 text-xs uppercase tracking-widest">Manage Portfolio Items</p>
                     </div>
-                    {!showForm && (
-                         <Button
-                              onClick={() => setShowForm(true)}
-                              variant="primary"
-                              size="sm"
-                         >
-                              New Project
-                         </Button>
-                    )}
+                    <div className="flex items-center gap-3">
+                         <DownloadPortfolioButton projects={projects} />
+                         {!showForm && (
+                              <Button
+                                   onClick={() => setShowForm(true)}
+                                   variant="primary"
+                                   size="sm"
+                              >
+                                   New Project
+                              </Button>
+                         )}
+                    </div>
                </div>
 
                {showForm && (

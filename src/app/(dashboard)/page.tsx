@@ -9,6 +9,7 @@ import Input from '@/components/ui/input';
 import { LinkIcon, FolderIcon, BriefcaseIcon, GlobeAltIcon } from '@heroicons/react/24/solid';
 import AnimatedStatsCard from '@/components/ui/animatedStatsCard';
 import { formatArrayCell } from "@/lib/utils/formatArray";
+import DownloadPortfolioButton from "@/components/pdf/DownloadPortfolioButton";
 
 export default function Overview() {
      const [selectedTable, setSelectedTable] = useState<"Projects" | "Links" | "Experiences" | "Subdomains">("Projects");
@@ -140,9 +141,14 @@ export default function Overview() {
 
      return (
           <div className="space-y-8">
-               <div className="flex flex-col gap-1">
-                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Overview</h1>
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest">System Status & Analytics</p>
+               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div className="flex flex-col gap-1">
+                         <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Overview</h1>
+                         <p className="text-zinc-500 text-xs uppercase tracking-widest">System Status & Analytics</p>
+                    </div>
+                    <div>
+                         <DownloadPortfolioButton projects={projects} />
+                    </div>
                </div>
 
                {/* Card Statistics */}
