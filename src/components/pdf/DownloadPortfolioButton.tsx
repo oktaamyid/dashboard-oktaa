@@ -42,6 +42,7 @@ export default function DownloadPortfolioButton({
     }
   }, [initialProjects]);
 
+  const sortedProjects = useMemo(() => sortProjectsByLatest(projects), [projects]);
   const sizeClass = size === 'sm' ? 'px-3 py-1.5 text-[10px] h-8' : 'px-4 py-2 text-xs h-10';
 
   if (!mounted || loading) {
@@ -55,8 +56,6 @@ export default function DownloadPortfolioButton({
       </button>
     );
   }
-
-  const sortedProjects = useMemo(() => sortProjectsByLatest(projects), [projects]);
 
   return (
     <PDFDownloadLink
