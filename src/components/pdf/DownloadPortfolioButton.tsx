@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { PortfolioPDF } from './PortfolioPDF';
+import { PortfolioPDF, sortProjectsByLatest } from './PortfolioPDF';
 import { Project } from '@/app/types';
 import { getProjects } from '@/lib/service';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/solid';
@@ -56,9 +56,11 @@ export default function DownloadPortfolioButton({
     );
   }
 
+  const sortedProjects = useMemo(() => sortProjectsByLatest(projects), [projects]);
+
   return (
     <PDFDownloadLink
-      document={<PortfolioPDF projects={projects} />}
+      document={<PortfolioPDF projects={sortedProjects} />}
       fileName="Firtiansyah_Okta_Portfolio.pdf"
       className={`btn btn-outline rounded-none font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black border-white/30 transition-all duration-300 flex items-center gap-2 ${sizeClass} ${className}`}
     >
